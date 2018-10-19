@@ -9,7 +9,6 @@ import com.klinker.android.twitter_l.data.roomdb.Hashtag;
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
@@ -25,12 +24,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 
-public class HashtagDaoTest {
+public class HashtagDaoTest extends DaoTest {
 
     private TalonDatabase testDatabase = null;
     private static final int initDatabaseSize = 100;
 
     @Before
+    @Override
     public void initDatabase() {
         RoomDatabase.Callback callback = new RoomDatabase.Callback() {
             @Override
@@ -58,7 +58,7 @@ public class HashtagDaoTest {
 
         testDatabase.hashtagDao().trimDatabase(databaseLimit);
         Cursor cursor = testDatabase.query("SELECT * FROM hashtags;", null);
-        assertThat("Database is not being trimmed properly", cursor.getCount(), is(equalTo(databaseLimit)));
+        assertThat("Database is not being trimmed properly", cursor.getCount(), is(databaseLimit));
     }
 
 
@@ -68,7 +68,7 @@ public class HashtagDaoTest {
 
         testDatabase.hashtagDao().trimDatabase(databaseLimit);
         Cursor cursor = testDatabase.query("SELECT * FROM hashtags;", null);
-        assertThat("Trim database incorrectly trims database", cursor.getCount(), is(equalTo(initDatabaseSize)));
+        assertThat("Trim database incorrectly trims database", cursor.getCount(), is(initDatabaseSize));
     }
 
 
@@ -80,7 +80,7 @@ public class HashtagDaoTest {
         Assert.assertTrue(cursor.moveToFirst());
 
         String name = cursor.getString(0);
-        assertThat("Hashtag wasn't inserted properly", name, is(equalTo("#wired25")));
+        assertThat("Hashtag wasn't inserted properly", name, is("#wired25"));
 
     }
 
@@ -94,13 +94,20 @@ public class HashtagDaoTest {
         Assert.fail("Unimplemented test");
     }
 
-
-
+    @Test
+    public void hashtagTableRejectsDuplicates() {
+        Hashtag hashtag = new Hashtag("#tag3");
+        testDatabase.hashtagDao().insertTag(hashtag);
+        Cursor cursor = testDatabase.query("SELECT name FROM hashtags WHERE name = ?", new String[] {"#tag3"});
+        assertThat("Database incorrectly allows duplicate names", cursor.getCount(), is(1));
+    }
 
 
     @After
+    @Override
     public void closeDatabase() {
         testDatabase.close();
+        testDatabase = null;
     }
 
 }

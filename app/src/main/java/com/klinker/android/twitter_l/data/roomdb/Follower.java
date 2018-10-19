@@ -7,9 +7,10 @@ import java.util.List;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "followers")
+@Entity(tableName = "followers", indices = { @Index(value = {"user_id", "account"}, unique = true)})
 public class Follower {
 
     @PrimaryKey(autoGenerate = true)

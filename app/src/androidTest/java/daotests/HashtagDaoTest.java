@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 
-import com.klinker.android.twitter_l.data.roomdb.Hashtag;
+import com.klinker.android.twitter_l.data.roomdb.entities.Hashtag;
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 
 import static org.hamcrest.Matchers.is;

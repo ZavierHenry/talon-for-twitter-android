@@ -1,11 +1,17 @@
+package daotests;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.google.gson.internal.bind.SqlDateTypeAdapter;
+
 import com.klinker.android.twitter_l.data.roomdb.Hashtag;
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 import org.junit.After;
 import org.junit.Assert;
@@ -52,7 +58,7 @@ public class HashtagDaoTest {
 
         testDatabase.hashtagDao().trimDatabase(databaseLimit);
         Cursor cursor = testDatabase.query("SELECT * FROM hashtags;", null);
-        Assert.assertEquals(databaseLimit, cursor.getCount());
+        assertThat("Database is not being trimmed properly", cursor.getCount(), is(equalTo(databaseLimit)));
     }
 
 
@@ -62,8 +68,7 @@ public class HashtagDaoTest {
 
         testDatabase.hashtagDao().trimDatabase(databaseLimit);
         Cursor cursor = testDatabase.query("SELECT * FROM hashtags;", null);
-        Assert.assertEquals(initDatabaseSize, cursor.getCount());
-
+        assertThat("Trim database incorrectly trims database", cursor.getCount(), is(equalTo(initDatabaseSize)));
     }
 
 
@@ -75,19 +80,21 @@ public class HashtagDaoTest {
         Assert.assertTrue(cursor.moveToFirst());
 
         String name = cursor.getString(0);
-        Assert.assertEquals("#wired25", name);
+        assertThat("Hashtag wasn't inserted properly", name, is(equalTo("#wired25")));
 
     }
 
     @Test
     public void getHashtagCursor() {
-
+        Assert.fail("Unimplemented test");
     }
 
     @Test
     public void getHashtagList() {
-
+        Assert.fail("Unimplemented test");
     }
+
+
 
 
 

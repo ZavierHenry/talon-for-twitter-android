@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.telecom.Call;
 
 import com.klinker.android.twitter_l.data.roomdb.daos.ActivityDao;
 import com.klinker.android.twitter_l.data.roomdb.daos.DirectMessageDao;
@@ -41,12 +42,24 @@ import com.klinker.android.twitter_l.data.roomdb.entities.ScheduledTweet;
 import com.klinker.android.twitter_l.data.roomdb.entities.Tweet;
 import com.klinker.android.twitter_l.data.roomdb.entities.User;
 import com.klinker.android.twitter_l.data.roomdb.entities.UserTweet;
+import com.klinker.android.twitter_l.data.sq_lite.ActivitySQLiteHelper;
 import com.klinker.android.twitter_l.data.sq_lite.DMSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.EmojiSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.FavoriteTweetsSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.FavoriteUserNotificationSQLiteHelper;
 import com.klinker.android.twitter_l.data.sq_lite.FavoriteUsersSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.FollowersSQLiteHelper;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.HomeSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.InteractionsSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.ListSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.MentionsSQLiteHelper;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.SavedTweetSQLiteHelper;
+import com.klinker.android.twitter_l.data.sq_lite.UserTweetsSQLiteHelper;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicLong;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -103,254 +116,293 @@ public abstract class TalonDatabase extends RoomDatabase {
     public static TalonDatabase getInstance(Context context) {
 
         if (dbInstance == null) {
-            dbInstance = Room.databaseBuilder(context.getApplicationContext(), TalonDatabase.class, "talondb" )
-                    .addCallback(transferOldDatabaseData(context))
+            AtomicLong userId = new AtomicLong(-2L);
+
+
+            dbInstance = Room.databaseBuilder(context.getApplicationContext(), TalonDatabase.class, "talondata.db" )
+                    .addCallback(transferActivityData(context, userId))
+                    .addCallback(transferDirectMessageData(context, userId))
+                    .addCallback(transferEmojiData(context))
+                    .addCallback(transferFavoriteTweetsData(context))
+                    .addCallback(transferFavoriteUserNotificationsData(context))
+                    .addCallback(transferFavoriteUsersData(context, userId))
+                    .addCallback(transferFollowersData(context, userId))
+                    .addCallback(transferHashtagData(context))
+                    .addCallback(transferHomeTweetsData(context, userId))
+                    .addCallback(transferInteractionsData(context))
+                    .addCallback(transferListData(context))
+                    .addCallback(transferMentionsData(context))
+                    .addCallback(transferQueuedData(context))
+                    .addCallback(transferSavedTweetsData(context))
+                    .addCallback(transferUserTweetsData(context))
                     .build();
+
+            //delete old databases if necessary
+
         }
 
         return dbInstance;
 
     }
 
+    //delete databases
 
-    private static Callback transferOldDatabaseData(Context context) {
+    private abstract static class TransferCallback extends Callback {
 
-        return new Callback() {
-            @Override
-            public void onCreate(@NonNull SupportSQLiteDatabase db) {
-                super.onCreate(db);
+        private String tableName;
+        private String relativePath;
+        private Context context;
 
-                handleActivityTransfer(context, db);
-                handleDirectMessagesTransfer(context, db);
-                handleEmojiTransfer(context, db);
-                handleFavoriteTweetsTransfer(context, db);
-                handleFavoriteUserNotificationsTransfer(context, db);
-                handleFavoriteUserTransfer(context, db);
-                handleFollowersTransfer(context, db);
-                handleHashtagsTransfer(context, db);
-                handleHomeTweetsTransfer(context, db);
-                handleInteractionsTransfer(context, db);
-                handleListTransfer(context, db);
-                handleMentionsTransfer(context, db);
-                handleQueuedTransfer(context, db);
-                handleSavedTweetsTransfer(context, db);
-                handleUserTweetsTransfer(context, db);
+        abstract void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor);
 
-                //delete databases
-            }
+        public TransferCallback(Context context, String relativePath, String tableName) {
+            this.context = context;
+            this.relativePath = relativePath;
+            this.tableName = tableName;
+        }
 
-            private long userId = -2;
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+            try (
+                    SQLiteDatabase source = getDatabase(context, relativePath);
+                    Cursor cursor = getDatabaseTable(source, tableName)
+            ) {
 
-            private SQLiteDatabase getDatabase(Context context, String relativeDbFilename) {
-                File dbPath = context.getDatabasePath(relativeDbFilename);
-                try {
-                    return SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
-                } catch (Exception ignored) {
-                    return null;
+                if (cursor != null && cursor.moveToFirst()) {
+                    readDatabaseRow(db, cursor);
                 }
             }
+        }
 
-            private Cursor getDatabaseTable(SQLiteDatabase db, String tableName) {
-                if (db == null) {
-                    return null;
-                } else {
-                    return db.query(tableName, null, null, null, null, null, null);
-                }
+        private SQLiteDatabase getDatabase(Context context, String relativePath) {
+            if (context == null) {
+                return null;
             }
 
-            private void handleActivityTransfer(Context context, SupportSQLiteDatabase db) {
-
+            File dbPath = context.getDatabasePath(relativePath);
+            if (!dbPath.exists()) {
+                return null;
             }
 
-            private void handleEmojiTransfer(Context context, SupportSQLiteDatabase db) {
+            try {
+                return SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
+            } catch (Exception e) {
+                return null;
+            }
+        }
 
+        private Cursor getDatabaseTable(SQLiteDatabase db, String tableName) {
+
+            if (db == null) {
+                return null;
             }
 
-
-            private void handleFavoriteUserNotificationsTransfer(Context context, SupportSQLiteDatabase db) {
-
+            try {
+                return db.query(tableName, null, null, null, null, null, null);
+            } catch (Exception e) {
+                return null;
             }
 
-            private void handleFollowersTransfer(Context context, SupportSQLiteDatabase db) {
+        }
 
-            }
-
-
-            private void handleHashtagsTransfer(Context context, SupportSQLiteDatabase db) {
-
-                try (
-                        SQLiteDatabase hashtagsDb = getDatabase(context, "hashtags.db");
-                        Cursor cursor = getDatabaseTable(hashtagsDb, HashtagSQLiteHelper.TABLE_HASHTAGS)
-                ) {
-
-                    if (hashtagsDb != null && cursor != null && cursor.moveToFirst()) {
-                        ContentValues contentValues = new ContentValues();
-
-                        do {
-
-                            String hashtag = cursor.getString(cursor.getColumnIndex(HashtagSQLiteHelper.COLUMN_TAG));
-                            contentValues.put("name", hashtag);
-                            db.insert("hashtags", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
-
-                        } while (cursor.moveToNext());
-
-                    }
-                }
-            }
-
-            private void handleHomeTweetsTransfer(Context context, SupportSQLiteDatabase db) {
-
-            }
-
-            private void handleListTransfer(Context context, SupportSQLiteDatabase db) {
-
-            }
-
-            private void handleMentionsTransfer(Context context, SupportSQLiteDatabase db) {
-
-            }
-
-            private void handleQueuedTransfer(Context context, SupportSQLiteDatabase db) {
-
-
-                try (
-                        SQLiteDatabase queuedDb = getDatabase(context, "queued.db");
-                        Cursor cursor = getDatabaseTable(queuedDb, QueuedSQLiteHelper.TABLE_QUEUED)
-                ) {
-
-                    if (queuedDb != null && cursor != null && cursor.moveToFirst()) {
-                        ContentValues contentValues = new ContentValues();
-
-                        do {
-
-                            int type = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TYPE));
-                            int account = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_ACCOUNT));
-                            String text = cursor.getString(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TEXT));
-                            if (text == null) { text = ""; }
-
-                            switch (type) {
-                                case QueuedSQLiteHelper.TYPE_SCHEDULED:
-                                    int alarmId = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_ALARM_ID));
-                                    contentValues.put("alarm_id", alarmId);
-                                    contentValues.put("account", account);
-                                    contentValues.put("text", text);
-                                    db.insert("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
-                                    break;
-
-                                case QueuedSQLiteHelper.TYPE_DRAFT:
-                                    contentValues.put("account", account);
-                                    contentValues.put("text", text);
-                                    db.insert("drafts", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
-                                    break;
-
-                                case QueuedSQLiteHelper.TYPE_QUEUED_TWEET:
-                                    contentValues.put("account", account);
-                                    contentValues.put("text", text);
-                                    db.insert("queued_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
-                                    break;
-                            }
-
-                            contentValues.clear();
-
-                        } while (cursor.moveToNext());
-
-                    }
-
-                }
-
-            }
-
-            private void handleDirectMessagesTransfer(Context context, SupportSQLiteDatabase db) {
-
-                try (
-                        SQLiteDatabase dmDb = getDatabase(context, "direct_messages.db");
-                        Cursor cursor = getDatabaseTable(dmDb, DMSQLiteHelper.TABLE_DM);
-                ) {
-
-                    if (dmDb != null && cursor != null && cursor.moveToFirst()) {
-
-                        ContentValues contentValues = new ContentValues();
-
-                        do {
-
-
-                            contentValues.clear();
-                        } while (cursor.moveToNext());
-
-                    }
-
-
-                }
-
-            }
-
-
-            private void handleFavoriteTweetsTransfer(Context context, SupportSQLiteDatabase db) {
-
-
-            }
-
-
-            private void handleFavoriteUserTransfer(Context context, SupportSQLiteDatabase db) {
-
-                try (
-                        SQLiteDatabase favoriteUsersDb = getDatabase(context, "favUsers.db");
-                        Cursor cursor = getDatabaseTable(favoriteUsersDb, FavoriteUsersSQLiteHelper.TABLE_HOME)
-                ) {
-
-                    if (favoriteUsersDb != null && cursor != null && cursor.moveToFirst()) {
-                        ContentValues userContentValues = new ContentValues();
-                        ContentValues favoriteUserContentValues = new ContentValues();
-
-                        do {
-
-                            String name = cursor.getString(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_NAME));
-                            String screenName = cursor.getString(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_SCREEN_NAME));
-                            String proPic = cursor.getString(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_PRO_PIC));
-                            int account = cursor.getInt(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_ACCOUNT));
-
-                            userContentValues.put("id", userId);
-                            userContentValues.put("name", name);
-                            userContentValues.put("screen_name", screenName);
-                            userContentValues.put("profile_pic", proPic);
-
-                            favoriteUserContentValues.put("account", account);
-
-                            try {
-                                db.beginTransaction();
-                                long id = db.insert("users", SQLiteDatabase.CONFLICT_IGNORE, userContentValues);
-                                if (id != -1) {
-                                    db.insert("favorite_users", SQLiteDatabase.CONFLICT_IGNORE, favoriteUserContentValues);
-                                }
-                                db.setTransactionSuccessful();
-                                userId--;
-
-                            } finally {
-                                db.endTransaction();
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-            }
-
-            private void handleInteractionsTransfer(Context context, SupportSQLiteDatabase db) {
-
-            }
-
-            private void handleSavedTweetsTransfer(Context context, SupportSQLiteDatabase db) {
-
-            }
-
-            private void handleUserTweetsTransfer(Context context, SupportSQLiteDatabase db) {
-
-            }
-
-
-        };
     }
 
 
+
+    public static Callback transferActivityData(Context context, AtomicLong userIdLabeler) {
+        return new TransferCallback(context, "activity.db", ActivitySQLiteHelper.TABLE_ACTIVITY) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferDirectMessageData(Context context, AtomicLong userIdLabeler) {
+        return new TransferCallback(context, "direct_messages.db", DMSQLiteHelper.TABLE_DM) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferEmojiData(Context context) {
+        return new TransferCallback(context, "recent.db", EmojiSQLiteHelper.TABLE_RECENTS) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+                ContentValues contentValues = new ContentValues();
+
+                do {
+
+                    String text = cursor.getString(cursor.getColumnIndex(EmojiSQLiteHelper.COLUMN_TEXT));
+                    String icon = cursor.getString(cursor.getColumnIndex(EmojiSQLiteHelper.COLUMN_ICON));
+                    int count = cursor.getInt(cursor.getColumnIndex(EmojiSQLiteHelper.COLUMN_COUNT));
+
+                    contentValues.put("text", text);
+                    contentValues.put("icon", icon);
+                    contentValues.put("count", count);
+
+                    db.insert("emojis", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
+
+                } while (cursor.moveToNext());
+
+            }
+        };
+    }
+
+    public static Callback transferFavoriteTweetsData(Context context) {
+        return new TransferCallback(context, "favorite_tweets.db", FavoriteTweetsSQLiteHelper.TABLE_FAVORITE_TWEETS) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferFavoriteUserNotificationsData(Context context) {
+        return new TransferCallback(context, "favorite_user_notifications.db", FavoriteUserNotificationSQLiteHelper.TABLE) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferFavoriteUsersData(Context context, AtomicLong atomicLong) {
+        return new TransferCallback(context, "favUsers.db", FavoriteUsersSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferFollowersData(Context context, AtomicLong userIdLabeler) {
+        return new TransferCallback(context, "followers.db", FollowersSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferHashtagData(Context context) {
+        return new TransferCallback(context, "hashtags.db", HashtagSQLiteHelper.TABLE_HASHTAGS) {
+            @Override
+            public void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+                ContentValues contentValues = new ContentValues();
+
+                do {
+
+                    String name = cursor.getString(cursor.getColumnIndex(HashtagSQLiteHelper.COLUMN_TAG));
+                    contentValues.put("name", name);
+                    db.insert("hashtags", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
+
+                } while (cursor.moveToNext());
+
+            }
+        };
+    }
+
+    public static Callback transferHomeTweetsData(Context context, AtomicLong userIdLabeler) {
+        return new TransferCallback(context, "tweets.db", HomeSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferInteractionsData(Context context) {
+        return new TransferCallback(context, "interactionss.db", InteractionsSQLiteHelper.TABLE_INTERACTIONS) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferListData(Context context) {
+        return new TransferCallback(context, "lists.db", ListSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferMentionsData(Context context) {
+        return new TransferCallback(context, "mentions.db", MentionsSQLiteHelper.TABLE_MENTIONS) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferQueuedData(Context context) {
+        return new TransferCallback(context, "queued.db", QueuedSQLiteHelper.TABLE_QUEUED) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+                ContentValues contentValues = new ContentValues();
+
+                do {
+
+                    int type = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TYPE));
+                    int account = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_ACCOUNT));
+                    String text = cursor.getString(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TEXT));
+                    if (text == null) { text = ""; }
+
+                    switch (type) {
+                        case QueuedSQLiteHelper.TYPE_SCHEDULED:
+                            int alarmId = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_ALARM_ID));
+                            contentValues.put("alarm_id", alarmId);
+                            contentValues.put("account", account);
+                            contentValues.put("text", text);
+                            db.insert("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
+                            break;
+
+                        case QueuedSQLiteHelper.TYPE_DRAFT:
+                            contentValues.put("account", account);
+                            contentValues.put("text", text);
+                            db.insert("drafts", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
+                            break;
+
+                        case QueuedSQLiteHelper.TYPE_QUEUED_TWEET:
+                            contentValues.put("account", account);
+                            contentValues.put("text", text);
+                            db.insert("queued_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
+                            break;
+                    }
+
+                    contentValues.clear();
+
+                } while (cursor.moveToNext());
+
+            }
+        };
+    }
+
+    public static Callback transferSavedTweetsData(Context context) {
+        return new TransferCallback(context, "saved_tweets.db", SavedTweetSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
+
+    public static Callback transferUserTweetsData(Context context) {
+        return new TransferCallback(context, "user_tweets.db", UserTweetsSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+
+            }
+        };
+    }
 
 
     public static void destroyInstance() {

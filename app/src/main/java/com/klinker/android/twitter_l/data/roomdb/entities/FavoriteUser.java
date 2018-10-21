@@ -8,7 +8,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "favorite_users",
-        indices = { @Index(value = { "user_id", "account"})},
+        indices = { @Index(value = { "user_id", "account"}), @Index(value = "account")},
         foreignKeys = { @ForeignKey( entity = User.class, parentColumns = "id", childColumns = "user_id", onDelete = ForeignKey.CASCADE)})
 public class FavoriteUser {
 
@@ -20,7 +20,5 @@ public class FavoriteUser {
 
     @ColumnInfo(name = "user_id")
     public long userId;
-
-
 
 }

@@ -1,6 +1,8 @@
 package com.klinker.android.twitter_l.data.roomdb.entities;
 
 
+import android.renderscript.Script;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -17,5 +19,15 @@ public class ScheduledTweet {
 
     @ColumnInfo
     public int account;
+
+    @ColumnInfo
+    public String text;
+
+    public ScheduledTweet(int alarmId, String text, long time, int account) {
+        this.alarmId = alarmId;
+        this.text = text;
+        this.time = time;
+        this.account = account;
+    }
 
 }

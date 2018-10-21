@@ -20,7 +20,7 @@ public interface HashtagDao {
     Cursor getHashtagCursor(String tag);
 
     //trimDatabase implementation
-    @Query("DELETE FROM hashtags WHERE id NOT IN (SELECT id FROM hashtags ORDER BY id DESC LIMIT :trimSize)")
+    @Query("DELETE FROM hashtags WHERE id <= (SELECT id FROM hashtags ORDER BY id DESC LIMIT 1 OFFSET :trimSize)")
     void trimDatabase(int trimSize);
 
 }

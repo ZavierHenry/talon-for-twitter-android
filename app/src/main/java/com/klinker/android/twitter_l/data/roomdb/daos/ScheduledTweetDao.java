@@ -19,14 +19,10 @@ public interface ScheduledTweetDao {
     @Delete
     void deleteScheduledTweet(ScheduledTweet scheduledTweet);
 
-    @Query("DELETE FROM scheduled_tweets WHERE alarm_id = :alarmId")
-    void deleteScheduledTweet(int alarmId);
-
-
     @Query("SELECT * FROM scheduled_tweets WHERE account = :account")
     List<ScheduledTweet> getScheduledTweets(int account);
 
-    @Query("SELECT * FROM scheduled_tweets")
-    List<ScheduledTweet> getScheduledTweets();
+    @Query("SELECT * FROM scheduled_tweets WHERE time > :time LIMIT 1")
+    ScheduledTweet getEarliestScheduledTweets(long time);
 
 }

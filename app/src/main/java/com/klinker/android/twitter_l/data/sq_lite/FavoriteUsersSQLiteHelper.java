@@ -58,5 +58,4 @@ public class FavoriteUsersSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HOME);
         onCreate(db);
     }
-
 }

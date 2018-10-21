@@ -26,7 +26,7 @@ public class HashtagSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TAG = "name";
 
-    private static final String DATABASE_NAME = "hashtags.db";
+    public static final String DATABASE_NAME = "hashtags.db";
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement

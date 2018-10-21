@@ -84,6 +84,7 @@ public class HomeDataSource {
     }
 
     public void open() throws SQLException {
+
         try {
             database = dbHelper.getWritableDatabase();
         } catch (Exception e) {
@@ -92,6 +93,8 @@ public class HomeDataSource {
     }
 
     public void close() {
+
+
         try {
             dbHelper.close();
         } catch (Exception e) {

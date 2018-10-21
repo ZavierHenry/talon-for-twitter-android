@@ -30,7 +30,7 @@ public class ActivitySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_RETWEET_COUNT = "retweet_count";
     public static final String COLUMN_MEDIA_LENGTH = "media_length";
 
-    private static final String DATABASE_NAME = "activity.db";
+    public static final String DATABASE_NAME = "activity.db";
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement

@@ -44,7 +44,7 @@ public class MentionsSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CONVERSATION = "conversation";
     public static final String COLUMN_MEDIA_LENGTH = "media_length";
 
-    private static final String DATABASE_NAME = "mentions.db";
+    public static final String DATABASE_NAME = "mentions.db";
     private static final int DATABASE_VERSION = 3;
 
     // Database creation sql statement

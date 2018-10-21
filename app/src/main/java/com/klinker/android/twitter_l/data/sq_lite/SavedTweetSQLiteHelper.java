@@ -43,7 +43,7 @@ public class SavedTweetSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EXTRA_THREE = "extra_three";
     public static final String COLUMN_MEDIA_LENGTH = "media_length";
 
-    private static final String DATABASE_NAME = "saved_tweets.db";
+    public static final String DATABASE_NAME = "saved_tweets.db";
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement

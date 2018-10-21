@@ -37,7 +37,7 @@ public class InteractionsSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EXTRA_TWO = "extra_two";
     public static final String COLUMN_EXTRA_THREE = "extra_three";
 
-    private static final String DATABASE_NAME = "interactions.db";
+    public static final String DATABASE_NAME = "interactions.db";
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement

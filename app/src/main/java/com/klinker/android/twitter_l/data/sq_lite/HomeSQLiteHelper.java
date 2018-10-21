@@ -45,8 +45,9 @@ public class HomeSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CONVERSATION = "conversation";
     public static final String COLUMN_MEDIA_LENGTH = "media_length";
 
-    private static final String DATABASE_NAME = "tweets.db";
+    public static final String DATABASE_NAME = "tweets.db";
     private static final int DATABASE_VERSION = 3;
+    //private static final int DATABASE_VERSION = 4;
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "create table "
@@ -77,6 +78,8 @@ public class HomeSQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
             "ALTER TABLE " + TABLE_HOME + " ADD COLUMN " + COLUMN_MEDIA_LENGTH + " INTEGER DEFAULT -1";
 
+    //private static final String DATABASE_ADD_IS_USER_VERIFIED = "ALTER TABLE " + TABLE_HOME + " ADD COLUMN " + COLUMN_IS_USER_VERIFIED + " INTEGER DEFAULT 0";
+
     public HomeSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -86,6 +89,7 @@ public class HomeSQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(DATABASE_CREATE);
         database.execSQL(DATABASE_ADD_CONVO_FIELD);
         database.execSQL(DATABASE_ADD_MEDIA_LENGTH_FIELD);
+        //database.execSQL(DATABASE_ADD_IS_USER_VERIFIED);
     }
 
     @Override
@@ -97,6 +101,11 @@ public class HomeSQLiteHelper extends SQLiteOpenHelper {
         if (oldVersion < 3) {
             db.execSQL(DATABASE_ADD_MEDIA_LENGTH_FIELD);
         }
+
+//        if (oldVersion < 4) {
+//            db.execSQL(DATABASE_ADD_IS_USER_VERIFIED);
+//        }
+
     }
 
 }

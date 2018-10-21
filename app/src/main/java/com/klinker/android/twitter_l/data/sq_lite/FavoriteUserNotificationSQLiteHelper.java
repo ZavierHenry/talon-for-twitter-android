@@ -11,7 +11,7 @@ public class FavoriteUserNotificationSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TWEET_ID = "tweet_id";
 
-    private static final String DATABASE_NAME = "favorite_user_notifications.db";
+    public static final String DATABASE_NAME = "favorite_user_notifications.db";
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement

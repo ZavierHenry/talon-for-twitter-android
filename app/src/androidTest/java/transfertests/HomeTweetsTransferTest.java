@@ -1,21 +1,32 @@
 package transfertests;
 
-import org.junit.After;
-import org.junit.Before;
+import com.klinker.android.twitter_l.data.sq_lite.HomeSQLiteHelper;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 
 public class HomeTweetsTransferTest extends TransferTest {
 
-    @Before
-    @Override
-    public void initDatabase() {
-
+    @BeforeClass
+    public static void initDatabase() {
+        initSourceDatabase();
+        initTestDatabase();
     }
 
-    @After
-    @Override
-    public void closeDatabase() {
 
+
+    @After
+    public void clearDatabases() {
+        clearSourceDatabase(HomeSQLiteHelper.TABLE_HOME);
+        clearTestDatabase();
+    }
+
+    @AfterClass
+    public static void closeDatabase() {
+        testDatabase.close();
+        sourceDatabase.close();
     }
 }

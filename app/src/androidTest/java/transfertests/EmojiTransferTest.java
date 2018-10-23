@@ -5,9 +5,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
+import com.klinker.android.twitter_l.data.roomdb.entities.Emoji;
+import com.klinker.android.twitter_l.data.sq_lite.EmojiSQLiteHelper;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -18,29 +22,16 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 public class EmojiTransferTest extends TransferTest {
 
-    @Before
-    @Override
-    public void initDatabase() {
-        Context context = InstrumentationRegistry.getInstrumentation().getContext();
-
-        //create emojis database
-        File sourcePath = context.getDatabasePath("recent.db");
-        sourceDatabase = SQLiteDatabase.openOrCreateDatabase(sourcePath, null);
-
-        //fill source database with data
-
-        testDatabase = Room
-                .inMemoryDatabaseBuilder(context, TalonDatabase.class)
-                .addCallback(TalonDatabase.transferEmojiData(context))
-                .build();
-
-        //populate database with information
-
+    @BeforeClass
+    public static void initDatabase() {
+        initSourceDatabase();
+        initTestDatabase();
     }
 
 
     @Test
     public void testDataTransferResult() {
+
 
     }
 
@@ -52,12 +43,17 @@ public class EmojiTransferTest extends TransferTest {
 
 
     @After
-    @Override
-    public void closeDatabase() {
-        testDatabase.close();
-
-        String path = sourceDatabase.getPath();
-        sourceDatabase.close();
-        SQLiteDatabase.deleteDatabase(new File(path));
+    public void clearDatabases() {
+        clearTestDatabase();
+        clearSourceDatabase(EmojiSQLiteHelper.TABLE_RECENTS);
     }
+
+
+    @AfterClass
+    public static void closeDatabase() {
+        testDatabase.close();
+        sourceDatabase.close();
+    }
+
+
 }

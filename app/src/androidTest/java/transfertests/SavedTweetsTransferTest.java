@@ -1,13 +1,40 @@
 package transfertests;
 
-public class SavedTweetsTransferTest extends TransferTest {
-    @Override
-    public void initDatabase() {
+import android.app.Instrumentation;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
+import com.klinker.android.twitter_l.data.sq_lite.SavedTweetSQLiteHelper;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+public class SavedTweetsTransferTest extends TransferTest {
+
+    @BeforeClass
+    public static void initDatabase() {
+        initSourceDatabase();
+        initTestDatabase();
     }
 
-    @Override
-    public void closeDatabase() {
 
+    @After
+    public void clearDatabases() {
+        clearTestDatabase();
+        clearSourceDatabase(SavedTweetSQLiteHelper.TABLE_HOME);
+    }
+
+
+    @AfterClass
+    public static void closeDatabase() {
+        testDatabase.close();
+        sourceDatabase.close();
     }
 }

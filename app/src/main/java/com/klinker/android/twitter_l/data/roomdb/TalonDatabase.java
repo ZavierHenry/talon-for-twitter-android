@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.telecom.Call;
 
 import com.klinker.android.twitter_l.data.roomdb.daos.ActivityDao;
@@ -146,26 +147,30 @@ public abstract class TalonDatabase extends RoomDatabase {
     }
 
     //delete databases
+    //TODO: rewrite callbacks to facilitate testing
 
     private abstract static class TransferCallback extends Callback {
 
         private String tableName;
-        private String relativePath;
-        private Context context;
+        private SQLiteDatabase database;
 
         abstract void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor);
 
-        public TransferCallback(Context context, String relativePath, String tableName) {
-            this.context = context;
-            this.relativePath = relativePath;
+        public TransferCallback(SQLiteDatabase database, String tableName) {
+            this.database = database;
+            this.tableName = tableName;
+        }
+
+        private TransferCallback(Context context, String relativePath, String tableName) {
+            this.database = getDatabase(context, relativePath);
             this.tableName = tableName;
         }
 
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             try (
-                    SQLiteDatabase source = getDatabase(context, relativePath);
-                    Cursor cursor = getDatabaseTable(source, tableName)
+                    SQLiteDatabase database = this.database;
+                    Cursor cursor = getDatabaseTable(database, tableName)
             ) {
 
                 if (cursor != null && cursor.moveToFirst()) {
@@ -206,8 +211,6 @@ public abstract class TalonDatabase extends RoomDatabase {
         }
 
     }
-
-
 
     public static Callback transferActivityData(Context context, AtomicLong userIdLabeler) {
         return new TransferCallback(context, "activity.db", ActivitySQLiteHelper.TABLE_ACTIVITY) {
@@ -399,7 +402,17 @@ public abstract class TalonDatabase extends RoomDatabase {
         return new TransferCallback(context, "user_tweets.db", UserTweetsSQLiteHelper.TABLE_HOME) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+                ContentValues tweetValues = new ContentValues();
+                ContentValues userValues = new ContentValues();
+                ContentValues userTweetValues = new ContentValues();
 
+                do {
+
+                    //fill content values
+
+                    db.insert("user_tweets", SQLiteDatabase.CONFLICT_IGNORE, userTweetValues);
+
+                } while (cursor.moveToNext());
             }
         };
     }

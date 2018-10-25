@@ -29,11 +29,11 @@ public class UserTweetsSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EXTRA_THREE = "extra_three";
     public static final String COLUMN_MEDIA_LENGTH = "media_length";
 
-    private static final String DATABASE_NAME = "user_tweets.db";
+    public static final String DATABASE_NAME = "user_tweets.db";
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_HOME + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_TWEET_ID

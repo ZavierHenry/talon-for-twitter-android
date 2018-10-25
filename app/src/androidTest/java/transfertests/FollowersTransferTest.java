@@ -6,16 +6,23 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class FollowersTransferTest extends TransferTest {
 
     @BeforeClass
     public static void initDatabase() {
-        initSourceDatabase();
+        String tableCreation = FollowersSQLiteHelper.DATABASE_CREATE;
+
+        initSourceDatabase(tableCreation);
         initTestDatabase();
     }
 
 
+    @Test
+    public void testBasicFollowersTransfer() {
+
+    }
 
 
     @After
@@ -28,6 +35,9 @@ public class FollowersTransferTest extends TransferTest {
     @AfterClass
     public static void closeDatabase() {
         testDatabase.close();
+        testDatabase = null;
+
         sourceDatabase.close();
+        sourceDatabase = null;
     }
 }

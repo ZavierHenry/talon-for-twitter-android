@@ -1,20 +1,30 @@
 package daotests;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 public class DraftDaoTest extends DaoTest {
 
 
-    @Before
-    @Override
-    public void initDatabase() {
+    @BeforeClass
+    public static void initDatabase() {
 
     }
 
-    @After
-    @Override
-    public void closeDatabase() {
 
+    //deletes single draft
+
+
+    @After
+    public void clearTables() {
+        testDatabase.clearAllTables();
+    }
+
+    @AfterClass
+    public static void closeDatabase() {
+        testDatabase.close();
+        testDatabase = null;
     }
 }

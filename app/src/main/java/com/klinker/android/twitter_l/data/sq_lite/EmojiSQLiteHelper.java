@@ -32,7 +32,7 @@ public class EmojiSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "CREATE TABLE " + TABLE_RECENTS + "("
+    public static final String DATABASE_CREATE = "CREATE TABLE " + TABLE_RECENTS + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_TEXT + " TEXT,"
             + COLUMN_ICON + " TEXT," + COLUMN_COUNT + " INTEGER" + ")";
 

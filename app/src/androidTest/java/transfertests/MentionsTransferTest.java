@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 
 public class MentionsTransferTest extends TransferTest {
@@ -14,6 +15,21 @@ public class MentionsTransferTest extends TransferTest {
     public static void initDatabase() {
         initSourceDatabase();
         initTestDatabase();
+    }
+
+    @Test
+    public void testBasicMentionsTransfer() {
+
+    }
+
+    @Test
+    public void testTransferIfEmptyTable() {
+
+    }
+
+    @Test
+    public void testTransferIfNoSourceDatabase() {
+
     }
 
     @After

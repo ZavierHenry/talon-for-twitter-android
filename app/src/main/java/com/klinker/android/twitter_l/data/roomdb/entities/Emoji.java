@@ -4,15 +4,16 @@ package com.klinker.android.twitter_l.data.roomdb.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 
 
-@Entity(tableName = "emojis")
+@Entity(tableName = "emojis", indices = {@Index(value = "icon", unique = true)})
 public class Emoji {
 
     @PrimaryKey(autoGenerate = true)
-    public final Integer id;
+    public final Long id;
 
     @ColumnInfo
     public String text;
@@ -25,7 +26,7 @@ public class Emoji {
 
     //maybe add account???
 
-    public Emoji(int id, String text, String icon, int count) {
+    public Emoji(long id, String text, String icon, int count) {
         this.id = id;
         this.text = text;
         this.icon = icon;

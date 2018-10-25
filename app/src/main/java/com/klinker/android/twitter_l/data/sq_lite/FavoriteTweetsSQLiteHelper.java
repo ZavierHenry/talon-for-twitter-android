@@ -33,7 +33,7 @@ public class FavoriteTweetsSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_FAVORITE_TWEETS + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_TWEET_ID
@@ -55,10 +55,10 @@ public class FavoriteTweetsSQLiteHelper extends SQLiteOpenHelper {
             + " text extra two, " + COLUMN_CLIENT_SOURCE
             + " text extra three);";
 
-    private static final String DATABASE_ADD_CONVO_FIELD =
+    public static final String DATABASE_ADD_CONVO_FIELD =
             "ALTER TABLE " + TABLE_FAVORITE_TWEETS + " ADD COLUMN " + COLUMN_CONVERSATION + " INTEGER DEFAULT 0";
 
-    private static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
+    public static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
             "ALTER TABLE " + TABLE_FAVORITE_TWEETS + " ADD COLUMN " + COLUMN_MEDIA_LENGTH + " INTEGER DEFAULT -1";
 
     public FavoriteTweetsSQLiteHelper(Context context) {

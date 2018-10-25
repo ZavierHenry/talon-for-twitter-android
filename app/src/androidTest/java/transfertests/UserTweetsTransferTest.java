@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 
@@ -25,6 +26,16 @@ public class UserTweetsTransferTest extends TransferTest {
         initTestDatabase();
     }
 
+    @Test
+    public void testBasicUserTweetsTransfer() {
+
+    }
+
+    @Test
+    public void testTransferIfNoSourceDatabase() {
+
+    }
+
 
     @After
     public void clearDatabases() {
@@ -35,9 +46,10 @@ public class UserTweetsTransferTest extends TransferTest {
     @AfterClass
     public static void closeDatabase() {
         testDatabase.close();
-        String path = sourceDatabase.getPath();
+        testDatabase = null;
+
         sourceDatabase.close();
-        SQLiteDatabase.deleteDatabase(new File(path));
+        sourceDatabase = null;
 
     }
 }

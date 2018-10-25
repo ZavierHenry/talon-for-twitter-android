@@ -5,10 +5,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
+import com.klinker.android.twitter_l.views.ViewDragHelper;
 
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 public abstract class TransferTest {
@@ -21,13 +21,17 @@ public abstract class TransferTest {
         testDatabase = Room.inMemoryDatabaseBuilder(context, TalonDatabase.class).build();
     }
 
-    protected static void initSourceDatabase() {
+    protected static void initSourceDatabase(String ...tableCreationStatements) {
         SQLiteDatabase.OpenParams params = new SQLiteDatabase.OpenParams.Builder()
                 .addOpenFlags(SQLiteDatabase.CREATE_IF_NECESSARY)
                 .addOpenFlags(SQLiteDatabase.OPEN_READWRITE)
                 .build();
 
         sourceDatabase = SQLiteDatabase.createInMemory(params);
+        for (String statement : tableCreationStatements) {
+            sourceDatabase.execSQL(statement);
+        }
+
     }
 
     protected static void clearTestDatabase() {
@@ -36,6 +40,10 @@ public abstract class TransferTest {
 
     protected static void clearSourceDatabase(String tableName) {
         sourceDatabase.delete(tableName, null, null);
+    }
+
+    protected void applyCallback(RoomDatabase.Callback callback) {
+        callback.onCreate(testDatabase.getOpenHelper().getWritableDatabase());
     }
 
 }

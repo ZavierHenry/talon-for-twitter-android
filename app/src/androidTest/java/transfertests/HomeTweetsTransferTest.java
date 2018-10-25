@@ -6,16 +6,26 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 
 public class HomeTweetsTransferTest extends TransferTest {
 
     @BeforeClass
     public static void initDatabase() {
-        initSourceDatabase();
+        String tableCreation = HomeSQLiteHelper.DATABASE_CREATE;
+        String addConvoField = HomeSQLiteHelper.DATABASE_ADD_CONVO_FIELD;
+        String addMediaLengthField = HomeSQLiteHelper.DATABASE_ADD_MEDIA_LENGTH_FIELD;
+
+        initSourceDatabase(tableCreation, addConvoField, addMediaLengthField);
         initTestDatabase();
     }
 
+
+    @Test
+    public void testBasicHomeTweetsTransfer() {
+
+    }
 
 
     @After

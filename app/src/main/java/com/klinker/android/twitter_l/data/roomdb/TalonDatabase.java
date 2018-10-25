@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.RemoteCallbackList;
 import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.telecom.Call;
 
@@ -60,6 +61,9 @@ import com.klinker.android.twitter_l.data.sq_lite.SavedTweetSQLiteHelper;
 import com.klinker.android.twitter_l.data.sq_lite.UserTweetsSQLiteHelper;
 
 import java.io.File;
+import java.sql.SQLInput;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import androidx.annotation.NonNull;
@@ -114,28 +118,44 @@ public abstract class TalonDatabase extends RoomDatabase {
 
     //list table columns
 
-    public static TalonDatabase getInstance(Context context) {
+    public static TalonDatabase getInstance(@NonNull Context context) {
 
         if (dbInstance == null) {
             AtomicLong userId = new AtomicLong(-2L);
 
+            String activityDbPath = context.getDatabasePath(ActivitySQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String dmDbPath = context.getDatabasePath(DMSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String emojiDbPath = context.getDatabasePath(EmojiSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String favoriteTweetsDbPath = context.getDatabasePath(FavoriteTweetsSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String favoriteUserNotificationsDbPath = context.getDatabasePath(FavoriteUserNotificationSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String favoriteUsersDbPath = context.getDatabasePath(FavoriteUsersSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String followersUsersDbPath = context.getDatabasePath(FollowersSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String hashtagDbPath = context.getDatabasePath(HashtagSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String homeTweetsDbPath = context.getDatabasePath(HomeSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String interactionsDbPath = context.getDatabasePath(InteractionsSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String listDbPath = context.getDatabasePath(ListSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String mentionsDbPath = context.getDatabasePath(MentionsSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String queuedDbPath = context.getDatabasePath(QueuedSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String savedTweetsDbPath = context.getDatabasePath(SavedTweetSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+            String userTweetsDbPath = context.getDatabasePath(UserTweetsSQLiteHelper.DATABASE_NAME).getAbsolutePath();
+
 
             dbInstance = Room.databaseBuilder(context.getApplicationContext(), TalonDatabase.class, "talondata.db" )
-                    .addCallback(transferActivityData(context, userId))
-                    .addCallback(transferDirectMessageData(context, userId))
-                    .addCallback(transferEmojiData(context))
-                    .addCallback(transferFavoriteTweetsData(context))
-                    .addCallback(transferFavoriteUserNotificationsData(context))
-                    .addCallback(transferFavoriteUsersData(context, userId))
-                    .addCallback(transferFollowersData(context, userId))
-                    .addCallback(transferHashtagData(context))
-                    .addCallback(transferHomeTweetsData(context, userId))
-                    .addCallback(transferInteractionsData(context))
-                    .addCallback(transferListData(context))
-                    .addCallback(transferMentionsData(context))
-                    .addCallback(transferQueuedData(context))
-                    .addCallback(transferSavedTweetsData(context))
-                    .addCallback(transferUserTweetsData(context))
+                    .addCallback(transferActivityData(activityDbPath, userId))
+                    .addCallback(transferDirectMessageData(dmDbPath, userId))
+                    .addCallback(transferEmojiData(emojiDbPath))
+                    .addCallback(transferFavoriteTweetsData(favoriteTweetsDbPath))
+                    .addCallback(transferFavoriteUserNotificationsData(favoriteUserNotificationsDbPath))
+                    .addCallback(transferFavoriteUsersData(favoriteUsersDbPath))
+                    .addCallback(transferFollowersData(followersUsersDbPath))
+                    .addCallback(transferHashtagData(hashtagDbPath))
+                    .addCallback(transferHomeTweetsData(homeTweetsDbPath))
+                    .addCallback(transferInteractionsData(interactionsDbPath))
+                    .addCallback(transferListData(listDbPath))
+                    .addCallback(transferMentionsData(mentionsDbPath))
+                    .addCallback(transferQueuedData(queuedDbPath))
+                    .addCallback(transferSavedTweetsData(savedTweetsDbPath))
+                    .addCallback(transferUserTweetsData(userTweetsDbPath))
                     .build();
 
             //delete old databases if necessary
@@ -152,24 +172,20 @@ public abstract class TalonDatabase extends RoomDatabase {
     private abstract static class TransferCallback extends Callback {
 
         private String tableName;
-        private SQLiteDatabase database;
+        private String databasePath;
 
         abstract void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor);
 
-        public TransferCallback(SQLiteDatabase database, String tableName) {
-            this.database = database;
+        private TransferCallback(String absolutePath, String tableName) {
             this.tableName = tableName;
+            this.databasePath = databasePath;
         }
 
-        private TransferCallback(Context context, String relativePath, String tableName) {
-            this.database = getDatabase(context, relativePath);
-            this.tableName = tableName;
-        }
 
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             try (
-                    SQLiteDatabase database = this.database;
+                    SQLiteDatabase database = getDatabase(databasePath);
                     Cursor cursor = getDatabaseTable(database, tableName)
             ) {
 
@@ -179,18 +195,10 @@ public abstract class TalonDatabase extends RoomDatabase {
             }
         }
 
-        private SQLiteDatabase getDatabase(Context context, String relativePath) {
-            if (context == null) {
-                return null;
-            }
-
-            File dbPath = context.getDatabasePath(relativePath);
-            if (!dbPath.exists()) {
-                return null;
-            }
+        private SQLiteDatabase getDatabase(String absolutePath) {
 
             try {
-                return SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
+                return SQLiteDatabase.openDatabase(absolutePath, null, SQLiteDatabase.OPEN_READONLY);
             } catch (Exception e) {
                 return null;
             }
@@ -212,8 +220,37 @@ public abstract class TalonDatabase extends RoomDatabase {
 
     }
 
-    public static Callback transferActivityData(Context context, AtomicLong userIdLabeler) {
-        return new TransferCallback(context, "activity.db", ActivitySQLiteHelper.TABLE_ACTIVITY) {
+    private static SQLiteDatabase getDatabase(Context context, String relativePath) {
+        if (context == null) {
+            return null;
+        }
+
+        File dbPath = context.getDatabasePath(relativePath);
+        if (!dbPath.exists()) {
+            return null;
+        }
+
+        try {
+            return SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static SQLiteDatabase getDatabase(String absolutePath) {
+
+        try {
+            return SQLiteDatabase.openDatabase(absolutePath, null, SQLiteDatabase.OPEN_READONLY);
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+
+
+    public static Callback transferActivityData(String absolutePath, AtomicLong userIdLabeler) {
+        return new TransferCallback(absolutePath, ActivitySQLiteHelper.TABLE_ACTIVITY) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -221,8 +258,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferDirectMessageData(Context context, AtomicLong userIdLabeler) {
-        return new TransferCallback(context, "direct_messages.db", DMSQLiteHelper.TABLE_DM) {
+
+    public static Callback transferDirectMessageData(String absolutePath, AtomicLong userIdLabeler) {
+        return new TransferCallback(absolutePath, DMSQLiteHelper.TABLE_DM) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -230,8 +268,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferEmojiData(Context context) {
-        return new TransferCallback(context, "recent.db", EmojiSQLiteHelper.TABLE_RECENTS) {
+
+    public static Callback transferEmojiData(String absolutePath) {
+        return new TransferCallback(absolutePath, EmojiSQLiteHelper.TABLE_RECENTS) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -255,8 +294,26 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferFavoriteTweetsData(Context context) {
-        return new TransferCallback(context, "favorite_tweets.db", FavoriteTweetsSQLiteHelper.TABLE_FAVORITE_TWEETS) {
+    public static Callback transferFavoriteTweetsData(String absolutePath) {
+        return new TransferCallback(absolutePath, FavoriteTweetsSQLiteHelper.TABLE_FAVORITE_TWEETS) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+                ContentValues userContentValues = new ContentValues();
+                ContentValues tweetContentValues = new ContentValues();
+                ContentValues favoriteTweetContentValues = new ContentValues();
+
+                do {
+
+
+
+                } while (cursor.moveToNext());
+
+            }
+        };
+    }
+
+    public static Callback transferFavoriteUserNotificationsData(String absolutePath) {
+        return new TransferCallback(absolutePath, FavoriteUserNotificationSQLiteHelper.TABLE) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -264,8 +321,46 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferFavoriteUserNotificationsData(Context context) {
-        return new TransferCallback(context, "favorite_user_notifications.db", FavoriteUserNotificationSQLiteHelper.TABLE) {
+
+    public static Callback transferFavoriteUsersData(String absolutePath) {
+        return new TransferCallback(absolutePath, FavoriteUsersSQLiteHelper.TABLE_HOME) {
+            @Override
+            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
+                ContentValues userValues = new ContentValues();
+                ContentValues favoriteUsersValues = new ContentValues();
+
+                do {
+
+                    long id = cursor.getLong(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_ID));
+                    int account = cursor.getInt(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_ACCOUNT));
+                    String name = cursor.getString(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_NAME));
+                    String screenName = cursor.getString(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_SCREEN_NAME));
+                    String profilePic = cursor.getString(cursor.getColumnIndex(FavoriteUsersSQLiteHelper.COLUMN_PRO_PIC));
+
+
+                    favoriteUsersValues.put("account", account);
+                    favoriteUsersValues.put("user_id", id);
+
+                    userValues.put("id", id);
+                    userValues.put("name", name);
+                    userValues.put("screen_name", screenName);
+                    userValues.put("profile_pic", profilePic);
+                    userValues.put("is_verified", false);
+
+                    //insert in user, replace user if screen_name already in database
+
+                    db.insert("favorite_tweets", SQLiteDatabase.CONFLICT_IGNORE, favoriteUsersValues);
+
+                } while (cursor.moveToNext());
+
+
+            }
+        };
+    }
+
+
+    public static Callback transferFollowersData(String absolutePath) {
+        return new TransferCallback(absolutePath, FollowersSQLiteHelper.TABLE_HOME) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -273,26 +368,8 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferFavoriteUsersData(Context context, AtomicLong atomicLong) {
-        return new TransferCallback(context, "favUsers.db", FavoriteUsersSQLiteHelper.TABLE_HOME) {
-            @Override
-            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
-
-            }
-        };
-    }
-
-    public static Callback transferFollowersData(Context context, AtomicLong userIdLabeler) {
-        return new TransferCallback(context, "followers.db", FollowersSQLiteHelper.TABLE_HOME) {
-            @Override
-            void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
-
-            }
-        };
-    }
-
-    public static Callback transferHashtagData(Context context) {
-        return new TransferCallback(context, "hashtags.db", HashtagSQLiteHelper.TABLE_HASHTAGS) {
+    public static Callback transferHashtagData(String absolutePath) {
+        return new TransferCallback(absolutePath, HashtagSQLiteHelper.TABLE_HASHTAGS) {
             @Override
             public void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
                 ContentValues contentValues = new ContentValues();
@@ -309,8 +386,8 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferHomeTweetsData(Context context, AtomicLong userIdLabeler) {
-        return new TransferCallback(context, "tweets.db", HomeSQLiteHelper.TABLE_HOME) {
+    public static Callback transferHomeTweetsData(String absolutePath) {
+        return new TransferCallback(absolutePath, HomeSQLiteHelper.TABLE_HOME) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -318,8 +395,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferInteractionsData(Context context) {
-        return new TransferCallback(context, "interactionss.db", InteractionsSQLiteHelper.TABLE_INTERACTIONS) {
+
+    public static Callback transferInteractionsData(String absolutePath) {
+        return new TransferCallback(absolutePath, InteractionsSQLiteHelper.TABLE_INTERACTIONS) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -327,8 +405,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferListData(Context context) {
-        return new TransferCallback(context, "lists.db", ListSQLiteHelper.TABLE_HOME) {
+
+    public static Callback transferListData(String absolutePath) {
+        return new TransferCallback(absolutePath, ListSQLiteHelper.TABLE_HOME) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -336,8 +415,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferMentionsData(Context context) {
-        return new TransferCallback(context, "mentions.db", MentionsSQLiteHelper.TABLE_MENTIONS) {
+
+    public static Callback transferMentionsData(String absolutePath) {
+        return new TransferCallback(absolutePath, MentionsSQLiteHelper.TABLE_MENTIONS) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -345,8 +425,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferQueuedData(Context context) {
-        return new TransferCallback(context, "queued.db", QueuedSQLiteHelper.TABLE_QUEUED) {
+
+    public static Callback transferQueuedData(String absolutePath) {
+        return new TransferCallback(absolutePath, QueuedSQLiteHelper.TABLE_QUEUED) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -389,8 +470,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferSavedTweetsData(Context context) {
-        return new TransferCallback(context, "saved_tweets.db", SavedTweetSQLiteHelper.TABLE_HOME) {
+
+    public static Callback transferSavedTweetsData(String absolutePath) {
+        return new TransferCallback(absolutePath, SavedTweetSQLiteHelper.TABLE_HOME) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
 
@@ -398,8 +480,9 @@ public abstract class TalonDatabase extends RoomDatabase {
         };
     }
 
-    public static Callback transferUserTweetsData(Context context) {
-        return new TransferCallback(context, "user_tweets.db", UserTweetsSQLiteHelper.TABLE_HOME) {
+
+    public static Callback transferUserTweetsData(String absolutePath) {
+        return new TransferCallback(absolutePath, UserTweetsSQLiteHelper.TABLE_HOME) {
             @Override
             void readDatabaseRow(SupportSQLiteDatabase db, Cursor cursor) {
                 ContentValues tweetValues = new ContentValues();
@@ -416,6 +499,7 @@ public abstract class TalonDatabase extends RoomDatabase {
             }
         };
     }
+
 
 
     public static void destroyInstance() {

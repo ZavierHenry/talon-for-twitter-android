@@ -6,13 +6,30 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.List;
 
 public class ListTransferTest extends TransferTest {
 
     @BeforeClass
     public static void initDatabase() {
-        initSourceDatabase();
+        String tableCreation = ListSQLiteHelper.DATABASE_CREATE;
+        String addMediaLengthField = ListSQLiteHelper.DATABASE_ADD_MEDIA_LENGTH_FIELD;
+
+        initSourceDatabase(tableCreation, addMediaLengthField);
         initTestDatabase();
+    }
+
+
+    @Test
+    public void testBasicListTransfer() {
+
+    }
+
+    @Test
+    public void testTransferIfNoSourceDatabase() {
+
     }
 
 

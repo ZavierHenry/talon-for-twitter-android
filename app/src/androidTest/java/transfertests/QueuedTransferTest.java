@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 
@@ -25,6 +26,16 @@ public class QueuedTransferTest extends TransferTest {
     public static void initDatabase() {
         initSourceDatabase();
         initTestDatabase();
+    }
+
+    @Test
+    public void testBasicQueuedTransfer() {
+
+    }
+
+    @Test
+    public void testTransferIfNoSourceDatabase() {
+
     }
 
 

@@ -8,18 +8,27 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 @Dao
-public interface UserDao {
+public abstract class UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertUser(User user);
+    abstract void insertUserSpecificInfo(User user);
+
 
     @Delete
-    void deleteUser(User user);
+    abstract void deleteUser(User user);
 
     @Query("DELETE from users WHERE id = :id")
-    void deleteUser(long id);
+    abstract void deleteUser(long id);
+
+
+    @Query("SELECT id FROM users WHERE screen_name = :screenName")
+    abstract long findUserByScreenName(String screenName);
+
+
+
 
 
 }

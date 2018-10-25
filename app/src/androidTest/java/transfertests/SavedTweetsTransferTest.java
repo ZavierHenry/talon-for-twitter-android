@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -24,6 +25,20 @@ public class SavedTweetsTransferTest extends TransferTest {
         initTestDatabase();
     }
 
+    @Test
+    public void testBasicSavedTweetsTransfer() {
+
+    }
+
+    @Test
+    public void testTransferIfEmptyTable() {
+
+    }
+
+    @Test
+    public void testTransferIfNoSourceDatabase() {
+
+    }
 
     @After
     public void clearDatabases() {

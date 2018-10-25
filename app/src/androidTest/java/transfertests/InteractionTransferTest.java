@@ -6,16 +6,23 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 
 public class InteractionTransferTest extends TransferTest {
 
     @BeforeClass
     public static void initDatabase() {
-        initSourceDatabase();
+        String tableCreation = InteractionsSQLiteHelper.DATABASE_CREATE;
+
+        initSourceDatabase(tableCreation);
         initTestDatabase();
     }
 
+    @Test
+    public void testBasicInteractionsTransfer() {
+
+    }
 
 
     @After

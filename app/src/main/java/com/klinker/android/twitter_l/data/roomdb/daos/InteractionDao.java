@@ -34,21 +34,21 @@ public abstract class InteractionDao {
     //getUnreadCursor?
 
     @Query("SELECT COUNT(id) FROM interactions WHERE account = :account AND is_unread = 1")
-    abstract int getUnreadCount(int account);
+    public abstract int getUnreadCount(int account);
 
     //TODO: improve query
-    @Query("UPDATE interactions SET is_unread = 0 WHERE id IN (SELECT id FROM interactions WHERE account = :account ORDER BY time DESC LIMIT -1 OFFSET :position)")
-    abstract void markRead(int account, int position);
+    @Query("UPDATE interactions SET is_unread = 0 WHERE id IN (SELECT id FROM interactions WHERE account = :account AND is_unread = 1 ORDER BY time DESC LIMIT -1 OFFSET :position)")
+    public abstract void markRead(int account, int position);
 
     @Query("SELECT users FROM interactions WHERE account = :account AND is_unread = :unread ORDER BY time DESC LIMIT 1 OFFSET :position")
-    abstract String getUsers(int account, int position, boolean unread);
+    public abstract String getUsers(int account, int position, boolean unread);
 
     @Query("UPDATE interactions SET is_unread = 0 WHERE account = :account")
-    abstract void markAllRead(int account);
+    public abstract void markAllRead(int account);
 
 
-    @Query("DELETE FROM interactions WHERE account = :account AND id < (SELECT MIN(id) FROM interactions WHERE account = :account ORDER BY time DESC LIMIT :trimSize)")
-    abstract void trimDatabase(int account, int trimSize);
+    @Query("DELETE FROM interactions WHERE id IN(SELECT id FROM interactions WHERE account = :account ORDER BY time DESC LIMIT -1 OFFSET :trimSize)")
+    public abstract void trimDatabase(int account, int trimSize);
 
 
 }

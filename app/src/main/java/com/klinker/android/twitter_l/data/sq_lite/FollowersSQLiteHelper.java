@@ -33,7 +33,7 @@ public class FollowersSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_HOME + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_NAME

@@ -15,7 +15,7 @@ public class FavoriteUserNotificationSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE + "(" + COLUMN_ID
             + " integer primary key, " +  COLUMN_TWEET_ID
             + " integer); ";

@@ -6,16 +6,23 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class FavoriteUserNotificationsTransferTest extends TransferTest {
 
     @BeforeClass
     public static void initDatabase() {
-        initSourceDatabase();
+        String tableCreation = FavoriteUserNotificationSQLiteHelper.DATABASE_CREATE;
+
+        initSourceDatabase(tableCreation);
         initTestDatabase();
     }
 
 
+    @Test
+    public void transferFavoriteUserNotificationsData() {
+
+    }
 
     @After
     public void clearDatabases() {

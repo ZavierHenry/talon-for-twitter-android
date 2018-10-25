@@ -29,11 +29,11 @@ public class FavoriteUsersSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PRO_PIC = "profile_pic";
     public static final String COLUMN_SCREEN_NAME = "screen_name";
 
-    private static final String DATABASE_NAME = "favUsers.db";
+    public static final String DATABASE_NAME = "favUsers.db";
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_HOME + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_NAME

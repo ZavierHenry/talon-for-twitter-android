@@ -34,7 +34,7 @@ public class ActivitySQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_ACTIVITY + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_TWEET_ID
             + " integer tweet id, " + COLUMN_TITLE
@@ -57,10 +57,10 @@ public class ActivitySQLiteHelper extends SQLiteOpenHelper {
             + " text extra two, " + COLUMN_EXTRA_THREE
             + " text extra three);";
 
-    private static final String DATABASE_ADD_CONVO_FIELD =
+    public static final String DATABASE_ADD_CONVO_FIELD =
             "ALTER TABLE " + TABLE_ACTIVITY + " ADD COLUMN " + COLUMN_CONVERSATION + " INTEGER DEFAULT 0";
 
-    private static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
+    public static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
             "ALTER TABLE " + TABLE_ACTIVITY + " ADD COLUMN " + COLUMN_MEDIA_LENGTH + " INTEGER DEFAULT -1";
 
     public ActivitySQLiteHelper(Context context) {

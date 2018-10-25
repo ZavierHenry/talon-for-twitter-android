@@ -30,7 +30,7 @@ public class HashtagSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_HASHTAGS + "(" + COLUMN_ID
             + " integer primary key, " +  COLUMN_TAG
             + " text hashtag); ";

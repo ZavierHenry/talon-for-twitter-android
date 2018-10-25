@@ -50,7 +50,7 @@ public class HomeSQLiteHelper extends SQLiteOpenHelper {
     //private static final int DATABASE_VERSION = 4;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_HOME + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_TWEET_ID
@@ -72,10 +72,10 @@ public class HomeSQLiteHelper extends SQLiteOpenHelper {
             + " text extra two, " + COLUMN_CLIENT_SOURCE
             + " text extra three);";
 
-    private static final String DATABASE_ADD_CONVO_FIELD =
+    public static final String DATABASE_ADD_CONVO_FIELD =
             "ALTER TABLE " + TABLE_HOME + " ADD COLUMN " + COLUMN_CONVERSATION + " INTEGER DEFAULT 0";
 
-    private static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
+    public static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
             "ALTER TABLE " + TABLE_HOME + " ADD COLUMN " + COLUMN_MEDIA_LENGTH + " INTEGER DEFAULT -1";
 
     //private static final String DATABASE_ADD_IS_USER_VERIFIED = "ALTER TABLE " + TABLE_HOME + " ADD COLUMN " + COLUMN_IS_USER_VERIFIED + " INTEGER DEFAULT 0";

@@ -206,8 +206,9 @@ dependencies {
     def room_version = "2.1.0-alpha01"
 
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
 
     testImplementation ("androidx.room:room-testing:$room_version") {
         exclude group: 'com.google.code.gson', module: 'gson'
@@ -273,3 +274,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-kapt'

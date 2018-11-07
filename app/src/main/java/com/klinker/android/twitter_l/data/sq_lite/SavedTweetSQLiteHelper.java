@@ -47,7 +47,7 @@ public class SavedTweetSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_HOME + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_TWEET_ID
@@ -68,7 +68,7 @@ public class SavedTweetSQLiteHelper extends SQLiteOpenHelper {
             + " text extra two, " + COLUMN_EXTRA_THREE
             + " text extra three);";
 
-    private static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
+    public static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
             "ALTER TABLE " + TABLE_HOME + " ADD COLUMN " + COLUMN_MEDIA_LENGTH + " INTEGER DEFAULT -1";
 
     public SavedTweetSQLiteHelper(Context context) {

@@ -48,7 +48,7 @@ public class MentionsSQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_MENTIONS + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_TWEET_ID
             + " integer tweet id, " + COLUMN_UNREAD
@@ -69,10 +69,10 @@ public class MentionsSQLiteHelper extends SQLiteOpenHelper {
             + " text extra two, " + COLUMN_EXTRA_THREE
             + " text extra three);";
 
-    private static final String DATABASE_ADD_CONVO_FIELD =
+    public static final String DATABASE_ADD_CONVO_FIELD =
             "ALTER TABLE " + TABLE_MENTIONS + " ADD COLUMN " + COLUMN_CONVERSATION + " INTEGER DEFAULT 0";
 
-    private static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
+    public static final String DATABASE_ADD_MEDIA_LENGTH_FIELD =
             "ALTER TABLE " + TABLE_MENTIONS + " ADD COLUMN " + COLUMN_MEDIA_LENGTH + " INTEGER DEFAULT -1";
 
     public MentionsSQLiteHelper(Context context) {

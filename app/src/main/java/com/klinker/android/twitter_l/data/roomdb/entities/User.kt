@@ -7,6 +7,8 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+import twitter4j.User as TwitterUser
+
 @Entity(tableName = "users", indices = [Index(value = ["screen_name"], unique = true)])
 class User {
 
@@ -20,13 +22,13 @@ class User {
     var screenName: String
 
     @ColumnInfo(name = "profile_pic")
-    var profilePic: String? = null
+    var profilePic: String
 
     @ColumnInfo(name = "is_verified")
     var isVerified: Boolean = false
 
 
-    constructor(user: twitter4j.User) {
+    constructor(user: TwitterUser) {
 
         id = user.id
         name = user.name
@@ -45,6 +47,15 @@ class User {
         this.screenName = screenName
         this.profilePic = profilePic
         this.isVerified = isVerified
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is User
+                && this.id == other.id
+                && this.name.contentEquals(other.name)
+                && this.screenName.contentEquals(other.screenName)
+                && this.isVerified == other.isVerified
+
     }
 
 

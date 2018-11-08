@@ -1,19 +1,40 @@
 package daotests
 
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.Before
-import org.junit.BeforeClass
-
 import androidx.room.Dao
+import com.klinker.android.twitter_l.data.roomdb.daos.DirectMessageDao
+import org.junit.*
 
 class DirectMessageDaoTest : DaoTest() {
+
+    private val directMessageDao get() = testDatabase.directMessageDao()
+
+
+    @Test
+    fun insertDirectMessage() {
+
+    }
+
+
+
+    @Test
+    fun trimDatabaseTrimsDatabase() {
+
+    }
+
+
+    @Test
+    fun trimDatabaseDoesntTrimSmallDatabase() {
+
+    }
+
 
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
+
+
 
     companion object {
 

@@ -12,6 +12,8 @@ import org.junit.Test
 
 class FollowerDaoTest : DaoTest() {
 
+    private val followerDao get() = testDatabase.followerDao()
+
 
     @Test
     fun insertFollower() {
@@ -33,7 +35,7 @@ class FollowerDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {

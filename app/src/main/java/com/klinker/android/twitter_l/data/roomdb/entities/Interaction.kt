@@ -18,11 +18,19 @@ import twitter4j.Status
         indices = [Index(value = ["time"])])
 class Interaction() {
 
+    //FOLLOWER = 0
+    //RETWEET = 1
+    //FAVORITE = 2
+    //MENTION = 3
+    //FAV_USER = 4
+    //QUOTED_TWEET = 5
+
+
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null
 
     @ColumnInfo(name = "tweet_id")
-    var tweetId: Long? = null
+    var tweetId : Long = 0
 
     @ColumnInfo(name = "is_unread")
     var isUnread: Boolean = false
@@ -50,31 +58,51 @@ class Interaction() {
     }
 
 
-    constructor(status: Status, account: Int, title: String, interactionType: Int) : this() {
+    constructor(context: Context, status: Status?, source: twitter4j.User, account: Int, interactionType: Int) : this() {
 
         this.account = account
         this.isUnread = true
-        this.tweetId = status.id
+        this.tweetId = status?.id ?: 0
         this.interactionType = interactionType
         this.time = GregorianCalendar().time.time
-        this.interactorUserId = status.user.id
-        this.users = "@" + status.user.screenName
-        this.title = title
+        this.interactorUserId = source.id
+        this.users = "@" + source.screenName
         this.interactionType = interactionType
 
+        when (interactionType) {
+
+            0 -> {
+
+            }
+
+            1 -> {
+                title = "<b>@${source.screenName}</b> ${context.getString(R.string.favorited)}"
+                tweetId = status!!.id
+            }
+
+            2 -> {
+                title = "<b>@${source.screenName}</b> ${context.getString(R.string.retweeted)}"
+                tweetId = status!!.id
+            }
+
+            3 -> {
+
+            }
+
+            4 -> {
+
+            }
+
+            5 -> {
+
+            }
+
+
+
+
+        }
+
     }
 
-    constructor(context: Context, follower: twitter4j.User, account: Int) : this() {
-
-        this.tweetId = null
-        this.users = "@" + follower.screenName
-        this.time = GregorianCalendar().time.time
-        this.interactorUserId = follower.id
-        this.title = "<b>@" + follower.screenName + "</b> " + context.resources.getString(R.string.followed)
-    }
-
-    fun updateInteraction(context: Context, source: twitter4j.User, status: Status, account: Int) {
-        this.users += " @" + source.screenName
-    }
 
 }

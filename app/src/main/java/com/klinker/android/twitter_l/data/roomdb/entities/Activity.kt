@@ -53,6 +53,9 @@ class Activity() {
     @ColumnInfo(name = "user_id")
     var userId: Long? = null
 
+    @ColumnInfo
+    var users: String = ""
+
 
     @ColumnInfo
     var type: Int = 0 //change to type ActivityType enum
@@ -82,8 +85,9 @@ class Activity() {
         this.text = "${users.size} ${context.getString(if (users.size == 1) R.string.new_follower_lower else R.string.new_followers_lower)}}"
         this.userId = null
         this.time = Calendar.getInstance().timeInMillis
-
-
+        this.users = buildUserList(users)
+        this.proPicUrls = buildProPicUrl(users)
+        this.title = buildUsersTitle(context, users)
     }
 
     private fun buildProPicUrl(users: List<User>): String {

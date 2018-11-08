@@ -31,8 +31,8 @@ class FavoriteUserNotificationsTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(FavoriteUserNotificationSQLiteHelper.TABLE)
+        clearTestDatabase()
+        clearSourceDatabase(FavoriteUserNotificationSQLiteHelper.TABLE)
     }
 
     companion object {

@@ -14,6 +14,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 class FavoriteUserDaoTest : DaoTest() {
 
+    private val favoriteUserDao get() = testDatabase.favoriteUserDao()
+
     @Test
     fun insertFavoriteUser() {
 
@@ -36,7 +38,7 @@ class FavoriteUserDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {

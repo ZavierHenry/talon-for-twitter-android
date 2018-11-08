@@ -8,6 +8,8 @@ import org.junit.Test
 
 class FavoriteTweetDaoTest : DaoTest() {
 
+    private val favoriteTweetDao get() = testDatabase.favoriteTweetDao()
+
     @Test
     fun insertFavoriteTweet() {
 
@@ -72,7 +74,7 @@ class FavoriteTweetDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.testDatabase!!.clearAllTables()
+        clearTestDatabase()
     }
 
     companion object {

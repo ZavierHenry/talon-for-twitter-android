@@ -12,13 +12,17 @@ import org.junit.BeforeClass
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.klinker.android.twitter_l.data.roomdb.daos.UserDao
 
 class UserDaoTest : DaoTest() {
+
+    private val userDao: UserDao
+        get() = testDatabase.userDao()
 
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {

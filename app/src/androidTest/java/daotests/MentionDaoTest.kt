@@ -15,6 +15,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 class MentionDaoTest : DaoTest() {
 
+    private val mentionDao get() = testDatabase.mentionDao()
+
     @Test
     fun insertMentionTest() {
 
@@ -69,7 +71,7 @@ class MentionDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
 

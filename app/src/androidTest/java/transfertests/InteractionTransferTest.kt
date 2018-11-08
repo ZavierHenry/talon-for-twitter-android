@@ -19,8 +19,8 @@ class InteractionTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearSourceDatabase(InteractionsSQLiteHelper.TABLE_INTERACTIONS)
-        TransferTest.clearTestDatabase()
+        clearSourceDatabase(InteractionsSQLiteHelper.TABLE_INTERACTIONS)
+        clearTestDatabase()
     }
 
     companion object {

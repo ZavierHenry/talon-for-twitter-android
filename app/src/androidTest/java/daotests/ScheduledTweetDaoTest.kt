@@ -25,12 +25,14 @@ import org.hamcrest.Matchers.notNullValue
 
 class ScheduledTweetDaoTest : DaoTest() {
 
+    private val scheduledTweetDao get() = testDatabase.scheduledTweetDao()
+
     @Test
     fun insertScheduledTweet() {
         val scheduledTweet = ScheduledTweet(1, "This is a test message", 100000, 1)
-        DaoTest.testDatabase!!.scheduledTweetDao().insertScheduledTweet(scheduledTweet)
+        scheduledTweetDao.insertScheduledTweet(scheduledTweet)
 
-        val cursor = DaoTest.testDatabase!!.query("SELECT alarm_id FROM scheduled_tweets WHERE alarm_id = ?", arrayOf(java.lang.Long.toString(scheduledTweet.alarmId.toLong())))
+        val cursor = queryDatabase("SELECT alarm_id FROM scheduled_tweets WHERE alarm_id = ?", arrayOf(scheduledTweet.alarmId))
         assertThat("Scheduled tweet is not inserted in the database", cursor.count, `is`(1))
     }
 
@@ -43,12 +45,10 @@ class ScheduledTweetDaoTest : DaoTest() {
         contentValues.put("account", scheduledTweet.account)
         contentValues.put("time", scheduledTweet.time)
 
-        val id = DaoTest.testDatabase!!.openHelper.writableDatabase.insert("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
-        assertThat("Initial setup for deleteScheduledTweet test failed", id, not<Number>(-1))
+        val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+        scheduledTweetDao.deleteScheduledTweet(scheduledTweet)
 
-
-        DaoTest.testDatabase!!.scheduledTweetDao().deleteScheduledTweet(scheduledTweet)
-        val cursor = DaoTest.testDatabase!!.query("SELECT alarm_id FROM scheduled_tweets WHERE alarm_id = ?", arrayOf(java.lang.Long.toString(scheduledTweet.alarmId.toLong())))
+        val cursor = queryDatabase("SELECT alarm_id FROM scheduled_tweets WHERE alarm_id = ?", arrayOf(scheduledTweet.alarmId))
         assertThat("Scheduled tweet is not deleted from the database", cursor.count, `is`(0))
     }
 
@@ -61,15 +61,15 @@ class ScheduledTweetDaoTest : DaoTest() {
         contentValues.put("time", 3000)
         contentValues.put("text", "This is a scheduled tweet test string")
 
-        for (i in 0..399) {
+        for (i in 0..99) {
             contentValues.put("account", if (i < 300) 1 else 2)
             contentValues.put("alarm_id", i)
-            DaoTest.testDatabase!!.openHelper.writableDatabase.insert("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+            insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
         }
 
         //assert some setup assertions
 
-        val scheduledTweets = DaoTest.testDatabase!!.scheduledTweetDao().getScheduledTweets(1)
+        val scheduledTweets = scheduledTweetDao.getScheduledTweets(1)
         assertThat("Querying for a list of scheduled tweets did not return tweets", scheduledTweets, notNullValue())
 
     }
@@ -79,7 +79,7 @@ class ScheduledTweetDaoTest : DaoTest() {
     fun getEarliestScheduledTweet() {
 
         val time: Long = 10000
-        val scheduledTweet = DaoTest.testDatabase!!.scheduledTweetDao().getEarliestScheduledTweets(time)
+        val scheduledTweet = scheduledTweetDao.getEarliestScheduledTweets(time)
     }
 
 
@@ -87,13 +87,13 @@ class ScheduledTweetDaoTest : DaoTest() {
     fun getNoScheduledTweetIfTimeisTooEarly() {
 
         val time: Long = 10000
-        val scheduledTweet = DaoTest.testDatabase!!.scheduledTweetDao().getEarliestScheduledTweets(time)
+        val scheduledTweet = scheduledTweetDao.getEarliestScheduledTweets(time)
     }
 
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {

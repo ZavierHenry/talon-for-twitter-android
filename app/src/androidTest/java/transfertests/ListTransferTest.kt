@@ -26,8 +26,8 @@ class ListTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(ListSQLiteHelper.TABLE_HOME)
+        clearTestDatabase()
+        clearSourceDatabase(ListSQLiteHelper.TABLE_HOME)
     }
 
     companion object {

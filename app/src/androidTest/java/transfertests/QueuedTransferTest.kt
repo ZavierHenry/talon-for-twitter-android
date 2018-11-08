@@ -43,8 +43,8 @@ class QueuedTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(QueuedSQLiteHelper.TABLE_QUEUED)
+        clearTestDatabase()
+        clearSourceDatabase(QueuedSQLiteHelper.TABLE_QUEUED)
     }
 
     companion object {

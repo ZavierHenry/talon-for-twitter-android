@@ -14,9 +14,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 class QueuedTweetDaoTest : DaoTest() {
 
+    private val queuedTweetDao get() = testDatabase.queuedTweetDao()
+
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {
@@ -28,7 +30,7 @@ class QueuedTweetDaoTest : DaoTest() {
 
         @AfterClass
         fun closeDatabase() {
-            DaoTest.clearTestDatabase()
+            DaoTest.closeTestDatabase()
         }
     }
 }

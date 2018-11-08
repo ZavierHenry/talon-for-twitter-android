@@ -86,8 +86,8 @@ class SavedTweetsTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(SavedTweetSQLiteHelper.TABLE_HOME)
+        clearTestDatabase()
+        clearSourceDatabase(SavedTweetSQLiteHelper.TABLE_HOME)
     }
 
     companion object {

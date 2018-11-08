@@ -1,8 +1,11 @@
 package transfertests
 
 
+import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import androidx.room.OnConflictStrategy
 
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 
@@ -15,9 +18,39 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 abstract class TransferTest {
 
+    val sourceDatabasePath : String
+        get() = sourceDatabase!!.path
+
     internal fun applyCallback(callback: RoomDatabase.Callback) {
         callback.onCreate(testDatabase!!.openHelper.writableDatabase)
     }
+
+    internal fun queryTestDatabase(query : String, args : Array<Any>?) : Cursor {
+        return testDatabase!!.query(query, args)
+    }
+
+    internal fun beginSourceDatabaseTransaction() {
+        sourceDatabase!!.beginTransaction()
+    }
+
+    internal fun endSuccessfulSourceDatabaseTransaction() {
+        sourceDatabase!!.setTransactionSuccessful()
+        sourceDatabase!!.endTransaction()
+    }
+
+    internal fun insertIntoSourceDatabase(tableName : String, values : ContentValues) : Long {
+        return sourceDatabase!!.insert(tableName, null, values)
+    }
+
+
+    internal fun clearTestDatabase() {
+        testDatabase?.clearAllTables()
+    }
+
+    internal fun clearSourceDatabase(tableName: String) {
+        sourceDatabase?.delete(tableName, null, null)
+    }
+
 
     companion object {
 
@@ -26,12 +59,12 @@ abstract class TransferTest {
         internal var sourceDatabase: SQLiteDatabase? = null
         internal const val badDatabaseLocation = "no_database_here.db"
 
-        fun initTestDatabase() {
+        internal fun initTestDatabase() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             testDatabase = Room.inMemoryDatabaseBuilder(context, TalonDatabase::class.java).build()
         }
 
-        fun initSourceDatabase(vararg tableCreationStatements: String) {
+        internal fun initSourceDatabase(vararg tableCreationStatements: String) {
 
             val fullDbPath = InstrumentationRegistry
                     .getInstrumentation()
@@ -47,15 +80,6 @@ abstract class TransferTest {
                 sourceDatabase!!.execSQL(statement)
             }
 
-        }
-
-
-        fun clearTestDatabase() {
-            testDatabase?.clearAllTables()
-        }
-
-        fun clearSourceDatabase(tableName: String) {
-            sourceDatabase?.delete(tableName, null, null)
         }
 
         internal fun closeTestDatabase() {

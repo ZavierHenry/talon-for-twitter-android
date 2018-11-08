@@ -10,23 +10,6 @@ import android.os.strictmode.SqliteObjectLeakedViolation
 import android.telecom.Call
 import android.util.Log
 
-import com.klinker.android.twitter_l.data.roomdb.daos.ActivityDao
-import com.klinker.android.twitter_l.data.roomdb.daos.DirectMessageDao
-import com.klinker.android.twitter_l.data.roomdb.daos.DraftDao
-import com.klinker.android.twitter_l.data.roomdb.daos.EmojiDao
-import com.klinker.android.twitter_l.data.roomdb.daos.FavoriteTweetDao
-import com.klinker.android.twitter_l.data.roomdb.daos.FavoriteUserDao
-import com.klinker.android.twitter_l.data.roomdb.daos.FavoriteUserNotificationDao
-import com.klinker.android.twitter_l.data.roomdb.daos.FollowerDao
-import com.klinker.android.twitter_l.data.roomdb.daos.HashtagDao
-import com.klinker.android.twitter_l.data.roomdb.daos.HomeTweetDao
-import com.klinker.android.twitter_l.data.roomdb.daos.InteractionDao
-import com.klinker.android.twitter_l.data.roomdb.daos.ListTweetDao
-import com.klinker.android.twitter_l.data.roomdb.daos.MentionDao
-import com.klinker.android.twitter_l.data.roomdb.daos.QueuedTweetDao
-import com.klinker.android.twitter_l.data.roomdb.daos.SavedTweetDao
-import com.klinker.android.twitter_l.data.roomdb.daos.ScheduledTweetDao
-import com.klinker.android.twitter_l.data.roomdb.daos.UserTweetDao
 import com.klinker.android.twitter_l.data.roomdb.entities.Activity
 import com.klinker.android.twitter_l.data.roomdb.entities.DirectMessage
 import com.klinker.android.twitter_l.data.roomdb.entities.Draft
@@ -72,6 +55,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.klinker.android.twitter_l.data.roomdb.daos.*
 
 @Database(entities = [
     Activity::class,
@@ -112,6 +96,8 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun savedTweetDao(): SavedTweetDao
     abstract fun scheduledTweetDao(): ScheduledTweetDao
     abstract fun userTweetDao(): UserTweetDao
+    abstract fun userDao() : UserDao
+    abstract fun tweetDao() : TweetDao
 
 
     //delete databases
@@ -400,7 +386,7 @@ abstract class TalonDatabase : RoomDatabase() {
         }
 
 
-        @JvmStatic fun transferSavedTweetsData(absolutePath: String, userLabeler: AtomicLong): RoomDatabase.Callback {
+        fun transferSavedTweetsData(absolutePath: String, userLabeler: AtomicLong): RoomDatabase.Callback {
             return object : TransferCallback(absolutePath) {
                 override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
@@ -409,7 +395,7 @@ abstract class TalonDatabase : RoomDatabase() {
         }
 
 
-        @JvmStatic fun transferUserTweetsData(absolutePath: String): RoomDatabase.Callback {
+        fun transferUserTweetsData(absolutePath: String): RoomDatabase.Callback {
             return object : TransferCallback(absolutePath) {
                 override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
@@ -418,7 +404,7 @@ abstract class TalonDatabase : RoomDatabase() {
         }
 
 
-        @JvmStatic fun destroyInstance() {
+        fun destroyInstance() {
             dbInstance?.close()
             dbInstance = null
         }

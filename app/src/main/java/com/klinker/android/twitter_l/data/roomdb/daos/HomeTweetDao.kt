@@ -1,10 +1,6 @@
 package com.klinker.android.twitter_l.data.roomdb.daos
 
 
-import android.content.SharedPreferences
-
-import com.klinker.android.twitter_l.data.roomdb.pojos.TweetWithUserInfo
-
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -32,11 +28,11 @@ abstract class HomeTweetDao : TweetDao() {
 
 
 
-    //internal abstract fun getUnreadTweetsFilterUsersNoRetweets(account: Int, mutedUsers: List<String>, mutedClients: List<String>): List<TweetWithUserInfo>
+    //internal abstract fun getUnreadTweetsFilterUsersNoRetweets(account: Int, mutedUsers: List<String>, mutedClients: List<String>): List<ExtendedTweet>
 
 
 //    @Query("SELECT * FROM home_tweets")
-//    internal abstract fun getUnreadTweetsFilterUsersWithRetweets(account: Int, mutedUsers: List<String>, mutedClients: List<String>): List<TweetWithUserInfo>
+//    internal abstract fun getUnreadTweetsFilterUsersWithRetweets(account: Int, mutedUsers: List<String>, mutedClients: List<String>): List<ExtendedTweet>
 
 
 }

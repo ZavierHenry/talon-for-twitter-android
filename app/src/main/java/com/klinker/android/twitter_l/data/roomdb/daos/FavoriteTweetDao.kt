@@ -4,7 +4,6 @@ package com.klinker.android.twitter_l.data.roomdb.daos
 import android.database.Cursor
 
 import com.klinker.android.twitter_l.data.roomdb.entities.FavoriteTweet
-import com.klinker.android.twitter_l.data.roomdb.pojos.TweetWithUserInfo
 
 import androidx.room.Dao
 import androidx.room.Delete

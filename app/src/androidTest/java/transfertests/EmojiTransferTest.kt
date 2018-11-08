@@ -121,8 +121,8 @@ class EmojiTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(EmojiSQLiteHelper.TABLE_RECENTS)
+        clearTestDatabase()
+        clearSourceDatabase(EmojiSQLiteHelper.TABLE_RECENTS)
     }
 
     companion object {

@@ -85,8 +85,8 @@ class FavoriteUsersTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(FavoriteUsersSQLiteHelper.TABLE_HOME)
+        clearTestDatabase()
+        clearSourceDatabase(FavoriteUsersSQLiteHelper.TABLE_HOME)
     }
 
     companion object {

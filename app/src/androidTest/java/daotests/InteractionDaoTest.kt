@@ -21,8 +21,10 @@ import org.hamcrest.Matchers.`is`
 
 class InteractionDaoTest : DaoTest() {
 
+    private val interactionDao get() = testDatabase.interactionDao()
+
     @Test
-    fun insertFollowerIntraction() {
+    fun insertFollowerInteraction() {
 
     }
 
@@ -79,16 +81,16 @@ class InteractionDaoTest : DaoTest() {
 
         //load data into database
 
-        for (i in 0..399) {
+        for (i in 0..99) {
 
         }
 
 
-        cursor = DaoTest.testDatabase!!.query("SELECT id FROM interactions WHERE account = ?", arrayOf(Integer.toString(account)))
+        cursor = queryDatabase("SELECT id FROM interactions WHERE account = ?", arrayOf(Integer.toString(account)))
         assertThat("Setup for loading data into database failed", cursor.count, greaterThan(trimSize))
 
-        DaoTest.testDatabase!!.interactionDao().trimDatabase(account, trimSize)
-        cursor = DaoTest.testDatabase!!.query("SELECT id FROM interactions WHERE account = ?", arrayOf(Integer.toString(account)))
+        interactionDao.trimDatabase(account, trimSize)
+        cursor = queryDatabase("SELECT id FROM interactions WHERE account = ?", arrayOf(Integer.toString(account)))
         assertThat("Database did not trim to specified size", cursor.count, `is`(trimSize))
 
 
@@ -102,7 +104,7 @@ class InteractionDaoTest : DaoTest() {
 
         //load data into database
 
-        DaoTest.testDatabase!!.interactionDao().trimDatabase(account, trimSize)
+        interactionDao.trimDatabase(account, trimSize)
 
 
     }
@@ -110,7 +112,7 @@ class InteractionDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {

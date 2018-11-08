@@ -1,46 +1,65 @@
 package transfertests
 
 import android.database.Cursor
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 
 import com.klinker.android.twitter_l.data.sq_lite.DMSQLiteHelper
 
 import org.hamcrest.Description
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.`is`
 import org.hamcrest.TypeSafeMatcher
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
+import java.util.concurrent.atomic.AtomicLong
 
 class DirectMessagesTransferTest : TransferTest() {
 
+    private val userLabeler : AtomicLong = AtomicLong(-2L)
+
+    @Before
+    fun resetUserLabeler() {
+        userLabeler.set(-2L)
+    }
 
     @Test
     fun testDirectMessagesTransfer() {
 
+
         //populate source database
-        //call callback onCreate
+
+
         //test direct message transfer results
 
-        val testCursor = TransferTest.testDatabase!!.query("SELECT * FROM direct_messages", null)
+        applyCallback(TalonDatabase.transferDirectMessageData(sourceDatabasePath, userLabeler))
+
+        val cursor = queryTestDatabase("SELECT * FROM direct_messages", null)
+
 
     }
 
     @Test
     fun testTransferIfEmptyTable() {
+        applyCallback(TalonDatabase.transferDirectMessageData(TransferTest.badDatabaseLocation, userLabeler))
 
+        val cursor = queryTestDatabase("SELECT * FROM direct_messages", null)
+        assertThat("Somehow the database is populated by values", cursor.count, `is`(0))
+        cursor.close()
     }
 
     @Test
     fun testTransferIfNoSourceDatabase() {
-
+        applyCallback(TalonDatabase.transferDirectMessageData(TransferTest.badDatabaseLocation, userLabeler))
     }
 
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(DMSQLiteHelper.TABLE_DM)
+        clearTestDatabase()
+        clearSourceDatabase(DMSQLiteHelper.TABLE_DM)
     }
 
     companion object {

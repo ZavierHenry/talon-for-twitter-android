@@ -5,7 +5,7 @@ import com.klinker.android.twitter_l.data.roomdb.entities.Tweet
 import com.klinker.android.twitter_l.data.roomdb.entities.User
 
 
-class TweetWithUserInfo {
+class ExtendedTweet {
 
     @Embedded
     var tweet: Tweet? = null

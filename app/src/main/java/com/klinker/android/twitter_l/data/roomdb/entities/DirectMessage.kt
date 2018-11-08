@@ -15,7 +15,10 @@ import twitter4j.URLEntity
 
 
 @Entity(tableName = "direct_messages",
-        indices = [ Index(value = ["sender_id" ]), Index(value = ["recipient_id"]) ],
+        indices = [
+            Index(value = ["sender_id"]),
+            Index(value = ["recipient_id"]),
+            Index(value = ["message_id", "account"], unique = true) ],
         foreignKeys = [
             ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["sender_id"], onDelete = ForeignKey.CASCADE),
             ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["recipient_id"])
@@ -33,6 +36,9 @@ class DirectMessage() {
 
     @ColumnInfo(name = "recipient_id")
     var recipientId: Long = 0
+
+    @ColumnInfo(name = "message_id")
+    var messageId: Long = 0
 
     @ColumnInfo
     var time: Long = 0

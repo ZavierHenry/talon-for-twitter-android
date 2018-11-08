@@ -69,8 +69,8 @@ class MentionsTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(MentionsSQLiteHelper.TABLE_MENTIONS)
+        clearTestDatabase()
+        clearSourceDatabase(MentionsSQLiteHelper.TABLE_MENTIONS)
     }
 
     companion object {

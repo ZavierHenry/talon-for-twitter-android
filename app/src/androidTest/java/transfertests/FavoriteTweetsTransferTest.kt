@@ -35,8 +35,8 @@ class FavoriteTweetsTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(FavoriteTweetsSQLiteHelper.TABLE_FAVORITE_TWEETS)
+        clearTestDatabase()
+        clearSourceDatabase(FavoriteTweetsSQLiteHelper.TABLE_FAVORITE_TWEETS)
     }
 
     companion object {

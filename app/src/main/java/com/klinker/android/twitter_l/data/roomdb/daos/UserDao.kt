@@ -1,14 +1,9 @@
 package com.klinker.android.twitter_l.data.roomdb.daos
 
 
+import androidx.room.*
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 import com.klinker.android.twitter_l.data.roomdb.entities.User
-
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
 
 @Dao
 abstract class UserDao {
@@ -16,6 +11,8 @@ abstract class UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     internal abstract fun insertUserSpecificInfo(user: User)
 
+    @Update
+    abstract fun updateUser(user: User)
 
     @Delete
     internal abstract fun deleteUser(user: User)
@@ -25,7 +22,37 @@ abstract class UserDao {
 
 
     @Query("SELECT id FROM users WHERE screen_name = :screenName")
-    internal abstract fun findUserByScreenName(screenName: String): Long
+    abstract fun findUserIdByScreenName(screenName: String): Long
+
+
+    @Query("SELECT * FROM users WHERE screen_name = :screenName")
+    abstract fun findUserByScreenName(screenName: String) : User?
+
+    @Transaction
+    open fun insertUser(user: User) {
+        val savedUser = findUserByScreenName(user.screenName)
+
+        when {
+            savedUser == null -> insertUserSpecificInfo(user)
+            savedUser.id < 0 || savedUser.id != user.id -> {
+
+                //replace ids in direct messages
+                //replace ids in tweets
+                //replace ids in favoriteUser
+                //??Deal with delete/insert dependency
+
+            }
+            savedUser != user -> updateUser(user)
+
+        }
+
+    }
+
+
+
+
+
+
 
 
 }

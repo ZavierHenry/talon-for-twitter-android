@@ -21,13 +21,16 @@ import org.hamcrest.Matchers.notNullValue
 
 class EmojiDaoTest : DaoTest() {
 
+    private val emojiDao get() = testDatabase.emojiDao()
+
     @Test
     fun insertEmojiTest() {
         val emoji = Emoji("Smiley face", ":}")
         emoji.count = 33
-        DaoTest.testDatabase!!.emojiDao().insertEmoji(emoji)
-        val cursor = DaoTest.testDatabase!!.query("SELECT * FROM emojis", null)
-        assertThat("Cursor was not returned to check database value", cursor, notNullValue())
+        emojiDao.insertEmoji(emoji)
+
+        val cursor = queryDatabase("SELECT * FROM emojis", null)
+
         assertThat("Emoji did not insert properly into database", cursor.count, `is`(1))
         assertThat("Emoji did not insert properly into database", cursor.moveToFirst(), `is`(true))
         assertThat("Emoji text not saved properly", cursor.getString(cursor.getColumnIndex("text")), `is`(emoji.text))
@@ -46,17 +49,17 @@ class EmojiDaoTest : DaoTest() {
         contentValues.put("icon", emoji.icon)
         contentValues.put("count", emoji.count)
 
-        val id = DaoTest.testDatabase!!.openHelper.writableDatabase.insert("emojis", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+        val id = insertIntoDatabase("emojis", SQLiteDatabase.CONFLICT_ABORT, contentValues)
         assertThat("Database setup did not execute correctly", id, not<Number>(-1))
 
         val oldValue = emoji.count
         emoji.count = emoji.count + 243
 
-        DaoTest.testDatabase!!.emojiDao().insertEmoji(emoji)
-        val cursor = DaoTest.testDatabase!!.query("SELECT * FROM emojis", null)
+        emojiDao.insertEmoji(emoji)
+        val cursor = queryDatabase("SELECT * FROM emojis", null)
         assertThat("Database saved when it shouldn't have saved", cursor.count, `is`(1))
 
-        cursor.moveToFirst()
+        cursor.moveToFirst() //add as assertion
         assertThat("New value was saved instead of the old value", cursor.getInt(cursor.getColumnIndex("count")), `is`(oldValue))
 
     }
@@ -73,12 +76,10 @@ class EmojiDaoTest : DaoTest() {
         contentValues.put("text", text)
         contentValues.put("count", count)
 
-        val id = DaoTest.testDatabase!!.openHelper.writableDatabase.insert("emojis", SQLiteDatabase.CONFLICT_ABORT, contentValues)
-        assertThat("Database setup did not work properly", id, not<Number>(-1))
+        val id = insertIntoDatabase("emojis", SQLiteDatabase.CONFLICT_ABORT, contentValues)
 
-        DaoTest.testDatabase!!.emojiDao().deleteEmoji(id)
-        val cursor = DaoTest.testDatabase!!.query("SELECT * FROM emojis", null)
-        assertThat("Cannot get cursor to check result", cursor, notNullValue())
+        emojiDao.deleteEmoji(id)
+        val cursor = queryDatabase("SELECT * FROM emojis", null)
         assertThat("Element did not delete properly", cursor.count, `is`(0))
         cursor.close()
 
@@ -105,7 +106,7 @@ class EmojiDaoTest : DaoTest() {
 
     @After
     fun clearDatabase() {
-        DaoTest.testDatabase!!.clearAllTables()
+        clearTestDatabase()
     }
 
     companion object {

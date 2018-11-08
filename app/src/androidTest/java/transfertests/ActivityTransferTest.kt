@@ -40,8 +40,8 @@ class ActivityTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearTestDatabase()
-        TransferTest.clearSourceDatabase(ActivitySQLiteHelper.TABLE_ACTIVITY)
+        clearTestDatabase()
+        clearSourceDatabase(ActivitySQLiteHelper.TABLE_ACTIVITY)
     }
 
 

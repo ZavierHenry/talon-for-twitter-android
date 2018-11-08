@@ -52,8 +52,8 @@ class FollowersTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearSourceDatabase(FollowersSQLiteHelper.TABLE_HOME)
-        TransferTest.clearTestDatabase()
+        clearSourceDatabase(FollowersSQLiteHelper.TABLE_HOME)
+        clearTestDatabase()
     }
 
     companion object {

@@ -15,6 +15,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 class SavedTweetDaoTest : DaoTest() {
 
+    private val savedTweetDao get() = testDatabase.savedTweetDao()
+
     @Test
     fun insertSavedTweet() {
 
@@ -52,7 +54,7 @@ class SavedTweetDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
 

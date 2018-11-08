@@ -9,23 +9,23 @@ import org.junit.BeforeClass
 
 class ActivityDaoTest : DaoTest() {
 
+    private val activityDao get() = testDatabase.activityDao()
 
     @After
     fun clearTables() {
-        DaoTest.testDatabase?.clearAllTables()
+        clearTestDatabase()
     }
 
     companion object {
 
         @BeforeClass
         fun initDatabase() {
-
+            DaoTest.initTestDatabase()
         }
 
         @AfterClass
         fun closeDatabase() {
-            DaoTest.testDatabase?.close()
-            DaoTest.testDatabase = null
+            DaoTest.closeTestDatabase()
         }
     }
 }

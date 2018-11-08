@@ -25,8 +25,8 @@ class HomeTweetsTransferTest : TransferTest() {
 
     @After
     fun clearDatabases() {
-        TransferTest.clearSourceDatabase(HomeSQLiteHelper.TABLE_HOME)
-        TransferTest.clearTestDatabase()
+        clearSourceDatabase(HomeSQLiteHelper.TABLE_HOME)
+        clearTestDatabase()
     }
 
     companion object {
@@ -72,7 +72,7 @@ internal class MockHomeTweetMatcher private constructor(expected: MockHomeTweet)
         return false
     }
 
-    override fun describeMismatchSafely(item: MockHomeTweet, description: Description) {
+    override fun describeMismatchSafely(item: MockHomeTweet, mismatchDescription: Description) {
 
     }
 

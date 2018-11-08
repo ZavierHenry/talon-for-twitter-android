@@ -15,6 +15,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 class HomeTweetDaoTest : DaoTest() {
 
+    private val homeTweetDao get() = testDatabase.homeTweetDao()
+
     @Test
     fun insertHomeTweet() {
 
@@ -31,7 +33,7 @@ class HomeTweetDaoTest : DaoTest() {
 
     @After
     fun clearTables() {
-        DaoTest.clearTestDatabase()
+        clearTestDatabase()
     }
 
     companion object {
@@ -43,7 +45,7 @@ class HomeTweetDaoTest : DaoTest() {
 
         @AfterClass
         fun closeDatabase() {
-            DaoTest.clearTestDatabase()
+            DaoTest.closeTestDatabase()
         }
     }
 }

@@ -14,8 +14,7 @@ import androidx.room.PrimaryKey
 class QueuedTweet {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "queued_tweet_id")
-    val id: Int?
+    val id: Long?
 
     @ColumnInfo
     var account: Int = 0
@@ -30,7 +29,7 @@ class QueuedTweet {
         this.account = account
     }
 
-    constructor(id: Int, text: String, account: Int) {
+    constructor(id: Long, text: String, account: Int) {
         this.id = id
         this.text = text
         this.account = account

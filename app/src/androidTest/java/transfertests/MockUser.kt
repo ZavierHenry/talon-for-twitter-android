@@ -1,76 +1,61 @@
 package transfertests
 
 
+import android.content.ContentValues
 import android.database.Cursor
 
-import org.hamcrest.CustomTypeSafeMatcher
-import org.hamcrest.Description
-import org.hamcrest.TypeSafeMatcher
 
-internal class MockUser {
+internal class MockUser(var twitterId: Long?, var name: String?, var screenName: String?, var profilePic: String?, var isVerified: Boolean) : MockEntity<MockUser>() {
 
-    var id: Long = 0
-    var name: String = ""
-    var screenName: String = ""
-    var profilePic: String = ""
-    var isVerified: Boolean = false
+    override fun showMismatches(other: MockUser): List<FieldMismatch> {
 
+        val mismatches = ArrayList<FieldMismatch>()
 
-    constructor(id: Long, name: String, screenName: String, profilePic: String, isVerified: Boolean) {
-        this.id = id
-        this.name = name
-        this.screenName = screenName
-        this.profilePic = profilePic
-        this.isVerified = isVerified
+        if (twitterId != other.twitterId) {
+            mismatches.add(makeMismatch("twitterId", twitterId, other.twitterId))
+        }
+
+        if (name != other.name) {
+            mismatches.add(makeMismatch("name", name, other.name))
+        }
+
+        if (screenName != other.screenName) {
+            mismatches.add(makeMismatch("screenName", screenName, other.screenName))
+        }
+
+        if (profilePic != other.profilePic) {
+            mismatches.add(makeMismatch("profilePic", profilePic, other.profilePic))
+        }
+
+        if (isVerified != other.isVerified) {
+            mismatches.add(makeMismatch("isVerified", isVerified, other.isVerified))
+        }
+
+        return mismatches.toList()
+
     }
 
-    constructor(cursor: Cursor) {
-        this.id = cursor.getLong(cursor.getColumnIndex("users.id"))
-        this.name = cursor.getString(cursor.getColumnIndex("users.name"))
-        this.screenName = cursor.getString(cursor.getColumnIndex("users.screen_name"))
-        this.profilePic = cursor.getString(cursor.getColumnIndex("users.profile_pic"))
-        this.isVerified = cursor.getInt(cursor.getColumnIndex("users.is_verified")) == 1
-    }
+    override fun setContentValues(contentValues: ContentValues) {}
 
+
+    companion object {
+
+        @JvmStatic fun create(cursor: Cursor) : MockUser {
+            val twitterId = cursor.getLong(cursor.getColumnIndex("twitter_id"))
+            val name = cursor.getString(cursor.getColumnIndex("name"))
+            val screenName = cursor.getString(cursor.getColumnIndex("screen_name"))
+            val profilePic = cursor.getString(cursor.getColumnIndex("profile_pic"))
+            val isVerified = cursor.getInt(cursor.getColumnIndex("is_verified")) == 1
+
+            return MockUser(twitterId, name, screenName, profilePic, isVerified)
+        }
+
+    }
 
 }
 
 
-internal class MockUserMatcher private constructor(private val expected: MockUser) : TypeSafeMatcher<MockUser>() {
-
-    public override fun matchesSafely(item: MockUser): Boolean {
-        return false
-    }
-
-    override fun describeTo(description: Description) {
-        description.appendText("All user fields should match")
-    }
-
-    override fun describeMismatchSafely(item: MockUser, description: Description) {
-        description.appendText("The following field have a mismatch:\n")
-
-
-        if (expected.isVerified != item.isVerified) {
-
-        }
-
-        if (expected.id != item.id) {
-
-        }
-
-        if (expected.name != item.name) {
-
-        }
-
-        if (expected.screenName != item.screenName) {
-
-        }
-
-        if (expected.profilePic != item.profilePic) {
-
-        }
-
-    }
+internal class MockUserMatcher private constructor(expected: MockUser) : MockMatcher<MockUser>(expected) {
 
     companion object {
 

@@ -126,7 +126,7 @@ internal class MockSavedTweet(var account: Int, var referenceTweet: MockTweet) {
 internal class MockSavedTweetsMatcher private constructor(private val expected: MockSavedTweet) : TypeSafeMatcher<MockSavedTweet>() {
 
     override fun matchesSafely(item: MockSavedTweet): Boolean {
-        return expected.account == item.account && matchesTweet(expected.referenceTweet).matchesSafely(item.referenceTweet)
+        return expected.account == item.account && matchesTweet(expected.referenceTweet).matches(item.referenceTweet)
     }
 
     override fun describeTo(description: Description) {

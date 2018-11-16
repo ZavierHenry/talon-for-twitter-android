@@ -1,10 +1,23 @@
 package transfertests
 
 import android.content.ContentValues
-import android.database.Cursor
 
-internal interface MockEntity {
+typealias Mismatch = Pair<Any?, Any?>
+typealias FieldMismatch = Pair<String, Mismatch>
 
-     fun setContentValues(contentValues: ContentValues)
+
+internal abstract class MockEntity<T> {
+
+    fun anyMismatches(other: T) : Boolean {
+        return showMismatches(other).isEmpty()
+    }
+
+    abstract fun showMismatches(other: T) : List<FieldMismatch>
+    abstract fun setContentValues(contentValues: ContentValues)
+
+
+    protected fun makeMismatch(name: String, expected: Any?, actual: Any?) : FieldMismatch {
+        return Pair(name, Pair(expected, actual))
+    }
 
 }

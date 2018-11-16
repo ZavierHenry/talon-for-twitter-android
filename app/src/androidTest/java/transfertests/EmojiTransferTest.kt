@@ -1,81 +1,59 @@
 package transfertests
 
 import android.content.ContentValues
-import android.content.Context
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
-import com.klinker.android.twitter_l.data.roomdb.entities.Emoji
 import com.klinker.android.twitter_l.data.sq_lite.EmojiSQLiteHelper
 
-import org.hamcrest.Description
-import org.hamcrest.Matchers
-import org.hamcrest.TypeSafeDiagnosingMatcher
-import org.hamcrest.TypeSafeMatcher
+
 import org.junit.After
 import org.junit.AfterClass
-import org.junit.Before
+
 import org.junit.BeforeClass
 import org.junit.Test
 
-import java.io.File
 import java.util.ArrayList
-import java.util.HashMap
-import java.util.HashSet
-
-import androidx.room.Room
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.test.platform.app.InstrumentationRegistry
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.empty
-import org.hamcrest.Matchers.greaterThan
-import org.hamcrest.Matchers.hasSize
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.not
-import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.*
 
 import transfertests.MockEmojiMatcher.Companion.matchesEmoji
+
 
 class EmojiTransferTest : TransferTest() {
 
 
     @Test
     fun testBasicTransferResult() {
-        val insertedEmojis = HashMap<String, MockEmoji>()
 
+        val emojis = List(2) { MockEmoji("This is the text for emoji $it", "(^($it)^)", it + 1) }
         val contentValues = ContentValues()
-        TransferTest.sourceDatabase!!.beginTransaction()
 
-        for (i in 0..29) {
+        beginSourceDatabaseTransaction()
 
-            val emoji = MockEmoji("icon_$i", "Description for icon $i", i)
+        val idCount = emojis.asSequence().map { emoji ->
             emoji.setContentValues(contentValues)
+            insertIntoSourceDatabase(EmojiSQLiteHelper.TABLE_RECENTS, contentValues)
+        }.count { it != -1L }
 
-            val id = TransferTest.sourceDatabase!!.insert(EmojiSQLiteHelper.TABLE_RECENTS, null, contentValues)
-            if (id != -1L) {
-                insertedEmojis[emoji.icon] = emoji
-            }
-        }
+        endSuccessfulSourceDatabaseTransaction()
 
-        TransferTest.sourceDatabase!!.setTransactionSuccessful()
-        TransferTest.sourceDatabase!!.endTransaction()
+        assertThat("At least one successful insertion is necessary to run this test", idCount, greaterThan(0))
 
-        assertThat("At least one successful insertion is necessary to run this test", insertedEmojis.size, greaterThan(0))
+        applyCallback(TalonDatabase.transferEmojiData(sourceDatabasePath))
 
-        applyCallback(TalonDatabase.transferEmojiData(TransferTest.sourceDatabase!!.path))
+        val cursor = queryTestDatabase("SELECT * FROM emojis", null)
+        assertThat("Number of transfers is incorrect", cursor.count, `is`(idCount))
+        assertThat("Problem moving to first value of the database", cursor.moveToFirst())
 
-        val cursor = TransferTest.testDatabase!!.query("SELECT * FROM emojis", null)
-        assertThat("Error getting database result for testing", cursor, notNullValue())
-        assertThat("Number of transfers is incorrect", cursor.count, `is`(insertedEmojis.size))
 
-        val actualEmojis = ArrayList<MockEmoji>()
+        val matchers = emojis.map { matchesEmoji(it) }
+
         do {
 
-            val testEmoji = MockEmoji(cursor)
-            assertThat(testEmoji, matchesEmoji(insertedEmojis.remove(testEmoji.icon)!!))
+            val testEmoji = MockEmoji.create(cursor)
+            assertThat("Database transfer did not work properly", testEmoji, anyOf(matchers))
 
         } while (cursor.moveToNext())
 
@@ -83,22 +61,57 @@ class EmojiTransferTest : TransferTest() {
 
     }
 
+
     @Test
     fun testDuplicateIcons() {
-        val expectedEmojis = HashMap<String, MockEmoji>()
         val contentValues = ContentValues()
+        val emojis = List(3) { MockEmoji("This is text for the emoji $it", "22",  it)}
 
-        TransferTest.sourceDatabase!!.beginTransaction()
+        beginSourceDatabaseTransaction()
 
-        for (i in 0..49) {
-            val mockEmoji = MockEmoji("icon_" + i % 7, "Description for icon $i", i)
-
+        emojis.forEach { emoji ->
+            emoji.setContentValues(contentValues)
+            insertIntoSourceDatabase(EmojiSQLiteHelper.TABLE_RECENTS, contentValues)
         }
 
-        TransferTest.sourceDatabase!!.setTransactionSuccessful()
-        TransferTest.sourceDatabase!!.endTransaction()
+        endSuccessfulSourceDatabaseTransaction()
 
-        //assert that the conditions for the test have been met
+        applyCallback(TalonDatabase.transferEmojiData(sourceDatabasePath))
+
+        val cursor = queryTestDatabase("SELECT * FROM emojis", null)
+        assertThat("Incorrect number of emojis in the database", cursor.count, `is`(1))
+        assertThat("Error pointing to value in the database", cursor.moveToFirst())
+
+        val testEmoji = MockEmoji.create(cursor)
+        assertThat("Proper emoji did not transfer into the new database", testEmoji, matchesEmoji(emojis.maxBy { it.count!! }!!))
+        cursor.close()
+    }
+
+
+    @Test
+    fun testDuplicateText() {
+        val contentValues = ContentValues()
+        val emojis = List(3) { MockEmoji( "This is the duplicate text for the emoji", "$it", it)}
+
+        beginSourceDatabaseTransaction()
+
+        emojis.forEach { emoji ->
+            emoji.setContentValues(contentValues)
+            insertIntoSourceDatabase(EmojiSQLiteHelper.TABLE_RECENTS, contentValues)
+        }
+
+        endSuccessfulSourceDatabaseTransaction()
+
+        applyCallback(TalonDatabase.transferEmojiData(sourceDatabasePath))
+
+        val cursor = queryTestDatabase("SELECT * FROM emojis", null)
+
+        assertThat("Incorrect number of emojis in the database", cursor.count, `is`(1))
+        assertThat("Error pointing to value in the database", cursor.moveToFirst())
+
+        val testEmoji = MockEmoji.create(cursor)
+        assertThat("Proper emoji did not transfer into the new database", testEmoji, matchesEmoji(emojis.maxBy { it.count!! }!!))
+        cursor.close()
 
     }
 
@@ -106,9 +119,8 @@ class EmojiTransferTest : TransferTest() {
     @Test
     fun testTransferIfEmptyTable() {
 
-        applyCallback(TalonDatabase.transferEmojiData(TransferTest.sourceDatabase!!.path))
-        val cursor = TransferTest.testDatabase!!.query("SELECT * FROM emojis", null)
-        assertThat("Could not get database cursor", cursor, notNullValue())
+        applyCallback(TalonDatabase.transferEmojiData(sourceDatabasePath))
+        val cursor = queryTestDatabase("SELECT * FROM emojis", null)
         assertThat("Database table somehow got populated", cursor.count, `is`(0))
         cursor.close()
     }
@@ -128,7 +140,7 @@ class EmojiTransferTest : TransferTest() {
     companion object {
 
         @BeforeClass
-        fun initDatabase() {
+        @JvmStatic fun initDatabase() {
             val tableCreation = EmojiSQLiteHelper.DATABASE_CREATE
             TransferTest.initSourceDatabase(tableCreation)
             TransferTest.initTestDatabase()
@@ -136,86 +148,61 @@ class EmojiTransferTest : TransferTest() {
 
 
         @AfterClass
-        fun closeDatabase() {
+        @JvmStatic fun closeDatabase() {
             TransferTest.closeTestDatabase()
             TransferTest.closeSourceDatabase()
         }
     }
 
-
-    //mock emoji matcher
-
-
 }
 
-internal class MockEmoji {
 
-    var icon: String
-    var text: String
-    var count: Int
+internal class MockEmoji(var text: String?, var icon: String?, var count: Int?) : MockEntity<MockEmoji>() {
+    override fun showMismatches(other: MockEmoji): List<FieldMismatch> {
+        val mismatches = ArrayList<FieldMismatch>()
 
-    constructor(icon: String, text: String, count: Int) {
-        this.icon = icon
-        this.text = text
-        this.count = count
+        if (text != other.text) {
+            mismatches.add(makeMismatch("text", text, other.text))
+        }
 
+        if (icon != other.icon) {
+            mismatches.add(makeMismatch("icon", icon, other.icon))
+        }
+
+        if (count != other.count) {
+            mismatches.add(makeMismatch("count", count, other.count))
+        }
+
+        return mismatches.toList()
     }
 
-    constructor(cursor: Cursor) {
-        this.icon = cursor.getString(cursor.getColumnIndex("icon"))
-        this.text = cursor.getString(cursor.getColumnIndex("text"))
-        this.count = cursor.getInt(cursor.getColumnIndex("count"))
-    }
-
-    fun setContentValues(contentValues: ContentValues) {
-        contentValues.put(EmojiSQLiteHelper.COLUMN_ICON, icon)
+    override fun setContentValues(contentValues: ContentValues) {
         contentValues.put(EmojiSQLiteHelper.COLUMN_TEXT, text)
+        contentValues.put(EmojiSQLiteHelper.COLUMN_ICON, icon)
         contentValues.put(EmojiSQLiteHelper.COLUMN_COUNT, count)
-    }
-
-
-}
-
-internal class MockEmojiMatcher private constructor(private val expected: MockEmoji) : TypeSafeMatcher<MockEmoji>() {
-
-    override fun matchesSafely(item: MockEmoji): Boolean {
-        return expected.icon == item.icon && expected.text == item.text && expected.count == item.count
-    }
-
-    override fun describeTo(description: Description) {
-        description.appendText("All emoji fields to be equal")
-    }
-
-    override fun describeMismatchSafely(item: MockEmoji, description: Description) {
-        description.appendText("The following fields are not equal:\n")
-
-        if (expected.icon != item.icon) {
-            description.appendText("Expected icon ").appendValue(expected.icon)
-                    .appendValue(", Actual icon ").appendValue(item.icon)
-                    .appendValue("\n")
-        }
-
-        if (expected.text != item.text) {
-            description.appendText("Expected text ").appendValue(expected.text)
-                    .appendValue(", Actual text ").appendValue(item.text)
-                    .appendValue("\n")
-        }
-
-        if (expected.count != item.count) {
-            description.appendText("Expected count ").appendValue(expected.count)
-                    .appendValue(", Actual count ").appendValue(item.count)
-                    .appendValue("\n")
-        }
-
     }
 
     companion object {
 
-        fun matchesEmoji(expected: MockEmoji): MockEmojiMatcher {
+        @JvmStatic fun create(cursor: Cursor) : MockEmoji {
+            val text = cursor.getString(cursor.getColumnIndex("text"))
+            val icon = cursor.getString(cursor.getColumnIndex("icon"))
+            val count = cursor.getInt(cursor.getColumnIndex("count"))
+
+            return MockEmoji(text, icon, count)
+        }
+
+    }
+
+
+}
+
+
+internal class MockEmojiMatcher private constructor(expected: MockEmoji) : MockMatcher<MockEmoji>(expected) {
+
+    companion object {
+        @JvmStatic fun matchesEmoji(expected: MockEmoji) : MockEmojiMatcher {
             return MockEmojiMatcher(expected)
         }
     }
-
-    //Possibly meta test matcher
-
 }

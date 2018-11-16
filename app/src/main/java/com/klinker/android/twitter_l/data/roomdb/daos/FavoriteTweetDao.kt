@@ -1,15 +1,15 @@
 package com.klinker.android.twitter_l.data.roomdb.daos
 
 
+import android.content.Context
 import android.database.Cursor
+import androidx.room.*
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 
 import com.klinker.android.twitter_l.data.roomdb.entities.FavoriteTweet
+import com.klinker.android.twitter_l.data.roomdb.entities.Tweet
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import twitter4j.Status
 
 @Dao
 abstract class FavoriteTweetDao {
@@ -20,7 +20,6 @@ abstract class FavoriteTweetDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     internal abstract fun insertFavoriteTweets(favoriteTweets: List<FavoriteTweet>)
-
 
     @Delete
     internal abstract fun deleteFavoriteTweet(favoriteTweet: FavoriteTweet)
@@ -45,8 +44,20 @@ abstract class FavoriteTweetDao {
     internal abstract fun tweetExists(tweetId: Long, account: Int): Long?
 
 
-    @Query("DELETE FROM favorite_tweets WHERE account = :account AND id <= (SELECT id FROM favorite_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT 1 OFFSET :trimSize)")
-    internal abstract fun trimDatabase(account: Int, trimSize: Int)
+    @Query("DELETE FROM favorite_tweets WHERE account = :account AND id < (SELECT id FROM favorite_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT 1 OFFSET :trimSize)")
+    abstract fun trimDatabase(account: Int, trimSize: Int)
+
+    @Transaction
+    open fun insertFavoriteTweet(context: Context, status: Status, account: Int) {
+        val tweet = Tweet(status)
+        val favoriteTweet = FavoriteTweet(status, account)
+
+        TalonDatabase.getInstance(context).tweetDao().insertTweet(tweet)
+        insertFavoriteTweet(favoriteTweet)
+    }
+
+
+    //insert the multiple forms of the tweets
 
 
 }

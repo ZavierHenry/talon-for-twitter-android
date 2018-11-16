@@ -77,8 +77,11 @@ class EmojiDaoTest : DaoTest() {
         contentValues.put("count", count)
 
         val id = insertIntoDatabase("emojis", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+        assertThat("Emoji must be in database to properly test this", id, not(-1L))
 
-        emojiDao.deleteEmoji(id)
+        val emoji = Emoji(id, text, icon, count)
+        emojiDao.deleteEmoji(emoji)
+
         val cursor = queryDatabase("SELECT * FROM emojis", null)
         assertThat("Element did not delete properly", cursor.count, `is`(0))
         cursor.close()
@@ -99,7 +102,7 @@ class EmojiDaoTest : DaoTest() {
 
 
     @Test
-    fun deleteListUsedRecentsOutsideBounds() {
+    fun deleteLeastUsedRecentsOutsideBounds() {
 
     }
 

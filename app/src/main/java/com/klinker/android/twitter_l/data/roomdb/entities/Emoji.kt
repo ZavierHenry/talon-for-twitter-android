@@ -8,13 +8,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "emojis", indices = [Index(value = ["icon"], unique = true)])
+@Entity(tableName = "emojis",
+        indices = [Index(value = ["icon"], unique = true), Index(value = ["text"], unique = true), Index(value = ["count"])])
 class Emoji {
 
     @PrimaryKey(autoGenerate = true)
     val id: Long?
 
-    //TODO: decide if field can be null
+
     @ColumnInfo
     var text: String
 
@@ -41,5 +42,8 @@ class Emoji {
         this.count = 0
     }
 
+    fun incrementCount() {
+        count += 1
+    }
 
 }

@@ -25,7 +25,7 @@ class SavedTweet {
     @ColumnInfo(name = "tweet_id")
     var tweetId: Long = 0
 
-    constructor(id: Long, account: Int, tweetId: Long) {
+    constructor(id: Long? = null, account: Int, tweetId: Long) {
         this.id = id
         this.account = account
         this.tweetId = tweetId

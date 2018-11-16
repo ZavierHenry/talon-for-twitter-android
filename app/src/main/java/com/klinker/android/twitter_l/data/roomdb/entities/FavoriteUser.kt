@@ -1,11 +1,9 @@
 package com.klinker.android.twitter_l.data.roomdb.entities
 
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
+
+import twitter4j.User as TwitterUser
 
 @Entity(tableName = "favorite_users",
         indices = [Index(value = ["user_id", "account"], unique = true), Index(value = ["account"])],
@@ -22,13 +20,13 @@ class FavoriteUser {
     var userId: Long? = null
 
 
-    constructor(user: twitter4j.User, account: Int) {
+    constructor(user: TwitterUser, account: Int) {
         this.id = null
         this.account = account
         this.userId = user.id
     }
 
-    constructor(id: Long, account: Int, userId: Long) {
+    constructor(account: Int, userId: Long, id: Long? = null) {
         this.id = id
         this.account = account
         this.userId = userId

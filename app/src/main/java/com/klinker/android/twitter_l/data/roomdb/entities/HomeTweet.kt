@@ -28,8 +28,14 @@ class HomeTweet {
     @ColumnInfo(name = "is_current_pos")
     var isCurrentPos: Boolean = false
 
+    @ColumnInfo(name = "is_liked")
+    var isLiked: Boolean = false
 
-    constructor(id: Long, account: Int, isUnread: Boolean, tweetId: Long, isCurrentPos: Boolean) {
+    @ColumnInfo(name = "is_retweeted")
+    var isRetweeted: Boolean = false
+
+
+    constructor(id: Long, account: Int, isUnread: Boolean, tweetId: Long, isCurrentPos: Boolean, isLiked: Boolean?, isRetweeted: Boolean?) {
         this.id = id
         this.account = account
         this.isUnread = isUnread

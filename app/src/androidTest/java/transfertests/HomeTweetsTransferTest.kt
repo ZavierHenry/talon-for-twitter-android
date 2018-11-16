@@ -48,39 +48,3 @@ class HomeTweetsTransferTest : TransferTest() {
         }
     }
 }
-
-internal class MockHomeTweet {
-
-    var account: Int = 0
-    var unread: Boolean = false
-    var isCurrentPosition: Boolean = false
-    var referencedTweet: MockTweet? = null
-
-    internal fun setContentValues(contentValues: ContentValues) {
-        contentValues.put(HomeSQLiteHelper.COLUMN_ACCOUNT, account)
-    }
-
-    internal fun readCursor(cursor: Cursor) {
-        this.account = cursor.getInt(cursor.getColumnIndex("account"))
-    }
-}
-
-
-internal class MockHomeTweetMatcher private constructor(expected: MockHomeTweet) : MockMatcher<MockHomeTweet>(expected) {
-
-    override fun matchesSafely(item: MockHomeTweet): Boolean {
-        return false
-    }
-
-    override fun describeMismatchSafely(item: MockHomeTweet, mismatchDescription: Description) {
-
-    }
-
-    companion object {
-
-        fun matchesHomeTweet(expected: MockHomeTweet): MockHomeTweetMatcher {
-            return MockHomeTweetMatcher(expected)
-        }
-    }
-
-}

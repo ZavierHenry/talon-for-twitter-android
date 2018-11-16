@@ -44,7 +44,6 @@ class DirectMessagesTransferTest : TransferTest() {
     @Test
     fun testTransferIfEmptyTable() {
         applyCallback(TalonDatabase.transferDirectMessageData(TransferTest.badDatabaseLocation, userLabeler))
-
         val cursor = queryTestDatabase("SELECT * FROM direct_messages", null)
         assertThat("Somehow the database is populated by values", cursor.count, `is`(0))
         cursor.close()

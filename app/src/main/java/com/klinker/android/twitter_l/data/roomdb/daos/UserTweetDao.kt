@@ -23,7 +23,7 @@ abstract class UserTweetDao : TweetDao() {
 
     //possibly put an index on tweet_id column to improve performance
     @Query("DELETE FROM user_tweets WHERE user_id = :userId AND tweet_id < (SELECT MIN(tweet_id) FROM user_tweets WHERE user_id = :userId ORDER BY tweet_id DESC LIMIT :trimSize)")
-    internal abstract fun trimDatabase(userId: Long, trimSize: Int)
+    abstract fun trimDatabase(userId: Long, trimSize: Int)
 
 
 }

@@ -12,13 +12,13 @@ class Draft {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo
-    val id: Long?
+    var id: Long?
 
     @ColumnInfo
     var text: String
 
     @ColumnInfo
-    var account: Int = 1
+    val account: Int
 
     @Ignore
     constructor(text: String, account: Int) {

@@ -19,9 +19,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.not
-import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.*
 
 class ScheduledTweetDaoTest : DaoTest() {
 
@@ -29,27 +27,62 @@ class ScheduledTweetDaoTest : DaoTest() {
 
     @Test
     fun insertScheduledTweet() {
-        val scheduledTweet = ScheduledTweet(1, "This is a test message", 100000, 1)
-        scheduledTweetDao.insertScheduledTweet(scheduledTweet)
+        val alarmId = 1L
+        val text = "This is a test message"
+        val time = 100000L
+        val account = 1
 
-        val cursor = queryDatabase("SELECT alarm_id FROM scheduled_tweets WHERE alarm_id = ?", arrayOf(scheduledTweet.alarmId))
-        assertThat("Scheduled tweet is not inserted in the database", cursor.count, `is`(1))
+        val scheduledTweet = ScheduledTweet(alarmId, text, time, account)
+        val id = scheduledTweetDao.insertScheduledTweet(scheduledTweet)
+        assertThat("Scheduled tweet did not insert into the database", id, not(-1L))
+
     }
+
+
+    @Test
+    fun insertScheduledTweetDuplicateText() {
+        val alarmId = 1L
+        val alarmId2 = 2L
+
+        val text = "This is a sample text message"
+        val time = 10000L
+        val account = 1
+
+        val scheduledTweet = ScheduledTweet(alarmId, text, time, account)
+        val scheduledTweet2 = ScheduledTweet(alarmId2, text, time, account)
+
+        scheduledTweetDao.insertScheduledTweet(scheduledTweet)
+        scheduledTweetDao.insertScheduledTweet(scheduledTweet2)
+
+        val cursor = queryDatabase("SELECT * FROM scheduled_tweets", null)
+        assertThat("Database doesn't allow duplicate scheduled tweet text", cursor.count, `is`(2))
+        cursor.close()
+
+    }
+
 
     @Test
     fun deleteScheduledTweet() {
-        val scheduledTweet = ScheduledTweet(76, "This is a test message", 130000, 1)
+        val alarmId = 75L
+        val text = "This is a sample text message"
+        val time = 110000L
+        val account = 1
+
+        val scheduledTweet = ScheduledTweet(alarmId, text, time, account)
         val contentValues = ContentValues()
-        contentValues.put("alarm_id", scheduledTweet.alarmId)
-        contentValues.put("text", scheduledTweet.text)
-        contentValues.put("account", scheduledTweet.account)
-        contentValues.put("time", scheduledTweet.time)
+        contentValues.put("alarm_id", alarmId)
+        contentValues.put("text", text)
+        contentValues.put("account", account)
+        contentValues.put("time", time)
 
         val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+        assertThat("Value got inserted into the database", id, not(-1L))
+
         scheduledTweetDao.deleteScheduledTweet(scheduledTweet)
 
         val cursor = queryDatabase("SELECT alarm_id FROM scheduled_tweets WHERE alarm_id = ?", arrayOf(scheduledTweet.alarmId))
         assertThat("Scheduled tweet is not deleted from the database", cursor.count, `is`(0))
+        cursor.close()
     }
 
 
@@ -57,20 +90,61 @@ class ScheduledTweetDaoTest : DaoTest() {
     fun getScheduledTweets() {
 
         val account = 1
+        val time = 3000
+
         val contentValues = ContentValues()
-        contentValues.put("time", 3000)
+        contentValues.put("account", account)
+        contentValues.put("time", time)
         contentValues.put("text", "This is a scheduled tweet test string")
 
-        for (i in 0..99) {
-            contentValues.put("account", if (i < 300) 1 else 2)
-            contentValues.put("alarm_id", i)
+        beginTransaction()
+
+        val insertedCount = (1..10).map {
+            contentValues.put("alarm_id", it)
             insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
-        }
 
-        //assert some setup assertions
+        }.count { x -> x != -1L }
 
-        val scheduledTweets = scheduledTweetDao.getScheduledTweets(1)
-        assertThat("Querying for a list of scheduled tweets did not return tweets", scheduledTweets, notNullValue())
+        contentValues.put("account", account + 1)
+        contentValues.put("alarm_id", insertedCount + 55)
+        val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+
+        endSuccessfulTransaction()
+
+        assertThat("At least one of a not queried account must be inserted to properly test this", id, not(-1L))
+
+        val scheduledTweets = scheduledTweetDao.getScheduledTweets(account)
+        assertThat("Querying for a list of scheduled tweets did not return tweets", scheduledTweets, hasSize(insertedCount))
+        assertThat("Filtered element is not in there", scheduledTweets.all { it.account == account })
+    }
+
+
+    @Test
+    fun getScheduledTweetsEmptyList() {
+
+        val account = 1
+        val time = 113000L
+
+        val contentValues = ContentValues()
+        contentValues.put("time", time)
+        contentValues.put("account", account)
+
+        beginTransaction()
+
+        val insertedCount = (0L..9L).map {
+            val alarmId = it
+            val text = "This is the sample text for tweet $it"
+            contentValues.put("alarm_id", alarmId)
+            contentValues.put("text", text)
+            insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+        }.any { x -> x != -1L }
+
+        endSuccessfulTransaction()
+
+        assertThat("At least one value must be in database to properly test this", insertedCount)
+
+        val scheduledTweets = scheduledTweetDao.getScheduledTweets(account + 1)
+        assertThat("Database returned value when it shouldn't have", scheduledTweets, emptyCollectionOf(ScheduledTweet::class.java))
 
     }
 
@@ -78,16 +152,47 @@ class ScheduledTweetDaoTest : DaoTest() {
     @Test
     fun getEarliestScheduledTweet() {
 
-        val time: Long = 10000
-        val scheduledTweet = scheduledTweetDao.getEarliestScheduledTweets(time)
+        val requestedTime = 10000L
+
+        val account = 1
+        val text = "This is sample text for this scheduled tweet"
+        val time = 12000L
+        val alarmId = 1
+        val contentValues = ContentValues()
+
+        contentValues.put("account", account)
+        contentValues.put("text", text)
+        contentValues.put("alarm_id", alarmId)
+        contentValues.put("time", time)
+        val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+        assertThat("Problem putting test value in the database", id, not(-1L))
+
+        val scheduledTweet = scheduledTweetDao.getEarliestScheduledTweet(requestedTime)
+        assertThat("Requested database value did not return", scheduledTweet, notNullValue())
+
     }
 
 
     @Test
-    fun getNoScheduledTweetIfTimeisTooEarly() {
+    fun getNoScheduledTweetIfTimeisTooLate() {
 
-        val time: Long = 10000
-        val scheduledTweet = scheduledTweetDao.getEarliestScheduledTweets(time)
+        val requestedTime = 10000L
+
+        val account = 1
+        val text = "This is a sample text"
+        val time = 5000L
+        val alarmId = 1
+        val contentValues = ContentValues()
+
+        contentValues.put("alarm_id", alarmId)
+        contentValues.put("time", time)
+        contentValues.put("text", text)
+        contentValues.put("account", account)
+
+        val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+        assertThat("Test value did not enter into database", id, not(-1L))
+        val scheduledTweet = scheduledTweetDao.getEarliestScheduledTweet(requestedTime)
+        assertThat("Returned a scheduled tweet when it shouldn't have", scheduledTweet, nullValue())
     }
 
 
@@ -99,12 +204,12 @@ class ScheduledTweetDaoTest : DaoTest() {
     companion object {
 
         @BeforeClass
-        fun initDatabase() {
+        @JvmStatic fun initDatabase() {
             DaoTest.initTestDatabase()
         }
 
         @AfterClass
-        fun closeDatabase() {
+        @JvmStatic fun closeDatabase() {
             DaoTest.closeTestDatabase()
         }
     }

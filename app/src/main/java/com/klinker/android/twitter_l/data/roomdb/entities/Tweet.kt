@@ -18,6 +18,8 @@ class Tweet() {
     @PrimaryKey
     var id: Long = 0
 
+    //possibly make a surrogate key for twitter id to be consistent with user
+
     @ColumnInfo
     var text: String = ""
 
@@ -54,12 +56,6 @@ class Tweet() {
     @ColumnInfo(name = "retweet_count")
     var retweetCount: Int = 0
 
-    @ColumnInfo(name = "is_liked")
-    var isLiked: Boolean = false
-
-    @ColumnInfo(name = "is_retweeted")
-    var isRetweeted: Boolean = false
-
     @ColumnInfo(name = "client_source")
     var clientSource: String? = null
 
@@ -82,12 +78,15 @@ class Tweet() {
             this.retweeter = status.user.screenName
             this.likeCount = status.retweetedStatus.favoriteCount
             this.retweetCount = status.retweetedStatus.retweetCount
+            this.text = status.retweetedStatus.text
 
         } else {
 
             this.retweeter = ""
             this.likeCount = status.favoriteCount
             this.retweetCount = status.retweetCount
+            this.text = status.text
+
 
         }
 

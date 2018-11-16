@@ -1,13 +1,11 @@
 package com.klinker.android.twitter_l.data.roomdb.entities
 
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 
-@Entity(tableName = "favorite_user_notifications", indices = [ Index(value = ["tweet_id"]) ])
+@Entity(tableName = "favorite_user_notifications",
+        indices = [ Index(value = ["tweet_id"]) ],
+        foreignKeys =  [ ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.CASCADE) ])
 class FavoriteUserNotification {
 
     @PrimaryKey(autoGenerate = true)

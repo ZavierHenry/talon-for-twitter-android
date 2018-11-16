@@ -39,7 +39,7 @@ public class QueuedSQLiteHelper extends SQLiteOpenHelper {
     public static final int TYPE_QUEUED_TWEET = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
+    public static final String DATABASE_CREATE = "create table "
             + TABLE_QUEUED + "(" + COLUMN_ID
             + " integer primary key, " + COLUMN_ACCOUNT
             + " integer account num, " + COLUMN_TEXT
@@ -48,7 +48,7 @@ public class QueuedSQLiteHelper extends SQLiteOpenHelper {
             + " integer type of queued tweet, " + COLUMN_ALARM_ID
             + " integer alarm identifier); ";
 
-    private static final String ALTER_TABLE_ADD_UNIQUE =
+    public static final String ALTER_TABLE_ADD_UNIQUE =
             "CREATE UNIQUE INDEX unique_name ON queued(_text)";
 
     public QueuedSQLiteHelper(Context context) {

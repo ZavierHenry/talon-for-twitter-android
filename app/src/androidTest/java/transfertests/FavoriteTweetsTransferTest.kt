@@ -58,36 +58,3 @@ class FavoriteTweetsTransferTest : TransferTest() {
         }
     }
 }
-
-internal class MockFavoriteTweet {
-
-    var account: Int = 0
-
-    internal fun setContentValues(contentValues: ContentValues) {
-        contentValues.put(FavoriteTweetsSQLiteHelper.COLUMN_ACCOUNT, account)
-    }
-
-    internal fun readCursor(cursor: Cursor) {
-        this.account = cursor.getInt(cursor.getColumnIndex("account"))
-    }
-}
-
-internal class MockFavoriteTweetMatcher private constructor(expected: MockFavoriteTweet) : MockMatcher<MockFavoriteTweet>(expected) {
-
-    override fun matchesSafely(item: MockFavoriteTweet): Boolean {
-        return false
-    }
-
-
-    override fun describeMismatchSafely(item: MockFavoriteTweet, description: Description) {
-
-    }
-
-    companion object {
-
-        fun matchesFavoriteTweet(expected: MockFavoriteTweet): MockFavoriteTweetMatcher {
-            return MockFavoriteTweetMatcher(expected)
-        }
-    }
-
-}

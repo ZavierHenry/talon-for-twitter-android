@@ -17,15 +17,12 @@ interface DraftDao {
     @Delete
     fun deleteDraft(draft: Draft)
 
-    @Query("DELETE FROM drafts WHERE id = :id")
-    fun deleteDraft(id: Long)
 
-    @Query("DELETE FROM drafts WHERE text = :message")
-    fun deleteDraft(message: String)
-
-
-    @Query("SELECT * FROM drafts WHERE account = :account")
+    @Query("SELECT * FROM drafts WHERE account = :account ORDER BY id DESC")
     fun getDrafts(account: Int): List<Draft>
+
+    @Query("DELETE FROM drafts WHERE account = :account")
+    fun deleteDrafts(account: Int)
 
 
 }

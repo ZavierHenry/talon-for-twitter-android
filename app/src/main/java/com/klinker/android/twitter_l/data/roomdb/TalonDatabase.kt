@@ -132,7 +132,7 @@ abstract class TalonDatabase : RoomDatabase() {
 
     private fun mergeUsers(newUser: User, targetUser: User) {
 
-        if (targetUser.id < 0) {
+        if (targetUser.id!! < 0) {
             targetUser.id = newUser.id
         }
 
@@ -161,59 +161,66 @@ abstract class TalonDatabase : RoomDatabase() {
 
     companion object {
 
-        private var dbInstance: TalonDatabase? = null
+        @Volatile private var instance: TalonDatabase? = null
 
-        //list table name
+        @JvmStatic fun getInstance(context: Context): TalonDatabase {
 
-        //list table columns
-
-        @JvmStatic fun getInstance(context: Context): TalonDatabase? {
-
-            if (dbInstance == null) {
-                val userId = AtomicLong(-2L)
-                val users = HashMap<String, User>()
-
-
-                val dmDbPath = context.getDatabasePath(DMSQLiteHelper.DATABASE_NAME).absolutePath
-                val emojiDbPath = context.getDatabasePath(EmojiSQLiteHelper.DATABASE_NAME).absolutePath
-                val favoriteTweetsDbPath = context.getDatabasePath(FavoriteTweetsSQLiteHelper.DATABASE_NAME).absolutePath
-                val favoriteUserNotificationsDbPath = context.getDatabasePath(FavoriteUserNotificationSQLiteHelper.DATABASE_NAME).absolutePath
-                val favoriteUsersDbPath = context.getDatabasePath(FavoriteUsersSQLiteHelper.DATABASE_NAME).absolutePath
-                val followersUsersDbPath = context.getDatabasePath(FollowersSQLiteHelper.DATABASE_NAME).absolutePath
-                val hashtagDbPath = context.getDatabasePath(HashtagSQLiteHelper.DATABASE_NAME).absolutePath
-                val homeTweetsDbPath = context.getDatabasePath(HomeSQLiteHelper.DATABASE_NAME).absolutePath
-                val interactionsDbPath = context.getDatabasePath(InteractionsSQLiteHelper.DATABASE_NAME).absolutePath
-                val listDbPath = context.getDatabasePath(ListSQLiteHelper.DATABASE_NAME).absolutePath
-                val mentionsDbPath = context.getDatabasePath(MentionsSQLiteHelper.DATABASE_NAME).absolutePath
-                val queuedDbPath = context.getDatabasePath(QueuedSQLiteHelper.DATABASE_NAME).absolutePath
-                val savedTweetsDbPath = context.getDatabasePath(SavedTweetSQLiteHelper.DATABASE_NAME).absolutePath
-                val userTweetsDbPath = context.getDatabasePath(UserTweetsSQLiteHelper.DATABASE_NAME).absolutePath
-
-
-                dbInstance = Room.databaseBuilder(context.applicationContext, TalonDatabase::class.java, "talondata.db")
-                        .addCallback(transferActivityData(getDatabasePath(context, ActivitySQLiteHelper.DATABASE_NAME), userId))
-                        .addCallback(transferDirectMessageData(dmDbPath, userId))
-                        .addCallback(transferEmojiData(emojiDbPath))
-                        .addCallback(transferFavoriteTweetsData(favoriteTweetsDbPath, userId))
-                        .addCallback(transferFavoriteUserNotificationsData(favoriteUserNotificationsDbPath))
-                        .addCallback(transferFavoriteUsersData(favoriteUsersDbPath, users))
-                        .addCallback(transferFollowersData(followersUsersDbPath, userId))
-                        .addCallback(transferHashtagData(hashtagDbPath))
-                        .addCallback(transferHomeTweetsData(homeTweetsDbPath))
-                        .addCallback(transferInteractionsData(interactionsDbPath))
-                        .addCallback(transferListData(listDbPath))
-                        .addCallback(transferMentionsData(mentionsDbPath, userId))
-                        .addCallback(transferQueuedData(queuedDbPath))
-                        .addCallback(transferSavedTweetsData(savedTweetsDbPath, userId))
-                        .addCallback(transferUserTweetsData(userTweetsDbPath))
-                        .build()
-
-                //delete old databases if necessary
-
+            val inst = instance
+            if (inst != null) {
+                return inst
             }
 
-            return dbInstance
+            return synchronized(this) {
+                val inst2 = instance
+                if (inst2 != null) {
+                    inst2
+                } else {
+                    val createdInstance = buildDatabase(context)
+                    instance = createdInstance
+                    createdInstance
+                }
+            }
 
+        }
+
+        private fun buildDatabase(context: Context): TalonDatabase {
+            val userId = AtomicLong(-2L)
+            val users = HashMap<String, User>()
+
+
+            val dmDbPath = context.getDatabasePath(DMSQLiteHelper.DATABASE_NAME).absolutePath
+            val emojiDbPath = context.getDatabasePath(EmojiSQLiteHelper.DATABASE_NAME).absolutePath
+            val favoriteTweetsDbPath = context.getDatabasePath(FavoriteTweetsSQLiteHelper.DATABASE_NAME).absolutePath
+            val favoriteUserNotificationsDbPath = context.getDatabasePath(FavoriteUserNotificationSQLiteHelper.DATABASE_NAME).absolutePath
+            val favoriteUsersDbPath = context.getDatabasePath(FavoriteUsersSQLiteHelper.DATABASE_NAME).absolutePath
+            val followersUsersDbPath = context.getDatabasePath(FollowersSQLiteHelper.DATABASE_NAME).absolutePath
+            val hashtagDbPath = context.getDatabasePath(HashtagSQLiteHelper.DATABASE_NAME).absolutePath
+            val homeTweetsDbPath = context.getDatabasePath(HomeSQLiteHelper.DATABASE_NAME).absolutePath
+            val interactionsDbPath = context.getDatabasePath(InteractionsSQLiteHelper.DATABASE_NAME).absolutePath
+            val listDbPath = context.getDatabasePath(ListSQLiteHelper.DATABASE_NAME).absolutePath
+            val mentionsDbPath = context.getDatabasePath(MentionsSQLiteHelper.DATABASE_NAME).absolutePath
+            val queuedDbPath = context.getDatabasePath(QueuedSQLiteHelper.DATABASE_NAME).absolutePath
+            val savedTweetsDbPath = context.getDatabasePath(SavedTweetSQLiteHelper.DATABASE_NAME).absolutePath
+            val userTweetsDbPath = context.getDatabasePath(UserTweetsSQLiteHelper.DATABASE_NAME).absolutePath
+
+
+             return Room.databaseBuilder(context.applicationContext, TalonDatabase::class.java, "talondata.db")
+                     .addCallback(transferActivityData(getDatabasePath(context, ActivitySQLiteHelper.DATABASE_NAME), userId))
+                     .addCallback(transferDirectMessageData(dmDbPath, userId))
+                     .addCallback(transferEmojiData(emojiDbPath))
+                     .addCallback(transferFavoriteTweetsData(favoriteTweetsDbPath, userId))
+                     .addCallback(transferFavoriteUserNotificationsData(favoriteUserNotificationsDbPath))
+                     .addCallback(transferFavoriteUsersData(favoriteUsersDbPath, users))
+                     .addCallback(transferFollowersData(followersUsersDbPath, userId))
+                     .addCallback(transferHashtagData(hashtagDbPath))
+                     .addCallback(transferHomeTweetsData(homeTweetsDbPath))
+                     .addCallback(transferInteractionsData(interactionsDbPath))
+                     .addCallback(transferListData(listDbPath))
+                     .addCallback(transferMentionsData(mentionsDbPath, userId))
+                     .addCallback(transferQueuedData(queuedDbPath))
+                     .addCallback(transferSavedTweetsData(savedTweetsDbPath, userId))
+                     .addCallback(transferUserTweetsData(userTweetsDbPath))
+                     .build()
         }
 
         private fun getDatabasePath(context: Context, relativePath: String): String {
@@ -241,7 +248,7 @@ abstract class TalonDatabase : RoomDatabase() {
             return object : TransferCallback(absolutePath) {
                 override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
-                    source.query(EmojiSQLiteHelper.TABLE_RECENTS, null, null, null, null, null, null).use { cursor ->
+                    source.query(EmojiSQLiteHelper.TABLE_RECENTS, null, null, null, null, null, EmojiSQLiteHelper.COLUMN_COUNT + " DESC").use { cursor ->
                         if (cursor != null && cursor.moveToFirst()) {
                             val contentValues = ContentValues()
 
@@ -381,6 +388,54 @@ abstract class TalonDatabase : RoomDatabase() {
             return object : TransferCallback(absolutePath) {
                 override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
+                    source.query(QueuedSQLiteHelper.TABLE_QUEUED, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor != null && cursor.moveToFirst()) {
+                            val draftContentValues = ContentValues()
+                            val scheduledTweetContentValues = ContentValues()
+                            val queuedTweetContentValues = ContentValues()
+
+                            db.beginTransaction()
+
+                            do {
+
+                                val type = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TYPE))
+                                val alarmId = cursor.getLong(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_ALARM_ID))
+                                val text = cursor.getString(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TEXT))
+                                val account = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_ACCOUNT))
+                                val time = cursor.getLong(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TIME))
+
+                                when (type) {
+                                    QueuedSQLiteHelper.TYPE_DRAFT -> {
+                                        draftContentValues.put("text", text)
+                                        draftContentValues.put("account", account)
+                                        db.insert("drafts", SQLiteDatabase.CONFLICT_IGNORE, draftContentValues)
+                                    }
+
+                                    QueuedSQLiteHelper.TYPE_SCHEDULED -> {
+                                        scheduledTweetContentValues.put("alarm_id", alarmId)
+                                        scheduledTweetContentValues.put("text", text)
+                                        scheduledTweetContentValues.put("account", account)
+                                        scheduledTweetContentValues.put("time", time)
+                                        db.insert("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, scheduledTweetContentValues)
+                                    }
+
+                                    QueuedSQLiteHelper.TYPE_QUEUED_TWEET -> {
+                                        queuedTweetContentValues.put("text", text)
+                                        queuedTweetContentValues.put("account", account)
+                                        db.insert("queued_tweets", SQLiteDatabase.CONFLICT_IGNORE, queuedTweetContentValues)
+                                    }
+                                }
+
+                            } while (cursor.moveToNext())
+
+                            db.setTransactionSuccessful()
+                            db.endTransaction()
+
+                        }
+
+                    }
+
                 }
             }
         }
@@ -404,9 +459,10 @@ abstract class TalonDatabase : RoomDatabase() {
         }
 
 
+        //TODO: possibly redo this to be thread safe
         fun destroyInstance() {
-            dbInstance?.close()
-            dbInstance = null
+            instance?.close()
+            instance = null
         }
     }
 

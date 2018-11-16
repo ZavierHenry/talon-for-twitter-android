@@ -37,12 +37,12 @@ abstract class DaoTest {
     companion object {
         lateinit var testDatabase: TalonDatabase
 
-        fun initTestDatabase() {
+        @JvmStatic internal fun initTestDatabase() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             testDatabase = Room.inMemoryDatabaseBuilder(context, TalonDatabase::class.java).build()
         }
 
-        fun closeTestDatabase() {
+        @JvmStatic internal fun closeTestDatabase() {
             testDatabase.close()
         }
     }

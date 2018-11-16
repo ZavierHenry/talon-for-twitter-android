@@ -1,6 +1,7 @@
 package com.klinker.android.twitter_l.data.roomdb.daos
 
 
+import android.content.Context
 import android.database.Cursor
 
 import com.klinker.android.twitter_l.data.roomdb.entities.SavedTweet
@@ -10,6 +11,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
+import com.klinker.android.twitter_l.data.roomdb.entities.Tweet
+import twitter4j.Status
 
 @Dao
 abstract class SavedTweetDao : TweetDao() {
@@ -37,6 +41,17 @@ abstract class SavedTweetDao : TweetDao() {
     //isSavedTweet equivalent
     @Query("SELECT id FROM saved_tweets WHERE tweet_id = :tweetId AND account = :account LIMIT 1")
     internal abstract fun isTweetSaved(tweetId: Long, account: Int): Boolean
+
+
+    @Transaction
+    open fun insertSavedTweet(context: Context, status: Status, account: Int) {
+        val tweet = Tweet(status)
+        val savedTweet = SavedTweet(status, account)
+
+        TalonDatabase.getInstance(context).tweetDao().insertTweet(tweet)
+        insertSavedTweet(savedTweet)
+    }
+
 
 
 }

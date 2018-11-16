@@ -53,23 +53,4 @@ class FavoriteUserNotificationsTransferTest : TransferTest() {
     }
 }
 
-internal class MockFavoriteUserNotification
-
-internal class MockFavoriteUserNotificationMatcher private constructor(expected: MockFavoriteUserNotification) : MockMatcher<MockFavoriteUserNotification>(expected) {
-
-    override fun matchesSafely(item: MockFavoriteUserNotification): Boolean {
-        return false
-    }
-
-    override fun describeMismatchSafely(item: MockFavoriteUserNotification, mismatchDescription: Description) {
-
-    }
-
-    companion object {
-
-        fun matchesFavoriteUserNotification(expected: MockFavoriteUserNotification): MockFavoriteUserNotificationMatcher {
-            return MockFavoriteUserNotificationMatcher(expected)
-        }
-    }
-}
 

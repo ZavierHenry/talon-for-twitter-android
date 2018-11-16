@@ -9,11 +9,14 @@ import androidx.room.PrimaryKey
 
 import twitter4j.User as TwitterUser
 
-@Entity(tableName = "users", indices = [Index(value = ["screen_name"], unique = true)])
+@Entity(tableName = "users", indices = [Index(value = ["screen_name"])])
 class User {
 
-    @PrimaryKey
-    var id: Long = 0
+    @PrimaryKey(autoGenerate = true)
+    var id: Long? = null
+
+    @ColumnInfo(name = "twitter_id")
+    var twitterId: Long? = null
 
     @ColumnInfo
     var name: String
@@ -30,23 +33,27 @@ class User {
 
     constructor(user: TwitterUser) {
 
-        id = user.id
-        name = user.name
-        screenName = user.screenName
-        isVerified = user.isVerified
+        this.id = null
+        this.twitterId = user.id
+        this.name = user.name
+        this.screenName = user.screenName
+        this.isVerified = user.isVerified
 
-        profilePic = user.originalProfileImageURLHttps ?: user.originalProfileImageURL
-
-
+        if (user.originalProfileImageURLHttps.isNullOrEmpty()) {
+            this.profilePic = user.originalProfileImageURL
+        } else {
+            this.profilePic = user.originalProfileImageURLHttps
+        }
     }
 
 
-    constructor(id: Long, name: String, screenName: String, profilePic: String, isVerified: Boolean) {
+    constructor(id: Long, twitterId: Long? = null, name: String, screenName: String, profilePic: String, isVerified: Boolean) {
         this.id = id
         this.name = name
         this.screenName = screenName
         this.profilePic = profilePic
         this.isVerified = isVerified
+        this.twitterId = twitterId
     }
 
     override fun equals(other: Any?): Boolean {
@@ -57,6 +64,8 @@ class User {
                 && this.isVerified == other.isVerified
 
     }
+
+
 
 
 }

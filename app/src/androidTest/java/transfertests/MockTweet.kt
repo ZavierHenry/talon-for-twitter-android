@@ -1,45 +1,24 @@
 package transfertests
 
+import android.content.ContentValues
 import android.database.Cursor
 
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeMatcher
 
-internal class MockTweet {
+internal class MockTweet(
 
-    var date: Long = 0
-
-    var text: String = ""
-
-    var retweeter: String? = null
-    var hashtags: String? = null
-    var clientSource: String? = null
-
-    var gifUrl: String? = null
-    var mediaLength: Int = 0
-
-
-    constructor(cursor: Cursor) {
-        this.text = cursor.getString(cursor.getColumnIndex("tweet.text"))
-
+): MockEntity<MockTweet>() {
+    override fun showMismatches(other: MockTweet): List<FieldMismatch> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun setContentValues(contentValues: ContentValues) {}
 
 
 }
 
-internal class MockTweetMatcher private constructor(private val expected: MockTweet) : TypeSafeMatcher<MockTweet>() {
-
-    public override fun matchesSafely(item: MockTweet): Boolean {
-        return false
-    }
-
-    override fun describeTo(description: Description) {
-
-    }
-
-    override fun describeMismatchSafely(item: MockTweet, description: Description) {
-
-    }
+internal class MockTweetMatcher private constructor(expected: MockTweet) : MockMatcher<MockTweet>(expected) {
 
     companion object {
 
@@ -47,5 +26,4 @@ internal class MockTweetMatcher private constructor(private val expected: MockTw
             return MockTweetMatcher(expected)
         }
     }
-
 }

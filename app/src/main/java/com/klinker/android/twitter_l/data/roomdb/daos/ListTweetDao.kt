@@ -9,24 +9,24 @@ import androidx.room.Insert
 import androidx.room.Query
 
 @Dao
-interface ListTweetDao {
+abstract class ListTweetDao {
 
     //insert list tweet
     @Insert
-    fun insertListTweet(listTweet: ListTweet)
+    abstract fun insertListTweet(listTweet: ListTweet)
 
     //insert list tweets
     @Insert
-    fun insertListTweets(listTweets: List<ListTweet>)
+    abstract fun insertListTweets(listTweets: List<ListTweet>)
 
     @Delete
-    fun deleteListTweet(listTweet: ListTweet)
+    abstract fun deleteListTweet(listTweet: ListTweet)
 
     @Query("DELETE FROM list_tweets WHERE tweet_id = :tweetId")
-    fun deleteListTweet(tweetId: Long)
+    abstract fun deleteListTweet(tweetId: Long)
 
     @Query("DELETE FROM list_tweets WHERE list_id = :listId")
-    fun deleteAllTweets(listId: Long)
+    abstract fun deleteAllTweets(listId: Long)
 
     //getListCursor equivalent
 
@@ -36,7 +36,7 @@ interface ListTweetDao {
 
 
     @Query("DELETE FROM list_tweets WHERE list_id = :listId AND id < (SELECT MIN(id) FROM list_tweets WHERE list_id = :listId ORDER BY id DESC LIMIT :trimSize)")
-    fun trimDatabase(listId: Long, trimSize: Int)
+    abstract fun trimDatabase(listId: Long, trimSize: Int)
 
 
 }

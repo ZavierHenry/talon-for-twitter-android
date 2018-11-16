@@ -1,13 +1,8 @@
 package com.klinker.android.twitter_l.data.roomdb.daos
 
 
+import androidx.room.*
 import com.klinker.android.twitter_l.data.roomdb.entities.Emoji
-
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
 
 @Dao
 interface EmojiDao {
@@ -16,20 +11,19 @@ interface EmojiDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertEmoji(emoji: Emoji)
 
-
     @Delete
     fun deleteEmoji(emoji: Emoji)
 
 
-    @Query("DELETE FROM emojis WHERE id = :id")
-    fun deleteEmoji(id: Long)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateEmoji(emoji: Emoji)
 
 
     @Query("SELECT * FROM emojis ORDER BY count DESC LIMIT :limit")
     fun getRecents(limit: Int): List<Emoji>
 
 
-    @Query("DELETE FROM emojis WHERE count < (SELECT MIN(count) FROM emojis ORDER BY count DESC LIMIT :offset)")
+    @Query("DELETE FROM emojis WHERE count < (SELECT count FROM emojis ORDER BY count DESC LIMIT 1 OFFSET :offset)")
     fun deleteLeastUsedRecents(offset: Int)
 
 

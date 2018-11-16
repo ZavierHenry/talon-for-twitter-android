@@ -21,7 +21,7 @@ abstract class MentionDao : TweetDao() {
 
 
     @Query("DELETE FROM mentions WHERE account = :account AND id < (SELECT MIN(id) from mentions WHERE account = :account ORDER BY id DESC LIMIT :trimSize)")
-    internal abstract fun trimDatabase(account: Int, trimSize: Int)
+    abstract fun trimDatabase(account: Int, trimSize: Int)
 
     @Update
     internal abstract fun updateMention(mention: Mention)

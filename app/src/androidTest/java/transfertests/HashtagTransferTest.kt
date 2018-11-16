@@ -19,16 +19,13 @@ import org.junit.Test
 
 
 import java.util.ArrayList
-import java.util.HashSet
 
-import androidx.test.platform.app.InstrumentationRegistry
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.greaterThan
-import org.hamcrest.Matchers.hasSize
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.isIn
-import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.*
+import transfertests.MockHashtagMatcher.Companion.matchesHashtag
+
+
 
 class HashtagTransferTest : TransferTest() {
 
@@ -36,35 +33,31 @@ class HashtagTransferTest : TransferTest() {
     fun testBasicHashtagTransfer() {
         //fill table with data
         val contentValues = ContentValues()
-        val tags = HashSet<String>()
+        val hashtags : List<MockHashtag> = List(2) { MockHashtag("#tag_$it") }
 
         beginSourceDatabaseTransaction()
 
-
-        (0..9).map{ i -> "#tag_$i"}.forEach {tag ->
-            contentValues.put("name", tag)
-            val id = insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
-            if (id != -1L) {
-                tags.add(tag)
-            }
-        }
+        val idCount = hashtags.asSequence().map{ hashtag ->
+            hashtag.setContentValues(contentValues)
+            insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
+        }.count { it != -1L }
 
         endSuccessfulSourceDatabaseTransaction()
 
-        assertThat<Collection<String>>("Needs to have at least one tag to properly run this test", tags, hasSize(greaterThan(0)))
-
+        assertThat("At least one hashtag must be inserted to properly run this test", idCount, greaterThan(0))
 
         applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
 
-        val cursor = queryTestDatabase("SELECT name FROM hashtags", null)
-        assertThat("Incorrect number of tags managed to transfer to the new database", cursor.count, `is`(tags.size))
+        val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
+        assertThat("Incorrect number of tags managed to transfer to the new database", cursor.count, `is`(idCount))
         assertThat("Error getting the first value of the query", cursor.moveToFirst())
+
+        val matchers = hashtags.map { matchesHashtag(it) }
 
         do {
 
-            val savedTag = cursor.getString(cursor.getColumnIndex("name"))
-            assertThat("Tag was not saved properly", savedTag, isIn(tags))
-            tags.remove(savedTag)
+            val testHashtag = MockHashtag.create(cursor)
+            assertThat("Source hashtag did not transfer to the test database", testHashtag, anyOf(matchers))
 
         } while (cursor.moveToNext())
 
@@ -74,34 +67,27 @@ class HashtagTransferTest : TransferTest() {
     @Test
     fun testTransferWithDuplicateNames() {
         val contentValues = ContentValues()
-        val tags = HashSet<String>()
+        val hashtags = List(3) { MockHashtag("#sampletag")}
 
         beginSourceDatabaseTransaction()
 
-        for (i in 0..20) {
-            val tag = "#tag_" + i % 5
-            contentValues.put(HashtagSQLiteHelper.COLUMN_TAG, tag)
-            val id = insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
-            if (id != -1L) {
-                tags.add(tag)
-            }
-        }
+        val idCount = hashtags.asSequence().map { hashtag ->
+            hashtag.setContentValues(contentValues)
+            insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
+        }.count { it != -1L }
 
         endSuccessfulSourceDatabaseTransaction()
 
-        assertThat<Set<String>>("Needs to have at least one element to properly run this test", tags, hasSize(greaterThan(0)))
-        applyCallback(TalonDatabase.transferHashtagData(TransferTest.sourceDatabase!!.path))
+        assertThat("Needs to have at least one element to properly run this test", idCount, greaterThan(0))
+        applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
 
-        val cursor = TransferTest.testDatabase!!.query("SELECT name FROM hashtags", null)
-        assertThat("Incorrect number of tags transferred to the test database", cursor.count, `is`(tags.size))
+        val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
+
+        assertThat("Incorrect number of tags transferred to the test database", cursor.count, `is`(1))
         assertThat("Error moving to the first value of the cursor", cursor.moveToFirst())
 
-        do {
-            val savedTag = cursor.getString(cursor.getColumnIndex(HashtagSQLiteHelper.COLUMN_TAG))
-            assertThat("Tag was not saved properly", savedTag, isIn(tags))
-
-        } while (cursor.moveToNext())
-
+        val testHashtag = MockHashtag.create(cursor)
+        assertThat("Transferred hashtag does not match source hashtag", testHashtag, matchesHashtag(hashtags[0]))
         cursor.close()
 
     }
@@ -109,25 +95,21 @@ class HashtagTransferTest : TransferTest() {
     @Test
     fun testTransferWithNullValues() {
         val contentValues = ContentValues()
-        var nullValues = 0
-
+        val hashtags = List(3) { x -> if (x == 0) MockHashtag(null) else MockHashtag("#tag_$x")}
 
         beginSourceDatabaseTransaction()
 
-        for (i in 0..15) {
-            val tag = if (i % 3 == 0) null else "#tag_$i"
-            contentValues.put(HashtagSQLiteHelper.COLUMN_TAG, tag)
-            val id = insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
-            if (id != -1L && tag == null) {
-                nullValues++
-            }
+        val ids = hashtags.map { hashtag ->
+            hashtag.setContentValues(contentValues)
+            insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
         }
 
         endSuccessfulSourceDatabaseTransaction()
 
-        assertThat("There needs to be at least one null value in the database to run this test properly", nullValues, greaterThan(0))
+        assertThat("The null mock hashtag must be properly inserted in the database to properly run this test", ids[0], not(-1L))
         applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
-        val cursor = queryTestDatabase("SELECT name FROM hashtags WHERE name IS NULL", null)
+
+        val cursor = queryTestDatabase("SELECT * FROM hashtags WHERE name IS NULL", null)
         assertThat("Test database does not reject null values", cursor.count, `is`(0))
         cursor.close()
 
@@ -177,32 +159,34 @@ class HashtagTransferTest : TransferTest() {
 }
 
 
-internal class MockHashtag(var name: String) {
+internal class MockHashtag(var name: String?) : MockEntity<MockHashtag>() {
+    override fun showMismatches(other: MockHashtag): List<FieldMismatch> {
+        val mismatches = ArrayList<FieldMismatch>()
 
-    fun setContentValues(contentValues: ContentValues) {
+        if (name != other.name) {
+            mismatches.add(makeMismatch("name", name, other.name))
+        }
+
+        return mismatches.toList()
+    }
+
+    override fun setContentValues(contentValues: ContentValues) {
         contentValues.put(HashtagSQLiteHelper.COLUMN_TAG, name)
-    }
-
-    fun readCursor(cursor: Cursor) {
-        this.name = cursor.getString(cursor.getColumnIndex("name"))
-    }
-
-}
-
-
-internal class MockHashtagMatcher private constructor(expected: MockHashtag) : MockMatcher<MockHashtag>(expected) {
-
-    override fun matchesSafely(item: MockHashtag): Boolean {
-        return expected.name.contentEquals(item.name)
-    }
-
-    override fun describeMismatchSafely(item: MockHashtag, mismatchDescription: Description) {
-
     }
 
     companion object {
 
-        @JvmStatic fun matchesHashtag(expected: MockHashtag): MockHashtagMatcher {
+        @JvmStatic fun create(cursor: Cursor) : MockHashtag {
+            val name = cursor.getString(cursor.getColumnIndex("name"))
+            return MockHashtag(name)
+        }
+    }
+
+}
+
+internal class MockHashtagMatcher private constructor(expected: MockHashtag) : MockMatcher<MockHashtag>(expected) {
+    companion object {
+        @JvmStatic fun matchesHashtag(expected: MockHashtag) : MockHashtagMatcher {
             return MockHashtagMatcher(expected)
         }
     }

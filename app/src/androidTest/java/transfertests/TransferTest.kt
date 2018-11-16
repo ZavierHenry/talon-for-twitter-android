@@ -59,12 +59,12 @@ abstract class TransferTest {
         internal var sourceDatabase: SQLiteDatabase? = null
         internal const val badDatabaseLocation = "no_database_here.db"
 
-        internal fun initTestDatabase() {
+        @JvmStatic internal fun initTestDatabase() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             testDatabase = Room.inMemoryDatabaseBuilder(context, TalonDatabase::class.java).build()
         }
 
-        internal fun initSourceDatabase(vararg tableCreationStatements: String) {
+        @JvmStatic internal fun initSourceDatabase(vararg tableCreationStatements: String) {
 
             val fullDbPath = InstrumentationRegistry
                     .getInstrumentation()
@@ -82,12 +82,12 @@ abstract class TransferTest {
 
         }
 
-        internal fun closeTestDatabase() {
+        @JvmStatic internal fun closeTestDatabase() {
             testDatabase?.close()
             testDatabase = null
         }
 
-        internal fun closeSourceDatabase() {
+        @JvmStatic internal fun closeSourceDatabase() {
             sourceDatabase?.close()
             val path = sourceDatabase?.path
             path ?: SQLiteDatabase.deleteDatabase(File(path))

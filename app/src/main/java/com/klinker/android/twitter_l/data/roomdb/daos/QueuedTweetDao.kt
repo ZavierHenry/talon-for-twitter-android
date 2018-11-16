@@ -12,16 +12,16 @@ import androidx.room.Query
 interface QueuedTweetDao {
 
     @Insert
-    fun insertQueuedTweet(queuedTweet: QueuedTweet)
+    fun insertQueuedTweet(queuedTweet: QueuedTweet) : Long
 
     @Delete
     fun deleteQueuedTweet(queuedTweet: QueuedTweet)
 
-    @Query("DELETE FROM queued_tweets WHERE text = :message AND account = :account")
-    fun deleteQueuedTweet(message: String, account: Int)
-
     @Query("SELECT * FROM queued_tweets WHERE account = :account")
     fun getQueuedTweets(account: Int): List<QueuedTweet>
+
+    @Query("DELETE FROM queued_tweets")
+    fun deleteAllQueuedTweets()
 
 
 }

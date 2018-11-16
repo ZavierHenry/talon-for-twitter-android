@@ -34,7 +34,7 @@ abstract class UserDao {
 
         when {
             savedUser == null -> insertUserSpecificInfo(user)
-            savedUser.id < 0 || savedUser.id != user.id -> {
+            savedUser.id!! < 0 || savedUser.id != user.id -> {
 
                 //replace ids in direct messages
                 //replace ids in tweets

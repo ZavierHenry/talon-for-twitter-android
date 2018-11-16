@@ -24,7 +24,7 @@ abstract class HomeTweetDao : TweetDao() {
 
 
     @Query("DELETE FROM home_tweets WHERE account = :account AND id < (SELECT MIN(id) FROM home_tweets WHERE account = :account ORDER BY id DESC LIMIT :trimSize)")
-    internal abstract fun trimDatabase(account: Int, trimSize: Int)
+    abstract fun trimDatabase(account: Int, trimSize: Int)
 
 
 

@@ -8,12 +8,17 @@ import androidx.room.Query
 
 
 @Dao
-interface FavoriteUserNotificationDao {
+abstract class FavoriteUserNotificationDao {
 
     @Insert
-    fun insertFavoriteUserNotification(notification: FavoriteUserNotification)
+    abstract fun insertFavoriteUserNotification(notification: FavoriteUserNotification)
 
     @Query("SELECT * FROM favorite_user_notifications WHERE id = :tweetId")
-    fun getFavoriteUserNotification(tweetId: Long): FavoriteUserNotification
+    abstract fun getFavoriteUserNotification(tweetId: Long): FavoriteUserNotification
+
+
+    @Query("DELETE FROM favorite_user_notifications WHERE id < (SELECT id FROM favorite_user_notifications ORDER BY id DESC LIMIT 1 OFFSET :trimSize)")
+    abstract fun trimDatabase(trimSize: Int)
+
 
 }

@@ -41,6 +41,6 @@ abstract class ActivityDao {
 
 
     @Query("DELETE FROM activities WHERE account = :account AND id NOT IN(SELECT id FROM activities WHERE account = :account ORDER BY time DESC LIMIT :trimSize)")
-    internal abstract fun trimDatabase(account: Int, trimSize: Int)
+    abstract fun trimDatabase(account: Int, trimSize: Int)
 
 }

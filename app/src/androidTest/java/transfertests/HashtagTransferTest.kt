@@ -46,7 +46,7 @@ class HashtagTransferTest : TransferTest() {
 
         assertThat("At least one hashtag must be inserted to properly run this test", idCount, greaterThan(0))
 
-        applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
+        applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
 
         val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
         assertThat("Incorrect number of tags managed to transfer to the new database", cursor.count, `is`(idCount))
@@ -79,7 +79,7 @@ class HashtagTransferTest : TransferTest() {
         endSuccessfulSourceDatabaseTransaction()
 
         assertThat("Needs to have at least one element to properly run this test", idCount, greaterThan(0))
-        applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
+        applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
 
         val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
 
@@ -107,7 +107,7 @@ class HashtagTransferTest : TransferTest() {
         endSuccessfulSourceDatabaseTransaction()
 
         assertThat("The null mock hashtag must be properly inserted in the database to properly run this test", ids[0], not(-1L))
-        applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
+        applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
 
         val cursor = queryTestDatabase("SELECT * FROM hashtags WHERE name IS NULL", null)
         assertThat("Test database does not reject null values", cursor.count, `is`(0))
@@ -120,7 +120,7 @@ class HashtagTransferTest : TransferTest() {
 
         //copy source database to prevent deletion error
 
-        applyCallback(TalonDatabase.transferHashtagData(sourceDatabasePath))
+        applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
         val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
         assertThat("Something went wrong in the database transfer", cursor.count, `is`(0))
         cursor.close()
@@ -129,7 +129,7 @@ class HashtagTransferTest : TransferTest() {
 
     @Test
     fun testTransferIfNoSource() {
-        applyCallback(TalonDatabase.transferHashtagData(TransferTest.badDatabaseLocation))
+        applyCallback(TalonDatabase.transferHashtagData(context, TransferTest.badDatabaseLocation))
     }
 
 
@@ -160,14 +160,14 @@ class HashtagTransferTest : TransferTest() {
 
 
 internal class MockHashtag(var name: String?) : MockEntity<MockHashtag>() {
-    override fun showMismatches(other: MockHashtag): List<FieldMismatch> {
+    override fun showMismatches(other: MockHashtag): Collection<FieldMismatch> {
         val mismatches = ArrayList<FieldMismatch>()
 
         if (name != other.name) {
             mismatches.add(makeMismatch("name", name, other.name))
         }
 
-        return mismatches.toList()
+        return mismatches
     }
 
     override fun setContentValues(contentValues: ContentValues) {

@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.klinker.android.twitter_l.adapters.TrendsArrayAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.activities.main_fragments.MainFragment;
 import com.klinker.android.twitter_l.activities.media_viewer.image.TimeoutThread;
@@ -85,6 +86,9 @@ public abstract class TrendsFragment extends MainFragment {
                     if (s.contains("#")) {
                         // we want to add it to the auto complete
                         Log.v("talon_hashtag", "adding: " + s);
+
+
+                        //TalonDatabase.getInstance(context).hashtagDao().createHashtag(s);
 
                         // could be much more efficient by querying and checking first, but I
                         // just didn't feel like it when there is only ever 10 of them here

@@ -26,14 +26,6 @@ import transfertests.MockUserMatcher.Companion.matchesUser
 
 class FavoriteUsersTransferTest : TransferTest() {
 
-    private val userLabeler: AtomicLong = AtomicLong(-2L)
-    private val users: HashMap<String, User> = HashMap()
-
-    @Before
-    fun resetUserLabeler() {
-        userLabeler.set(-2L)
-    }
-
 
     @Test
     fun testBasicFavoriteUsersTransfer() {
@@ -48,7 +40,7 @@ class FavoriteUsersTransferTest : TransferTest() {
 
     @Test
     fun testTransferIfNoSourceDatabase() {
-        applyCallback(TalonDatabase.transferFavoriteUsersData(TransferTest.badDatabaseLocation, users))
+        applyCallback(TalonDatabase.transferFavoriteUsersData(context, TransferTest.badDatabaseLocation))
     }
 
     @After

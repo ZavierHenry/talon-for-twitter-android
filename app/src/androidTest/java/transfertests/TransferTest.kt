@@ -21,6 +21,8 @@ abstract class TransferTest {
     val sourceDatabasePath : String
         get() = sourceDatabase!!.path
 
+    val context : Context get() = InstrumentationRegistry.getInstrumentation().context
+
     internal fun applyCallback(callback: RoomDatabase.Callback) {
         callback.onCreate(testDatabase!!.openHelper.writableDatabase)
     }
@@ -37,6 +39,23 @@ abstract class TransferTest {
         sourceDatabase!!.setTransactionSuccessful()
         sourceDatabase!!.endTransaction()
     }
+
+
+    internal inline fun <R> asTransaction(block: () -> R) : R {
+
+        return with(sourceDatabase!!) {
+            beginTransaction()
+
+            val result = block()
+
+            setTransactionSuccessful()
+            endTransaction()
+
+            result
+        }
+
+    }
+
 
     internal fun insertIntoSourceDatabase(tableName : String, values : ContentValues) : Long {
         return sourceDatabase!!.insert(tableName, null, values)
@@ -89,8 +108,7 @@ abstract class TransferTest {
 
         @JvmStatic internal fun closeSourceDatabase() {
             sourceDatabase?.close()
-            val path = sourceDatabase?.path
-            path ?: SQLiteDatabase.deleteDatabase(File(path))
+            sourceDatabase?.path?.also { SQLiteDatabase.deleteDatabase(File(it))}
             sourceDatabase = null
         }
     }

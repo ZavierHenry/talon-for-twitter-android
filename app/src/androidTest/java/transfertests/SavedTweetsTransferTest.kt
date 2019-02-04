@@ -72,7 +72,7 @@ class SavedTweetsTransferTest : TransferTest() {
     @Test
     fun testTransferIfEmptyTable() {
 
-        applyCallback(TalonDatabase.transferSavedTweetsData(TransferTest.sourceDatabase!!.path, userLabeler))
+        applyCallback(TalonDatabase.transferSavedTweetsData(context, TransferTest.sourceDatabase!!.path, userLabeler))
         val cursor = TransferTest.testDatabase!!.query("SELECT * FROM saved_tweets", null)
         assertThat("Database somehow stored values", cursor.count, `is`(0))
         cursor.close()
@@ -81,7 +81,7 @@ class SavedTweetsTransferTest : TransferTest() {
 
     @Test
     fun testTransferIfNoSourceDatabase() {
-        applyCallback(TalonDatabase.transferSavedTweetsData(TransferTest.badDatabaseLocation, userLabeler))
+        applyCallback(TalonDatabase.transferSavedTweetsData(context, TransferTest.badDatabaseLocation, userLabeler))
     }
 
     @After

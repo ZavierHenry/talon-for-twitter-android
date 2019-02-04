@@ -11,36 +11,19 @@ import androidx.room.Query
 @Dao
 abstract class ActivityDao {
 
-    //0 - MENTION
-    //1 - NEW_FOLLOWER
-    //2 - RETWEETS
-    //3 - FAVORITES
 
 
-    @Insert
-    internal abstract fun insertActivitySpecificInfo(activity: Activity)
-
-    @Query("SELECT * FROM activities WHERE account = :account ORDER BY time ASC")
-    abstract fun getAllActivities(account: Int): List<Activity>
 
 
-    @Query("UPDATE activities SET user_id = :newUserId WHERE user_id = :oldUserId")
-    internal abstract fun updateUserId(oldUserId: Long, newUserId: Long)
+    //abstract fun getDisplayActivities(account: Int, page : Int = 1, pageSize: Int = 60);
 
-    @Query("SELECT tweet_id FROM activities WHERE account = :account ORDER BY time DESC LIMIT 2")
-    abstract fun getLastTwoIds(account: Int): LongArray
-
-    @Query("SELECT tweets.like_count FROM activities JOIN tweets ON activities.tweet_id = tweets.id AND tweet_id = :tweetId AND account = :account AND type = 3")
-    internal abstract fun favoriteExists(tweetId: Long, account: Int): Int
-
-    @Query("SELECT tweets.retweet_count FROM activities JOIN tweets ON tweet_id = tweets.id AND tweet_id = :tweetId AND account = :account AND type = 2")
-    internal abstract fun retweetExists(tweetId: Long, account: Int): Int
+    @Query("SELECT id FROM activities WHERE account = :account ORDER BY time DESC LIMIT :size")
+    abstract fun getLatestIds(account: Int, size : Int = 2) : List<Long>
 
     @Query("DELETE FROM activities WHERE account = :account")
-    internal abstract fun deleteActivities(account: Int)
+    abstract fun deleteAllActivities(account: Int)
 
-
-    @Query("DELETE FROM activities WHERE account = :account AND id NOT IN(SELECT id FROM activities WHERE account = :account ORDER BY time DESC LIMIT :trimSize)")
+    @Query("DELETE FROM activities WHERE id NOT IN(SELECT id FROM activities WHERE account = :account ORDER BY time DESC LIMIT :trimSize)")
     abstract fun trimDatabase(account: Int, trimSize: Int)
 
 }

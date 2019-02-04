@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.github.ajalt.reprint.core.Reprint;
 import com.klinker.android.twitter_l.BuildConfig;
 import com.klinker.android.twitter_l.R;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedDataSource;
 import com.klinker.android.twitter_l.settings.AppSettings;
 import com.klinker.android.twitter_l.utils.PermissionModelUtils;
@@ -239,6 +240,11 @@ public class ComposeActivity extends Compose {
                             case SAVE_DRAFT:
                                 if (reply.getText().length() > 0) {
                                     QueuedDataSource.getInstance(context).createDraft(reply.getText().toString(), currentAccount);
+
+                                    //TalonDatabase.getInstance(context).draftDao().saveDraft(reply.getText().toString(), currentAccount);
+                                    //TODO: give user feedback if draft failed to save
+
+
                                     Toast.makeText(context, getResources().getString(R.string.saved_draft), Toast.LENGTH_SHORT).show();
                                     reply.setText("");
                                     finish();
@@ -267,6 +273,7 @@ public class ComposeActivity extends Compose {
                                                             @Override
                                                             public void onClick(DialogInterface dialogInterface, int i) {
                                                                 QueuedDataSource.getInstance(context).deleteAllDrafts();
+                                                                //TalonDatabase.getInstance(context).draftDao().deleteDrafts(currentAccount);
                                                                 dialogInterface.dismiss();
                                                             }
                                                         })
@@ -678,6 +685,11 @@ public class ComposeActivity extends Compose {
             if (!(doneClicked || discardClicked)) {
                 QueuedDataSource.getInstance(context).createDraft(reply.getText().toString(), currentAccount);
             }
+
+//            if ((!doneClicked && !discardClicked && reply.getText() != null)) {
+//                TalonDatabase.getInstance(context).draftDao().saveDraft(reply.getText().toString(), currentAccount);
+//            }
+
         } catch (Exception e) {
             // it is a direct message
         }

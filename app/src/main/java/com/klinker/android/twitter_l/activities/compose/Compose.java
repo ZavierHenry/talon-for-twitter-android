@@ -75,6 +75,9 @@ import com.google.android.gms.location.LocationServices;
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.activities.GiphySearch;
 import com.klinker.android.twitter_l.data.ThemeColor;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
+import com.klinker.android.twitter_l.data.roomdb.daos.HashtagDao;
+import com.klinker.android.twitter_l.data.roomdb.entities.Hashtag;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedDataSource;
 import com.klinker.android.twitter_l.utils.FingerprintDialog;
@@ -791,6 +794,8 @@ public abstract class Compose extends Activity implements
 
         Intent resultIntent = new Intent(this, RetryCompose.class);
         QueuedDataSource.getInstance(this).createDraft(text, settings.currentAccount);
+        //TalonDatabase.getInstance(this).draftDao().saveDraft(text, settings.currentAccount);
+
         resultIntent.setAction(Intent.ACTION_SEND);
         resultIntent.putExtra("failed_notification_text", text);
 
@@ -1612,6 +1617,17 @@ public abstract class Compose extends Activity implements
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
+
+//                                    HashtagDao hashtagDao = TalonDatabase.getInstance(context).hashtagDao();
+//
+//                                    for (final String split : text) {
+//                                        if (split.contains("#")) {
+//                                            hashtagDao.createHashtag(split);
+//                                        }
+//                                    }
+//
+
+
                                     ArrayList<String> tags = new ArrayList<String>();
                                     for (final String split : text) {
                                         if (split.contains("#")) {

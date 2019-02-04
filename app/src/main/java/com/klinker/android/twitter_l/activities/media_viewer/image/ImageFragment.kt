@@ -21,6 +21,7 @@ import android.net.Uri
 import android.os.*
 import androidx.core.content.FileProvider
 import android.os.Environment.getExternalStorageDirectory
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
@@ -250,7 +251,8 @@ class ImageFragment : Fragment() {
                     activity.startActivity(Intent.createChooser(sharingIntent, activity.getString(R.string.menu_share) + ": "))
                 }
             } catch (e: Exception) {
-
+                Log.d("IMAGE_SHARE_EXCEPTION", "This exception gets tripped when sharing an image")
+                e.printStackTrace()
             }
         }).start()
     }

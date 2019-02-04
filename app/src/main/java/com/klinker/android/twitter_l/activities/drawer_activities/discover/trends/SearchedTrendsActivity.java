@@ -40,6 +40,7 @@ import android.widget.*;
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.activities.WhiteToolbarActivity;
 import com.klinker.android.twitter_l.adapters.TimelineArrayAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.activities.media_viewer.image.TimeoutThread;
 import com.klinker.android.twitter_l.views.widgets.swipe_refresh_layout.material.MaterialSwipeRefreshLayout;
@@ -228,6 +229,9 @@ public class SearchedTrendsActivity extends WhiteToolbarActivity {
                 HashtagDataSource source = HashtagDataSource.getInstance(context);
 
                 if (source != null) {
+
+                    //TalonDatabase.getInstance(context).hashtagDao().createHashtag(searchQuery.replaceAll("\"", ""));
+
                     source.deleteTag(searchQuery.replaceAll("\"", ""));
                     source.createTag(searchQuery.replaceAll("\"", ""));
                 }

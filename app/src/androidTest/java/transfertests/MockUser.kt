@@ -5,9 +5,13 @@ import android.content.ContentValues
 import android.database.Cursor
 
 
-internal class MockUser(var twitterId: Long?, var name: String?, var screenName: String?, var profilePic: String?, var isVerified: Boolean) : MockEntity<MockUser>() {
+internal class MockUser(var twitterId: Long?,
+                        var name: String?,
+                        var screenName: String?,
+                        var profilePic: String?,
+                        var isVerified: Boolean = false) : MockEntity<MockUser>() {
 
-    override fun showMismatches(other: MockUser): List<FieldMismatch> {
+    override fun showMismatches(other: MockUser): Collection<FieldMismatch> {
 
         val mismatches = ArrayList<FieldMismatch>()
 

@@ -115,12 +115,12 @@ class EmojiDaoTest : DaoTest() {
     companion object {
 
         @BeforeClass
-        fun initDatabase() {
+        @JvmStatic fun initDatabase() {
             DaoTest.initTestDatabase()
         }
 
         @AfterClass
-        fun closeDatabase() {
+        @JvmStatic fun closeDatabase() {
             DaoTest.closeTestDatabase()
         }
     }

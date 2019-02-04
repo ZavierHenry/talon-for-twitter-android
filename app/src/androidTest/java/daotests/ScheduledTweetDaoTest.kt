@@ -54,9 +54,9 @@ class ScheduledTweetDaoTest : DaoTest() {
         scheduledTweetDao.insertScheduledTweet(scheduledTweet)
         scheduledTweetDao.insertScheduledTweet(scheduledTweet2)
 
-        val cursor = queryDatabase("SELECT * FROM scheduled_tweets", null)
-        assertThat("Database doesn't allow duplicate scheduled tweet text", cursor.count, `is`(2))
-        cursor.close()
+        queryDatabase("SELECT * FROM scheduled_tweets", null).use { cursor ->
+            assertThat("Database doesn't allow duplicate scheduled tweet text", cursor.count, `is`(2))
+        }
 
     }
 
@@ -97,21 +97,21 @@ class ScheduledTweetDaoTest : DaoTest() {
         contentValues.put("time", time)
         contentValues.put("text", "This is a scheduled tweet test string")
 
-        beginTransaction()
+        val insertedCount = asTransaction {
 
-        val insertedCount = (1..10).map {
-            contentValues.put("alarm_id", it)
-            insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+            val insertedCount = (1..10).count {
+                contentValues.put("alarm_id", it)
+                insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues) != -1L
+            }
 
-        }.count { x -> x != -1L }
+            contentValues.put("account", account + 1)
+            contentValues.put("alarm_id", insertedCount + 55)
+            val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+            assertThat("At least one of a not queried account must be inserted to properly test this", id, not(-1L))
 
-        contentValues.put("account", account + 1)
-        contentValues.put("alarm_id", insertedCount + 55)
-        val id = insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+            insertedCount
 
-        endSuccessfulTransaction()
-
-        assertThat("At least one of a not queried account must be inserted to properly test this", id, not(-1L))
+        }
 
         val scheduledTweets = scheduledTweetDao.getScheduledTweets(account)
         assertThat("Querying for a list of scheduled tweets did not return tweets", scheduledTweets, hasSize(insertedCount))
@@ -129,17 +129,18 @@ class ScheduledTweetDaoTest : DaoTest() {
         contentValues.put("time", time)
         contentValues.put("account", account)
 
-        beginTransaction()
 
-        val insertedCount = (0L..9L).map {
-            val alarmId = it
-            val text = "This is the sample text for tweet $it"
-            contentValues.put("alarm_id", alarmId)
-            contentValues.put("text", text)
-            insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
-        }.any { x -> x != -1L }
+        val insertedCount = asTransaction {
 
-        endSuccessfulTransaction()
+            (0L..9L).any {
+                val alarmId = it
+                val text = "This is the sample text for tweet $it"
+                contentValues.put("alarm_id", alarmId)
+                contentValues.put("text", text)
+                insertIntoDatabase("scheduled_tweets", SQLiteDatabase.CONFLICT_IGNORE, contentValues) != -1L
+            }
+
+        }
 
         assertThat("At least one value must be in database to properly test this", insertedCount)
 

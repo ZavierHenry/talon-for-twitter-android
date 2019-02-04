@@ -1,56 +1,22 @@
 package com.klinker.android.twitter_l.data.roomdb.entities
 
 
-import androidx.media.AudioAttributesCompat
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import twitter4j.Status
 
 
 @Entity(tableName = "home_tweets",
-        indices = [Index(value = ["tweet_id", "account"], unique = true)])
-class HomeTweet {
-
-    @PrimaryKey(autoGenerate = true)
-    val id: Long?
-
-    @ColumnInfo
-    val account: Int
-
-    @ColumnInfo(name = "is_unread")
-    var isUnread: Boolean = false
-
-    @ColumnInfo(name = "tweet_id")
-    val tweetId: Long
-
-    @ColumnInfo(name = "is_current_pos")
-    var isCurrentPos: Boolean = false
-
-    @ColumnInfo(name = "is_liked")
-    var isLiked: Boolean = false
-
-    @ColumnInfo(name = "is_retweeted")
-    var isRetweeted: Boolean = false
+        indices = [Index(value = ["tweet_id", "account"], unique = true)],
+        foreignKeys = [ForeignKey(entity = Tweet::class, childColumns = ["tweet_id"], parentColumns = ["id"], onDelete = ForeignKey.RESTRICT)])
+data class HomeTweet(@PrimaryKey(autoGenerate = true) val id: Long? = null,
+                     @ColumnInfo val account: Int,
+                     @ColumnInfo(name = "is_unread") val isUnread: Boolean = false,
+                     @ColumnInfo(name = "tweet_id") val tweetId: Long? = null,
+                     @ColumnInfo(name = "is_current_pos") val isCurrentPos: Boolean = false,
+                     @ColumnInfo(name = "is_liked") val isLiked: Boolean = false,
+                     @ColumnInfo(name = "is_retweeted") val isRetweeted: Boolean = false) {
 
 
-    constructor(id: Long, account: Int, isUnread: Boolean, tweetId: Long, isCurrentPos: Boolean, isLiked: Boolean?, isRetweeted: Boolean?) {
-        this.id = id
-        this.account = account
-        this.isUnread = isUnread
-        this.tweetId = tweetId
-        this.isCurrentPos = isCurrentPos
-    }
-
-
-    constructor(status: Status, account: Int) {
-        this.id = null
-        this.account = account
-        this.tweetId = status.id
-        this.isUnread = true
-        this.isCurrentPos = false
-    }
-
+    constructor(status: Status, account: Int, isUnread: Boolean) : this(null, account, isUnread, status.id, false, status.isFavorited, status.isRetweeted)
 
 }

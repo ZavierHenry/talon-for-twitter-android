@@ -36,6 +36,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.adapters.TrendsArrayAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.settings.AppSettings;
 import com.klinker.android.twitter_l.activities.drawer_activities.DrawerActivity;
@@ -202,6 +203,9 @@ public class LocalTrends extends Fragment implements
                         if (s.contains("#")) {
                             // we want to add it to the auto complete
                             Log.v("talon_hashtag", "adding: " + s);
+
+                            //TalonDatabase.getInstance(context).hashtagDao().createHashtag(s);
+
 
                             // could be much more efficient by querying and checking first, but I
                             // just didn't feel like it when there is only ever 10 of them here

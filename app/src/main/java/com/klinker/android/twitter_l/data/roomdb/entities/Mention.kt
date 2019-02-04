@@ -11,39 +11,14 @@ import twitter4j.Status
 
 
 @Entity(tableName = "mentions",
-        indices = [Index(value = ["account", "tweet_id"], unique = true)],
-        foreignKeys = [ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"])])
-class Mention {
+        indices = [Index(value = ["account", "tweet_id"], unique = true), Index(value = ["tweet_id"])],
+        foreignKeys = [ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.RESTRICT)])
+data class Mention(@PrimaryKey(autoGenerate = true) val id: Long? = null,
+                   @field:ColumnInfo val account: Int = -1,
+                   @field:ColumnInfo(name = "tweet_id") val tweetId: Long = 0,
+                   @field:ColumnInfo(name = "is_unread") val isUnread: Boolean = true) {
 
-    @PrimaryKey(autoGenerate = true)
-    var id: Long? = null
-
-    @ColumnInfo(name = "account")
-    var account: Int = 0
-
-    @ColumnInfo(name = "tweet_id")
-    var tweetId: Long = 0
-
-
-    @ColumnInfo(name = "is_unread", typeAffinity = ColumnInfo.INTEGER)
-    var isUnread: Boolean = false
-
-
-    constructor(id: Long, account: Int, tweetId: Long, isUnread: Boolean) {
-        this.id = id
-        this.account = account
-        this.tweetId = tweetId
-        this.isUnread = isUnread
-    }
-
-
-    constructor(status: Status, account: Int) {
-        this.id = null
-        this.account = account
-        this.tweetId = status.id
-        this.isUnread = true
-    }
-
+    constructor(status: Status, account: Int) : this(null, account, status.id, true)
 
 }
 

@@ -46,7 +46,7 @@ class MentionsTransferTest : TransferTest() {
         TransferTest.sourceDatabase!!.endTransaction()
         //save mention info
 
-        applyCallback(TalonDatabase.transferMentionsData(TransferTest.sourceDatabase!!.path, userLabeler!!))
+        applyCallback(TalonDatabase.transferMentionsData(context, TransferTest.sourceDatabase!!.path))
         val cursor = TransferTest.testDatabase!!.query("SELECT * FROM mentions", null)
         assertThat("Error getting database to test", cursor, notNullValue())
 
@@ -55,7 +55,7 @@ class MentionsTransferTest : TransferTest() {
     @Test
     fun testTransferIfEmptyTable() {
 
-        applyCallback(TalonDatabase.transferMentionsData(TransferTest.sourceDatabase!!.path, userLabeler!!))
+        applyCallback(TalonDatabase.transferMentionsData(context, TransferTest.sourceDatabase!!.path))
         val cursor = TransferTest.testDatabase!!.query("SELECT id FROM mentions", null)
         assertThat("Error getting the database result for testing", cursor, notNullValue())
         assertThat("Somehow entries got into the database", cursor.count, `is`(0))
@@ -64,7 +64,7 @@ class MentionsTransferTest : TransferTest() {
 
     @Test
     fun testTransferIfNoSourceDatabase() {
-        applyCallback(TalonDatabase.transferMentionsData(TransferTest.badDatabaseLocation, userLabeler))
+        applyCallback(TalonDatabase.transferMentionsData(context, TransferTest.badDatabaseLocation))
     }
 
     @After

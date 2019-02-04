@@ -9,50 +9,49 @@ import com.klinker.android.twitter_l.data.roomdb.entities.User
 abstract class UserDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    internal abstract fun insertUserSpecificInfo(user: User)
+    internal abstract fun insertUserInDatabase(user: User) : Long?
 
-    @Update
+    fun insertUser(user: User) : User? {
+        return insertUserInDatabase(user).let { id -> if (id != -1L) user.copy(id = id) else null }
+    }
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     abstract fun updateUser(user: User)
 
-    @Delete
-    internal abstract fun deleteUser(user: User)
+    private fun updateUser(latestUser: User, savedUser: User) {
+        if (!latestUser.contentEquals(savedUser)) {
+            updateUser(latestUser)
+        }
+    }
 
-    @Query("DELETE from users WHERE id = :id")
-    internal abstract fun deleteUser(id: Long)
+    @Query("DELETE FROM users WHERE id = :id")
+    abstract fun deleteUserById(id: Long)
 
-
-    @Query("SELECT id FROM users WHERE screen_name = :screenName")
-    abstract fun findUserIdByScreenName(screenName: String): Long
+    @Query("SELECT * FROM users WHERE id = :id")
+    abstract fun findUserById(id: Long) : User?
 
 
     @Query("SELECT * FROM users WHERE screen_name = :screenName")
     abstract fun findUserByScreenName(screenName: String) : User?
 
+    @Query("SELECT * FROM users WHERE twitter_id = :twitterId")
+    abstract fun findUserByTwitterId(twitterId: Long): User?
+
     @Transaction
-    open fun insertUser(user: User) {
-        val savedUser = findUserByScreenName(user.screenName)
+    open fun findUser(user: User) : User? {
 
-        when {
-            savedUser == null -> insertUserSpecificInfo(user)
-            savedUser.id!! < 0 || savedUser.id != user.id -> {
-
-                //replace ids in direct messages
-                //replace ids in tweets
-                //replace ids in favoriteUser
-                //??Deal with delete/insert dependency
-
-            }
-            savedUser != user -> updateUser(user)
-
+        if (user.id != null) {
+            return findUserById(user.id)
         }
 
+        return user.twitterId?.let { findUserByTwitterId(it)} ?: findUserByScreenName(user.screenName)
     }
 
 
-
-
-
-
+    @Transaction
+    open fun saveUser(user: User): User? {
+        return findUser(user)?.also { u -> updateUser(user.copy(id = u.id), u) } ?: insertUser(user)
+    }
 
 
 }

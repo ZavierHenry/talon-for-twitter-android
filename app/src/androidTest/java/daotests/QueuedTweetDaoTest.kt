@@ -63,9 +63,9 @@ class QueuedTweetDaoTest : DaoTest() {
         val queuedTweet = QueuedTweet(id, text, account)
         queuedTweetDao.deleteQueuedTweet(queuedTweet)
 
-        val cursor = queryDatabase("SELECT * FROM queued_tweets", null)
-        assertThat("Value did not delete from the database", cursor.count, `is`(0))
-        cursor.close()
+        queryDatabase("SELECT * FROM queued_tweets", null).use { cursor ->
+            assertThat("Value did not delete from the database", cursor.count, `is`(0))
+        }
 
     }
 
@@ -76,21 +76,24 @@ class QueuedTweetDaoTest : DaoTest() {
 
         contentValues.put("account", 1)
 
-        beginTransaction()
 
-        val firstAccountIds = (0..2).map {
-            contentValues.put("text", "This is a sample text for tweet $it")
-            insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
-        }.count { it != -1L }
+        val firstAccountIds = asTransaction {
 
-        contentValues.put("account", 2)
+            val firstAccountIds = (0..2).map {
+                contentValues.put("text", "This is a sample text for tweet $it")
+                insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+            }.count { it != -1L }
 
-        (0..2).forEach {
-            contentValues.put("text", "This is a sample text for tweet $it")
-            insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+            contentValues.put("account", 2)
+
+            (0..2).forEach {
+                contentValues.put("text", "This is a sample text for tweet $it")
+                insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
+            }
+
+            firstAccountIds
         }
 
-        endSuccessfulTransaction()
 
         val queuedTweets = queuedTweetDao.getQueuedTweets(testAccountNumber)
         assertThat("Did not get the correct number of values", queuedTweets, hasSize(firstAccountIds))
@@ -104,18 +107,17 @@ class QueuedTweetDaoTest : DaoTest() {
         val contentValues = ContentValues()
         contentValues.put("account", account)
 
-        beginTransaction()
+        val numberInsertedIds = asTransaction {
 
-        val numberInsertedIds = (0..5).map {
-            contentValues.put("text", "This is a sample text for queued tweet $it")
-            insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
-        }.count { it != -1L }
-
-        endSuccessfulTransaction()
+            (0..5).count {
+                contentValues.put("text", "This is a sample text for queued tweet $it")
+                insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues) != -1L
+            }
+        }
 
         assertThat("At least one value must be inserted to properly test this", numberInsertedIds, greaterThan(0))
         val queriedTweets = queuedTweetDao.getQueuedTweets(account + 1)
-        assertThat("Incorrect number of queued tweets returned", queriedTweets, emptyCollectionOf(QueuedTweet::class.java))
+        assertThat("Incorrect number of queued tweets returned", queriedTweets, empty())
 
     }
 
@@ -125,22 +127,20 @@ class QueuedTweetDaoTest : DaoTest() {
         contentValues.put("account", 1)
         contentValues.put("text", "This is a sample queued text")
 
-        beginTransaction()
 
         val id1 = insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
         contentValues.put("account", 2)
         val id2 = insertIntoDatabase("queued_tweets", SQLiteDatabase.CONFLICT_ABORT, contentValues)
 
-        endSuccessfulTransaction()
 
         assertThat("Problem inserting test value 1 into database", id1, not(-1L))
         assertThat("Problem inserting test value 2 into database", id2, not(-1L))
 
         queuedTweetDao.deleteAllQueuedTweets()
 
-        val cursor = queryDatabase("SELECT * FROM queued_tweets", null)
-        assertThat("Database values were not deleted properly", cursor.count, `is`(0))
-        cursor.close()
+        queryDatabase("SELECT * FROM queued_tweets", null).use { cursor ->
+            assertThat("Database values were not deleted properly", cursor.count, `is`(0))
+        }
 
     }
 

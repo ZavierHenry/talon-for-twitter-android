@@ -111,6 +111,7 @@ public class SendScheduledTweet extends BroadcastReceiver {
                 if (sent) {
                     finishedTweetingNotification(context);
                     QueuedDataSource.getInstance(context).deleteScheduledTweet(tweet.alarmId);
+
                 } else {
                     makeFailedNotification(context, tweet.text, settings);
                 }

@@ -1,16 +1,9 @@
 package daotests
 
-import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
-
 import org.junit.After
 import org.junit.AfterClass
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-
-import androidx.core.widget.TextViewCompat
-import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
 
 class FavoriteUserDaoTest : DaoTest() {
 
@@ -18,6 +11,18 @@ class FavoriteUserDaoTest : DaoTest() {
 
     @Test
     fun insertFavoriteUser() {
+
+    }
+
+
+    @Test
+    fun insertFavoriteUserTwitterIdSaved() {
+
+    }
+
+
+    @Test
+    fun insertFavoriteUserScreenNameSaved() {
 
     }
 

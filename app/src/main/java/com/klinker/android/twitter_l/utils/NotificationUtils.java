@@ -38,6 +38,8 @@ import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.klinker.android.twitter_l.R;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
+import com.klinker.android.twitter_l.data.roomdb.pojos.DisplayDirectMessage;
 import com.klinker.android.twitter_l.data.sq_lite.*;
 import com.klinker.android.twitter_l.receivers.MarkMentionReadReceiver;
 import com.klinker.android.twitter_l.receivers.NotificationDeleteReceiverOne;
@@ -537,6 +539,10 @@ public class NotificationUtils {
         } else if (dmTweets == 1 && mentionsTweets == 0 && homeTweets == 0) { // display the new message
             DMDataSource dm = DMDataSource.getInstance(context);
             text = dm.getNewestMessage(currentAccount, screenName);
+
+            //DisplayDirectMessage dm = TalonDatabase.getInstance(context).directMessageDao().getLatestDirectMessage(userId, currentAccount)
+            //text = dm.getText()
+
         } else if (homeTweets > 0 && mentionsTweets == 0 && dmTweets == 0) { // it is just tweets being displayed, so put new out front
             text = homeTweets + " " + (homeTweets == 1 ? context.getResources().getString(R.string.new_tweet) : context.getResources().getString(R.string.new_tweets));
         } else {

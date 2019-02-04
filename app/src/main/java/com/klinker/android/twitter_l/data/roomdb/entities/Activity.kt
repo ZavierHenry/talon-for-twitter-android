@@ -15,99 +15,71 @@ import java.util.HashSet
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import twitter4j.Status
-import twitter4j.User
+
+@Entity(tableName = "Activities", foreignKeys = [ForeignKey(entity = Tweet::class, childColumns = ["tweet_id"], parentColumns = ["id"])])
+data class Activity(@PrimaryKey(autoGenerate = true) val id: Long? = null,
+                    val type: Int,
+                    @ColumnInfo val account: Int = -1,
+                    @ColumnInfo(name = "tweet_id") val tweetId: Long? = null,
+                    val time: Long = 0,
+                    val text: String = "",
+                    val profilePicUrls: String? = null,
+                    val title: String? = null,
+                    val userId: Long? = null,
+                    val users: String = "") {
 
 
-//TODO: add foreign keys for tweet_id and user_id
-@Entity(tableName = "activities")
-class Activity() {
 
-    // MENTION = 0
-    // NEW_FOLLOWER = 1
-    // RETWEETS = 2
-    // FAVORITES = 3
+    companion object {
 
-    @PrimaryKey(autoGenerate = true)
-    var id: Long? = null
+        const val MENTION = 0
+        const val NEW_FOLLOWER = 1
+        const val RETWEETS = 2
+        const val FAVORITES = 3
 
-    @ColumnInfo
-    var account: Int = 0
-
-    @ColumnInfo(name = "tweet_id")
-    var tweetId: Long? = null
-
-    @ColumnInfo
-    var time: Long = 0
-
-    @ColumnInfo
-    var text: String = ""
-
-    @ColumnInfo(name = "profile_pic_urls")
-    var proPicUrls: String? = null
-
-    @ColumnInfo
-    var title: String? = null
-
-    @ColumnInfo(name = "user_id")
-    var userId: Long? = null
-
-    @ColumnInfo
-    var users: String = ""
-
-
-    @ColumnInfo
-    var type: Int = 0 //change to type ActivityType enum
-
-    init {
-
-    }
-
-    constructor(status: Status, account: Int, activityType: Int) : this() {
-        this.id = null
-        this.account = account
-        this.type = activityType
-
-        when (activityType) {
-            0 -> text = ""
-            1 -> text = ""
-            else -> text = ""
+        @JvmStatic private fun buildText(context: Context, tweet: Tweet, activityType: Int) : String {
+            return when (activityType) {
+                MENTION -> tweet.text
+                RETWEETS -> "${tweet.retweetCount} ${context.getString(if (tweet.retweetCount == 1) R.string.retweet else R.string.retweets)}"
+                FAVORITES -> "${tweet.likeCount} ${context.getString(if (tweet.likeCount == 1) R.string.favorite_lower else R.string.favorites_lower)}"
+                else -> ""
+            }
         }
-    }
 
-
-    constructor(context: Context, users: List<User>, account: Int) : this() {
-        this.id = null
-        this.account = account
-        this.tweetId = null
-        this.type = 1 //new follower
-        this.text = "${users.size} ${context.getString(if (users.size == 1) R.string.new_follower_lower else R.string.new_followers_lower)}}"
-        this.userId = null
-        this.time = Calendar.getInstance().timeInMillis
-        this.users = buildUserList(users)
-        this.proPicUrls = buildProPicUrl(users)
-        this.title = buildUsersTitle(context, users)
-    }
-
-    private fun buildProPicUrl(users: List<User>): String {
-        return users.asSequence().take(4).joinToString(separator = " "){ user -> "@${user.screenName}" }
-    }
-
-    private fun buildUserList(users: List<User>): String {
-        return users.asSequence().distinctBy { user -> user.screenName }.joinToString(separator = " ") { user -> "@${user.screenName}" }
-    }
-
-    private fun buildUsersTitle(context: Context, users: List<User>): String {
-        val and = context.getString(R.string.and)
-        val screenNames = ArrayList<String>()
-
-        return when (users.size) {
-            0 -> ""
-            1 -> "@${users[0].screenName}"
-            2 -> "@${users[0].screenName} $and ${users[1].screenName}"
-            else -> users.asSequence().take(users.size - 1).joinToString(separator = ", ") { user -> "@${user.screenName}"} + ", $and @" + users.last().screenName
+        @JvmStatic private fun buildText(context: Context, users: List<User>) : String {
+            val size = users.size
+            return "$size ${context.getString(if (size == 1) R.string.new_follower_lower else R.string.new_followers_lower)}"
         }
+
+
+
+
+
+
+        @JvmStatic fun buildScreenNamesList(users : List<User>) : String {
+            return users.asSequence()
+                    .distinctBy { it.screenName }
+                    .joinToString(separator = " ", transform = { user -> "@${user.screenName}" })
+        }
+
+        @JvmStatic fun buildUsersList(context: Context, users: List<User>) : String {
+            val and = context.getString(R.string.and)
+
+            return when (users.size) {
+                0 -> ""
+                1 -> "@${users[0].screenName}"
+                2 -> "@${users[0].screenName} $and @${users[1].screenName}"
+                else ->
+                    users.dropLast(1).joinToString(separator = " ", postfix = ", $and @${users.last().screenName}", transform = { user -> "@${user.screenName}"})
+            }
+        }
+
+        @JvmStatic fun buildProPicUrl(users: List<User>) : String {
+            return users.joinToString(separator = " ", limit = 4, transform = { user -> user.profilePic})
+        }
+
     }
 
 }

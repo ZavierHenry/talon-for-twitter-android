@@ -14,9 +14,11 @@ import android.widget.ListPopupWindow;
 import android.widget.TextView;
 
 import com.klinker.android.twitter_l.adapters.AutoCompleteHashtagAdapter;
+import com.klinker.android.twitter_l.adapters.AutoCompleteHashtagEntityAdapter;
 import com.klinker.android.twitter_l.adapters.AutoCompletePeopleAdapter;
 import com.klinker.android.twitter_l.adapters.AutoCompleteUserArrayAdapter;
 import com.klinker.android.twitter_l.adapters.UserListMembersArrayAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.FollowersDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.settings.AppSettings;
@@ -87,6 +89,10 @@ public class UserAutoCompleteHelper {
         hashtagAutoComplete.setAdapter(new AutoCompleteHashtagAdapter(hashtagAutoComplete, context,
                 HashtagDataSource.getInstance(context).getCursor(""), textView));
 
+//
+//        hashtagAutoComplete.setAdapter(new AutoCompleteHashtagEntityAdapter(hashtagAutoComplete, context, textView,
+//                TalonDatabase.getInstance(context).hashtagDao().getHashtags("")));
+
         userAutoComplete.setAdapter(new AutoCompletePeopleAdapter(userAutoComplete, context,
                 FollowersDataSource.getInstance(context).getCursor(AppSettings.getInstance(context).currentAccount,
                         textView.getText().toString()), textView));
@@ -155,6 +161,12 @@ public class UserAutoCompleteHelper {
                 adapterText = adapterText.replace("#", "");
                 hashtagAutoComplete.setAdapter(new AutoCompleteHashtagAdapter(hashtagAutoComplete, context,
                         HashtagDataSource.getInstance(context).getCursor(adapterText), textView));
+
+//
+//                hashtagAutoComplete.setAdapter(new AutoCompleteHashtagEntityAdapter(hashtagAutoComplete, context, textView,
+//                        TalonDatabase.getInstance(context).hashtagDao().getHashtags(adapterText)));
+//
+
             }
 
             if (searchText.charAt(position) == '@') {

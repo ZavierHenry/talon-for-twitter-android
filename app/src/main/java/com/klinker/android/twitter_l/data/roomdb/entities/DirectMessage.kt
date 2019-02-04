@@ -18,103 +18,24 @@ import twitter4j.URLEntity
         indices = [
             Index(value = ["sender_id"]),
             Index(value = ["recipient_id"]),
-            Index(value = ["message_id", "account"], unique = true) ],
+            Index(value = ["message_id", "account"], unique = true)],
         foreignKeys = [
-            ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["sender_id"], onDelete = ForeignKey.CASCADE),
-            ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["recipient_id"])
+            ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["sender_id"], onDelete = ForeignKey.RESTRICT),
+            ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["recipient_id"], onDelete = ForeignKey.RESTRICT)
         ])
-class DirectMessage() {
-
-    @PrimaryKey
-    var id: Long = 0
-
-    @ColumnInfo
-    var account: Int = 0
-
-    @ColumnInfo(name = "sender_id")
-    var senderId: Long = 0
-
-    @ColumnInfo(name = "recipient_id")
-    var recipientId: Long = 0
-
-    @ColumnInfo(name = "message_id")
-    var messageId: Long = 0
-
-    @ColumnInfo
-    var time: Long = 0
-
-    @ColumnInfo
-    var text: String = ""
-
-    @ColumnInfo(name = "pic_urls")
-    var picUrls: String? = null
-
-    @ColumnInfo
-    var urls: String? = null
-
-    @ColumnInfo(name = "gif_url")
-    var gifUrl: String? = null
-
-    @ColumnInfo(name = "media_length")
-    var mediaLength: Long = 0
-
-    init {
-
-    }
+data class DirectMessage(@PrimaryKey val id: Long? = null,
+                         @ColumnInfo val account: Int = -1,
+                         @ColumnInfo(name = "sender_id") val senderId: Long = 0,
+                         @ColumnInfo(name = "recipient_id") val recipientId: Long = 0,
+                         @ColumnInfo(name = "message_id") val messageId: Long = 0,
+                         @ColumnInfo val time: Long = 0,
+                         @ColumnInfo val text: String = "",
+                         @ColumnInfo(name = "picture_urls") val pictureUrls: String? = null,
+                         @ColumnInfo val urls: String? = null,
+                         @ColumnInfo(name = "gif_url") val gifUrl: String? = null,
+                         @ColumnInfo(name = "media_length") val mediaLength: Long = -1) {
 
 
-    constructor(status: twitter4j.DirectMessageEvent, possibleUsers: List<twitter4j.User>, account: Int) : this() {
-
-        val html = TweetLinkUtils.getLinksInStatus(status)
-        val text = html[0]
-        val media = html[1]
-        val url = html[2]
-
-        var sender: twitter4j.User? = null
-        var receiver: twitter4j.User? = null
-
-        for (user in possibleUsers) {
-
-            if (user.id == status.senderId) {
-                sender = user
-                if (receiver != null) break
-
-            } else if (user.id == status.recipientId) {
-                receiver = user
-                if (sender != null) break
-            }
-        }
-
-        if (sender == null || receiver == null) {
-            return
-        }
-
-        this.account = account
-        this.text = text
-        this.id = status.id
-        this.senderId = sender.id
-        this.time = status.createdTimestamp.time
-        this.picUrls = media
-
-        val info = TweetLinkUtils.getGIFUrl(status.mediaEntities, url)
-        this.gifUrl = info.url
-        this.mediaLength = info.duration
-
-        val entities = status.mediaEntities
-
-        if (entities.isNotEmpty()) {
-            this.picUrls = entities[0].mediaURL
-        }
-
-        //only saves last url?
-        //TODO: check if saving only last url is intended behavior
-        val urls = status.urlEntities
-        for (u in urls) {
-            Log.v("inserting_dm", "url here: " + u.expandedURL)
-            this.urls = u.expandedURL
-        }
-
-    }
-
+    constructor(status: twitter4j.DirectMessageEvent, possibleUsers: List<twitter4j.User>, account: Int) : this()
 
 }

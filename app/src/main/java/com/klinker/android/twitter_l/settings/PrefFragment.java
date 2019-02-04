@@ -56,6 +56,7 @@ import com.klinker.android.twitter_l.adapters.MainDrawerArrayAdapter;
 import com.klinker.android.twitter_l.adapters.TimelinePagerAdapter;
 import com.klinker.android.twitter_l.data.App;
 import com.klinker.android.twitter_l.data.ThemeColor;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.FollowersDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.HomeDataSource;
 import com.klinker.android.twitter_l.utils.ServiceUtils;
@@ -1728,6 +1729,8 @@ public class PrefFragment extends PreferenceFragment implements SharedPreference
             FollowersDataSource followers = FollowersDataSource.getInstance(context);
 
             followers.deleteAllUsers(sharedPrefs.getInt("current_account", 1));
+            //TalonDatabase.getInstance(context).followerDao().deleteAllFollowers(sharedPrefs.getInt("current_account", 1));
+
 
             try {
 

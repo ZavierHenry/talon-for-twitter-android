@@ -8,6 +8,8 @@ import android.util.Log;
 import com.klinker.android.twitter_l.data.sq_lite.MentionsDataSource;
 import com.klinker.android.twitter_l.activities.media_viewer.image.TimeoutThread;
 
+
+//TODO: potentially replace tweetId with mentionId
 public class MarkMentionReadReceiver extends BroadcastReceiver {
 
     private static final String ARG_TWEET_ID = "tweet_id";

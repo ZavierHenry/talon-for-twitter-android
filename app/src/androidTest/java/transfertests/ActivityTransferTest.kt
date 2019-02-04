@@ -35,7 +35,7 @@ class ActivityTransferTest : TransferTest() {
     @Test
     fun testTransferIfNoSourceDatabase() {
         val userId = AtomicLong(-2L)
-        applyCallback(TalonDatabase.transferActivityData(TransferTest.badDatabaseLocation, userId))
+        applyCallback(TalonDatabase.transferActivityData(context, TransferTest.badDatabaseLocation))
     }
 
     @After

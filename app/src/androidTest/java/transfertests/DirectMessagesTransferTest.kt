@@ -34,24 +34,26 @@ class DirectMessagesTransferTest : TransferTest() {
 
         //test direct message transfer results
 
-        applyCallback(TalonDatabase.transferDirectMessageData(sourceDatabasePath, userLabeler))
+        applyCallback(TalonDatabase.transferDirectMessageData(context, sourceDatabasePath))
 
-        val cursor = queryTestDatabase("SELECT * FROM direct_messages", null)
+        queryTestDatabase("SELECT * FROM direct_messages", null).use { cursor ->
 
+        }
 
     }
 
     @Test
     fun testTransferIfEmptyTable() {
-        applyCallback(TalonDatabase.transferDirectMessageData(TransferTest.badDatabaseLocation, userLabeler))
-        val cursor = queryTestDatabase("SELECT * FROM direct_messages", null)
-        assertThat("Somehow the database is populated by values", cursor.count, `is`(0))
-        cursor.close()
+        applyCallback(TalonDatabase.transferDirectMessageData(context, TransferTest.badDatabaseLocation))
+
+        queryTestDatabase("SELECT * FROM direct_messages", null).use { cursor ->
+            assertThat("Somehow the database is populated by values", cursor.count, `is`(0))
+        }
     }
 
     @Test
     fun testTransferIfNoSourceDatabase() {
-        applyCallback(TalonDatabase.transferDirectMessageData(TransferTest.badDatabaseLocation, userLabeler))
+        applyCallback(TalonDatabase.transferDirectMessageData(context, TransferTest.badDatabaseLocation))
     }
 
 

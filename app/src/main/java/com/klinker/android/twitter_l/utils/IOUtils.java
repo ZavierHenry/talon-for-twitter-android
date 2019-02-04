@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.adapters.TimelinePagerAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.*;
 import com.klinker.android.twitter_l.settings.AppSettings;
 
@@ -315,16 +316,30 @@ public class IOUtils {
             AppSettings settings = AppSettings.getInstance(context);
             SharedPreferences sharedPrefs = AppSettings.getSharedPreferences(context);
 
+            //TalonDatabase.getInstance(context).interactionDao().trimDatabase(account, 100);
+            //TalonDatabase.getInstance(context).homeTweetDao().trimDatabase(account, settings.timelineSize);
+            //TalonDatabase.getInstance(context).favoriteUserNotificationDao().trimDatabase(100);
+            //TalonDatabase.getInstance(context).mentionDao().trimDatabase(account, settings.mentionsSize);
+            //TalonDatabase.getInstance(context).directMessageDao().trimDatabase(account, settings.dmSize);
+            //TalonDatabase.getInstance(context).hashtagDao().trimDatabase(500);
+            //TalonDatabase.getInstance(context).activityDao().trimDatabase(account, 200);
+            //TalonDatabase.getInstance(context).favoriteTweetDao().trimDatabase(account, 400);
+
+
             InteractionsDataSource interactions = InteractionsDataSource.getInstance(context);
             interactions.trimDatabase(account, 100);
+
 
             HomeDataSource home = HomeDataSource.getInstance(context);
             home.deleteDups(settings.currentAccount);
             home.trimDatabase(account, settings.timelineSize);
 
+
             FavoriteUserNotificationDataSource favoriteUserNotificationDataSource =
                     FavoriteUserNotificationDataSource.getInstance(context);
             favoriteUserNotificationDataSource.trimDatabase(100);
+
+
 
             // trimming the lists
             ListDataSource lists = ListDataSource.getInstance(context);
@@ -333,6 +348,8 @@ public class IOUtils {
                     long listId = sharedPrefs.getLong("account_" + accountIndex + "_list_" + (i + 1) + "_long", 0);
                     lists.deleteDups(listId);
                     lists.trimDatabase(listId, settings.listSize);
+
+                    //TalonDatabase.getInstance(context).listTweetDao().trimDatabase(listId, settings.listSize);
                 }
             }
 
@@ -343,6 +360,7 @@ public class IOUtils {
                     long userId = sharedPrefs.getLong("account_" + accountIndex + "_user_tweets_" + (i + 1) + "_long", 0);
                     userTweets.deleteDups(userId);
                     userTweets.trimDatabase(userId, settings.userTweetsSize);
+                    //TalonDatabase.getInstance(context).userTweetDao().trimDatabase(userId, settings.userTweetsSize);
                 }
             }
 
@@ -350,15 +368,19 @@ public class IOUtils {
             mentions.deleteDups(account);
             mentions.trimDatabase(account, settings.mentionsSize);
 
+
             DMDataSource dm = DMDataSource.getInstance(context);
             dm.deleteDups(account);
             dm.trimDatabase(account, settings.dmSize);
 
+
             HashtagDataSource hashtag = HashtagDataSource.getInstance(context);
             hashtag.trimDatabase(500);
 
+
             ActivityDataSource activity = ActivityDataSource.getInstance(context);
             activity.trimDatabase(account, 200);
+
 
             FavoriteTweetsDataSource favtweets = FavoriteTweetsDataSource.getInstance(context);
             favtweets.deleteDups(settings.currentAccount);

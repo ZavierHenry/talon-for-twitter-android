@@ -12,12 +12,12 @@ internal abstract class MockEntity<T> {
         return showMismatches(other).isEmpty()
     }
 
-    abstract fun showMismatches(other: T) : List<FieldMismatch>
+    abstract fun showMismatches(other: T) : Collection<FieldMismatch>
+
     abstract fun setContentValues(contentValues: ContentValues)
 
-
     protected fun makeMismatch(name: String, expected: Any?, actual: Any?) : FieldMismatch {
-        return Pair(name, Pair(expected, actual))
+        return name to (expected to actual)
     }
 
 }

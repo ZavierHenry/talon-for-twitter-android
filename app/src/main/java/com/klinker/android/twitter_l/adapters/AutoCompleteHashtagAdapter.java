@@ -21,13 +21,20 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
 import com.klinker.android.twitter_l.R;
+import com.klinker.android.twitter_l.data.roomdb.entities.Hashtag;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagSQLiteHelper;
 import com.klinker.android.twitter_l.utils.AutoCompleteHelper;
+
+import java.util.List;
+
 
 public class AutoCompleteHashtagAdapter extends CursorAdapter {
 

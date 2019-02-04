@@ -27,29 +27,33 @@ class HashtagDaoTest : DaoTest() {
 
     @Test
     fun trimDatabaseTrimsDatabase() {
-        val databaseLimit = 5
+        val databaseSize = 5
         val contentValues = ContentValues()
+        val trimSize = 3
+
+
         var actualSize = 0
 
 
-        beginTransaction()
+        asTransaction {
 
-        for (i in 0..15) {
-            contentValues.put("name", "#tag$i")
-            val id = insertIntoDatabase("hashtags", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+            for (i in 0..15) {
+                contentValues.put("name", "#tag$i")
+                val id = insertIntoDatabase("hashtags", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
 
-            if (id != -1L) {
-                actualSize++
+                if (id != -1L) {
+                    actualSize++
+                }
             }
+
         }
 
-        endSuccessfulTransaction()
+        assertThat("Database setup for test failed", actualSize, greaterThan(trimSize))
+        hashtagDao.trimDatabase(trimSize)
 
-        assertThat("Database setup for test failed", actualSize, greaterThan(databaseLimit))
-        hashtagDao.trimDatabase(databaseLimit)
-        val cursor = queryDatabase("SELECT * FROM hashtags", null)
-        assertThat("Database is not being trimmed properly", cursor.count, `is`(databaseLimit))
-        cursor.close()
+        queryDatabase("SELECT * FROM hashtags", null).use { cursor ->
+            assertThat("Database is not being trimmed properly", cursor.count, `is`(trimSize))
+        }
 
     }
 
@@ -61,34 +65,40 @@ class HashtagDaoTest : DaoTest() {
         val contentValues = ContentValues()
         var actualSize = 0
 
-        beginTransaction()
+        asTransaction {
 
-        for (i in 0..10) {
-            contentValues.put("name", "#tag_$i")
-            val id = insertIntoDatabase("hashtags", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
-            if (id != -1L) {
-                actualSize++
+            for (i in 0..10) {
+                contentValues.put("name", "#tag_$i")
+                val id = insertIntoDatabase("hashtags", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+                if (id != -1L) {
+                    actualSize++
+                }
             }
+
         }
 
-        endSuccessfulTransaction()
         hashtagDao.trimDatabase(databaseLimit)
 
-        val cursor = queryDatabase("SELECT * FROM hashtags;", null)
-        assertThat("Trim database incorrectly trims database", cursor.count, `is`(actualSize))
+        queryDatabase("SELECT * FROM hashtags;", null).use { cursor ->
+            assertThat("Trim database incorrectly trims database", cursor.count, `is`(actualSize))
+        }
+
     }
 
 
     @Test
     fun insertHashtag() {
-        val hashtag = Hashtag("#wired25")
+        val hashtag = Hashtag(null, "#wired25")
         hashtagDao.insertTag(hashtag)
-        val cursor = queryDatabase("SELECT name FROM hashtags WHERE name = ?", arrayOf(hashtag.tag))
-        assertThat("Incorrect number of arguments", cursor.count, `is`(0))
-        assertThat("Error getting first value of database", cursor.moveToFirst())
 
-        val name = cursor.getString(0)
-        assertThat("Hashtag wasn't inserted properly", name, `is`(hashtag.tag))
+        queryDatabase("SELECT name FROM hashtags WHERE name = ?", arrayOf(hashtag.tag)).use { cursor ->
+            assertThat("Incorrect number of arguments", cursor.count, `is`(0))
+            assertThat("Error getting first value of database", cursor.moveToFirst())
+
+            val name = cursor.getString(0)
+            assertThat("Hashtag wasn't inserted properly", name, `is`(hashtag.tag))
+        }
+
     }
 
     @Test
@@ -102,10 +112,13 @@ class HashtagDaoTest : DaoTest() {
     @Test
     fun hashtagTableRejectsDuplicates() {
         val name = "#tag3"
-        val hashtag = Hashtag(name)
+        val hashtag = Hashtag(tag = name)
+
         hashtagDao.insertTag(hashtag)
-        val cursor = queryDatabase("SELECT name FROM hashtags WHERE name = ?", arrayOf(name))
-        assertThat("Database incorrectly allows duplicate names", cursor.count, `is`(1))
+        queryDatabase("SELECT name FROM hashtags WHERE name = ?", arrayOf(name)).use { cursor ->
+            assertThat("Database incorrectly allows duplicate names", cursor.count, `is`(1))
+        }
+
 
         //test for duplicate
     }
@@ -118,12 +131,12 @@ class HashtagDaoTest : DaoTest() {
     companion object {
 
         @BeforeClass
-        fun initDatabase() {
+        @JvmStatic fun initDatabase() {
             DaoTest.initTestDatabase()
         }
 
         @AfterClass
-        fun closeDatabase() {
+        @JvmStatic fun closeDatabase() {
             DaoTest.closeTestDatabase()
         }
     }

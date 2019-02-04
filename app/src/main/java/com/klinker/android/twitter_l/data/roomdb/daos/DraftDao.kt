@@ -9,20 +9,32 @@ import androidx.room.Query
 import com.klinker.android.twitter_l.data.roomdb.entities.Draft
 
 @Dao
-interface DraftDao {
+abstract class DraftDao {
+
+    fun createDraft(text: String, account: Int) : Draft {
+        return Draft(text = text, account = account)
+    }
+
+    fun saveDraft(text: String, account: Int) : Draft? {
+        return saveDraft(createDraft(text, account))
+    }
+
+    fun saveDraft(draft: Draft) : Draft? {
+        return insertDraft(draft)?.let { id -> draft.copy(id = id) }
+    }
 
     @Insert
-    fun insertDraft(draft: Draft): Long
+    abstract fun insertDraft(draft: Draft): Long?
 
     @Delete
-    fun deleteDraft(draft: Draft)
+    abstract fun deleteDraft(draft: Draft)
 
 
-    @Query("SELECT * FROM drafts WHERE account = :account ORDER BY id DESC")
-    fun getDrafts(account: Int): List<Draft>
+    @Query("SELECT * FROM drafts WHERE account = :account ORDER BY id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    abstract fun getDrafts(account: Int, page: Int = 1, pageSize: Int = 50): List<Draft>
+
 
     @Query("DELETE FROM drafts WHERE account = :account")
-    fun deleteDrafts(account: Int)
-
+    abstract fun deleteDrafts(account: Int)
 
 }

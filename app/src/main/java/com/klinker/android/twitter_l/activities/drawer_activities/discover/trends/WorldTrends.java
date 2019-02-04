@@ -31,6 +31,7 @@ import android.widget.ListView;
 
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.adapters.TrendsArrayAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.settings.AppSettings;
 import com.klinker.android.twitter_l.activities.drawer_activities.DrawerActivity;
@@ -130,6 +131,9 @@ public class WorldTrends extends Fragment {
                         if (s.contains("#")) {
                             // we want to add it to the userAutoComplete
                             Log.v("talon_hashtag", "adding: " + s);
+
+                            //TalonDatabase.getInstance(context).hashtagDao().createHashtag(s);
+
 
                             // could be much more efficient by querying and checking first, but I
                             // just didn't feel like it when there is only ever 10 of them here

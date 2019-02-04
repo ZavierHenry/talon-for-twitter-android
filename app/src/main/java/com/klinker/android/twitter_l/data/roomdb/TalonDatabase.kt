@@ -10,25 +10,6 @@ import android.os.strictmode.SqliteObjectLeakedViolation
 import android.telecom.Call
 import android.util.Log
 
-import com.klinker.android.twitter_l.data.roomdb.entities.Activity
-import com.klinker.android.twitter_l.data.roomdb.entities.DirectMessage
-import com.klinker.android.twitter_l.data.roomdb.entities.Draft
-import com.klinker.android.twitter_l.data.roomdb.entities.Emoji
-import com.klinker.android.twitter_l.data.roomdb.entities.FavoriteTweet
-import com.klinker.android.twitter_l.data.roomdb.entities.FavoriteUser
-import com.klinker.android.twitter_l.data.roomdb.entities.FavoriteUserNotification
-import com.klinker.android.twitter_l.data.roomdb.entities.Follower
-import com.klinker.android.twitter_l.data.roomdb.entities.Hashtag
-import com.klinker.android.twitter_l.data.roomdb.entities.HomeTweet
-import com.klinker.android.twitter_l.data.roomdb.entities.Interaction
-import com.klinker.android.twitter_l.data.roomdb.entities.ListTweet
-import com.klinker.android.twitter_l.data.roomdb.entities.Mention
-import com.klinker.android.twitter_l.data.roomdb.entities.QueuedTweet
-import com.klinker.android.twitter_l.data.roomdb.entities.SavedTweet
-import com.klinker.android.twitter_l.data.roomdb.entities.ScheduledTweet
-import com.klinker.android.twitter_l.data.roomdb.entities.Tweet
-import com.klinker.android.twitter_l.data.roomdb.entities.User
-import com.klinker.android.twitter_l.data.roomdb.entities.UserTweet
 import com.klinker.android.twitter_l.data.sq_lite.ActivitySQLiteHelper
 import com.klinker.android.twitter_l.data.sq_lite.DMSQLiteHelper
 import com.klinker.android.twitter_l.data.sq_lite.EmojiSQLiteHelper
@@ -56,8 +37,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.roomdb.daos.*
+import com.klinker.android.twitter_l.data.roomdb.entities.*
+import com.klinker.android.twitter_l.settings.AppSettings
 
 @Database(entities = [
+
+    TweetInteraction::class,
     Activity::class,
     DirectMessage::class,
     Draft::class,
@@ -99,52 +84,36 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun userDao() : UserDao
     abstract fun tweetDao() : TweetDao
 
+    abstract fun tweetInteractionDao() : TweetInteractionDao
+
 
     //delete databases
     //TODO: rewrite callbacks to facilitate testing
 
-    private abstract class TransferCallback constructor(private val databasePath: String) : RoomDatabase.Callback() {
+    private abstract class TransferCallback constructor(private val databasePath: String,
+                                                        private val context: Context) : RoomDatabase.Callback() {
 
-        internal abstract fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase)
+
+        internal abstract fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase)
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             getDatabase(databasePath)?.use { source ->
-                readDatabase(db, source)
+                readDatabase(context, db, source)
             }
         }
 
-        private fun getDatabase(absolutePath: String): SQLiteDatabase? {
-
-            try {
-                return SQLiteDatabase.openDatabase(absolutePath, null, SQLiteDatabase.OPEN_READONLY)
-            } catch (e: Exception) {
-                return null
-            }
-
+        private fun getDatabase(absolutePath: String): SQLiteDatabase? = try {
+            SQLiteDatabase.openDatabase(absolutePath, null, SQLiteDatabase.OPEN_READONLY)
+        } catch (e: Exception) {
+            null
         }
 
     }
 
 
-    private fun mergeTweets(newTweet: Tweet, targetTweet: Tweet) {
 
-    }
 
-    private fun mergeUsers(newUser: User, targetUser: User) {
 
-        if (targetUser.id!! < 0) {
-            targetUser.id = newUser.id
-        }
-
-        if (targetUser.profilePic.isNullOrEmpty()) {
-            targetUser.profilePic = newUser.profilePic
-        }
-
-        if (targetUser.name.isNullOrEmpty()) {
-            targetUser.name = newUser.name
-        }
-
-    }
 
     private fun fillUserContentValues(user: User, contentValues: ContentValues) {
         contentValues.put("id", user.id)
@@ -183,9 +152,87 @@ abstract class TalonDatabase : RoomDatabase() {
 
         }
 
-        private fun buildDatabase(context: Context): TalonDatabase {
+        @JvmStatic private fun getStringFromCursor(cursor: Cursor, columnName: String) : String? {
+            return cursor.getColumnIndex(columnName).let { index ->
+                if (index != -1) cursor.getString(index) else null
+            }
+        }
+
+        @JvmStatic private fun getIntFromCursor(cursor: Cursor, columnName: String) : Int? {
+            return cursor.getColumnIndex(columnName).let { index ->
+                if (index != -1) cursor.getInt(index) else null
+            }
+        }
+
+        @JvmStatic private fun getBooleanFromCursor(cursor: Cursor, columnName: String) : Boolean? {
+            return getIntFromCursor(cursor, columnName)?.let { if (it != -1) it == 1 else null }
+        }
+
+        @JvmStatic private fun getLongFromCursor(cursor: Cursor, columnName: String) : Long? {
+            return cursor.getColumnIndex(columnName).let { index ->
+                if (index != -1) cursor.getLong(index) else null
+            }
+        }
+
+        @JvmStatic private fun <T> removeFromContentValues(contentValues: ContentValues, key: String, value: T?, comparisonValue: T) {
+            if (value != null && value != comparisonValue) {
+                contentValues.remove(key)
+            }
+        }
+
+
+        @JvmStatic private fun mergeUsers(cursor: Cursor, contentValues: ContentValues) : ContentValues {
+            val twitterId = getLongFromCursor(cursor, "twitter_id")
+            val name = getStringFromCursor(cursor, "name")
+            val screenName = getStringFromCursor(cursor, "screen_name")
+            val profilePic = getStringFromCursor(cursor, "profile_pic")
+            val isVerified = getBooleanFromCursor(cursor, "is_verified")
+
+            return ContentValues().apply {
+                putAll(contentValues)
+                removeFromContentValues(this, "twitter_id", twitterId, -1L)
+                removeFromContentValues(this, "name", name, "")
+                removeFromContentValues(this, "screen_name", screenName, "")
+                removeFromContentValues(this, "profile_pic", profilePic, "")
+                if (isVerified != null) remove("is_verified")
+            }
+
+        }
+
+        @JvmStatic private fun mergeTweets(cursor: Cursor, contentValues: ContentValues) : ContentValues {
+            val userId = getLongFromCursor(cursor,"user_id")
+            val time = getLongFromCursor(cursor, "time")
+            val text = getStringFromCursor(cursor, "text")
+            val likeCount = getIntFromCursor(cursor, "like_count")
+            val retweetCount = getIntFromCursor(cursor, "retweet_count")
+            val gifUrl = getStringFromCursor(cursor, "gif_url")
+            val mediaDuration = getIntFromCursor(cursor, "media_duration")
+            val pictureUrls = getStringFromCursor(cursor, "picture_urls")
+            val urls = getStringFromCursor(cursor, "urls")
+            val hashtags = getStringFromCursor(cursor, "hashtags")
+            val users = getStringFromCursor(cursor, "users")
+            val isConversation = getBooleanFromCursor(cursor, "is_conversation")
+            val retweeter = getStringFromCursor(cursor, "retweeter")
+            val clientSource = getStringFromCursor(cursor, "client_source")
+
+
+
+
+            return ContentValues().apply {
+                putAll(contentValues)
+                removeFromContentValues(this, "user_id", userId, -1L)
+                removeFromContentValues(this, "text", text, "")
+                removeFromContentValues(this, "time", time, -1L)
+                removeFromContentValues(this, "like_count", likeCount, -1)
+                removeFromContentValues(this, "retweet_count", retweetCount, -1)
+
+
+            }
+        }
+
+
+        @JvmStatic private fun buildDatabase(context: Context): TalonDatabase {
             val userId = AtomicLong(-2L)
-            val users = HashMap<String, User>()
 
 
             val dmDbPath = context.getDatabasePath(DMSQLiteHelper.DATABASE_NAME).absolutePath
@@ -205,21 +252,21 @@ abstract class TalonDatabase : RoomDatabase() {
 
 
              return Room.databaseBuilder(context.applicationContext, TalonDatabase::class.java, "talondata.db")
-                     .addCallback(transferActivityData(getDatabasePath(context, ActivitySQLiteHelper.DATABASE_NAME), userId))
-                     .addCallback(transferDirectMessageData(dmDbPath, userId))
-                     .addCallback(transferEmojiData(emojiDbPath))
-                     .addCallback(transferFavoriteTweetsData(favoriteTweetsDbPath, userId))
-                     .addCallback(transferFavoriteUserNotificationsData(favoriteUserNotificationsDbPath))
-                     .addCallback(transferFavoriteUsersData(favoriteUsersDbPath, users))
-                     .addCallback(transferFollowersData(followersUsersDbPath, userId))
-                     .addCallback(transferHashtagData(hashtagDbPath))
-                     .addCallback(transferHomeTweetsData(homeTweetsDbPath))
-                     .addCallback(transferInteractionsData(interactionsDbPath))
-                     .addCallback(transferListData(listDbPath))
-                     .addCallback(transferMentionsData(mentionsDbPath, userId))
-                     .addCallback(transferQueuedData(queuedDbPath))
-                     .addCallback(transferSavedTweetsData(savedTweetsDbPath, userId))
-                     .addCallback(transferUserTweetsData(userTweetsDbPath))
+                     .addCallback(transferActivityData(context, getDatabasePath(context, ActivitySQLiteHelper.DATABASE_NAME)))
+                     .addCallback(transferDirectMessageData(context, dmDbPath))
+                     .addCallback(transferEmojiData(context, emojiDbPath))
+                     .addCallback(transferFavoriteTweetsData(context, favoriteTweetsDbPath))
+                     .addCallback(transferFavoriteUserNotificationsData(context, favoriteUserNotificationsDbPath))
+                     .addCallback(transferFavoriteUsersData(context, favoriteUsersDbPath))
+                     .addCallback(transferFollowersData(context, followersUsersDbPath))
+                     .addCallback(transferHashtagData(context, hashtagDbPath))
+                     .addCallback(transferHomeTweetsData(context, homeTweetsDbPath))
+                     .addCallback(transferInteractionsData(context, interactionsDbPath))
+                     .addCallback(transferListData(context, listDbPath))
+                     .addCallback(transferMentionsData(context, mentionsDbPath))
+                     .addCallback(transferQueuedData(context, queuedDbPath))
+                     .addCallback(transferSavedTweetsData(context, savedTweetsDbPath, userId))
+                     .addCallback(transferUserTweetsData(context, userTweetsDbPath))
                      .build()
         }
 
@@ -228,28 +275,66 @@ abstract class TalonDatabase : RoomDatabase() {
         }
 
 
-        @JvmStatic fun transferActivityData(absolutePath: String, userIdLabeler: AtomicLong): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferActivityData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(ActivitySQLiteHelper.TABLE_ACTIVITY, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            do {
+
+                            } while (cursor.moveToNext())
+
+                        }
+
+                    }
+
 
                 }
             }
         }
 
-        @JvmStatic fun transferDirectMessageData(absolutePath: String, userIdLabeler: AtomicLong): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferDirectMessageData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    val dmSize = AppSettings.getInstance(context).dmSize
+
+                    source.query(DMSQLiteHelper.TABLE_DM,
+                            null,
+                            null,
+                            null,
+                            DMSQLiteHelper.COLUMN_ID,
+                            null,
+                            DMSQLiteHelper.COLUMN_TWEET_ID + " DESC",
+                            dmSize.toString()).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            do {
+
+
+
+                            } while (cursor.moveToNext())
+
+
+                        }
+
+                    }
+
 
                 }
             }
         }
 
-        @JvmStatic fun transferEmojiData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferEmojiData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
-                    source.query(EmojiSQLiteHelper.TABLE_RECENTS, null, null, null, null, null, EmojiSQLiteHelper.COLUMN_COUNT + " DESC").use { cursor ->
-                        if (cursor != null && cursor.moveToFirst()) {
+                    source.query(EmojiSQLiteHelper.TABLE_RECENTS, null, null, null, null, null, EmojiSQLiteHelper.COLUMN_COUNT + " DESC", "60").use { cursor ->
+                        if (cursor.moveToFirst()) {
                             val contentValues = ContentValues()
 
                             do {
@@ -257,9 +342,12 @@ abstract class TalonDatabase : RoomDatabase() {
                                 val icon = cursor.getString(cursor.getColumnIndex(EmojiSQLiteHelper.COLUMN_ICON))
                                 val count = cursor.getInt(cursor.getColumnIndex(EmojiSQLiteHelper.COLUMN_COUNT))
 
-                                contentValues.put("text", text)
-                                contentValues.put("icon", icon)
-                                contentValues.put("count", count)
+                                with(contentValues) {
+                                    put("text", text)
+                                    put("icon", icon)
+                                    put("count", count)
+                                }
+
 
                                 db.insert("emojis", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
 
@@ -273,58 +361,140 @@ abstract class TalonDatabase : RoomDatabase() {
 
         }
 
-        @JvmStatic fun transferFavoriteTweetsData(absolutePath: String, userIdLabeler: AtomicLong): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
-                    val tweetIds = HashSet<Long>()
+        @JvmStatic fun transferFavoriteTweetsData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(FavoriteTweetsSQLiteHelper.TABLE_FAVORITE_TWEETS,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "400").use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            db.beginTransaction()
 
 
-                }
-            }
-        }
-
-        @JvmStatic fun transferFavoriteUserNotificationsData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
-
-                }
-            }
-        }
-
-
-        @JvmStatic fun transferFavoriteUsersData(absolutePath: String, users: Map<String, User>): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
-
-                }
-            }
-        }
-
-
-        @JvmStatic fun transferFollowersData(absolutePath: String, userLabeler: AtomicLong): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
-                    val enteredUsers = HashMap<String, Long>()
-                    db.query("SELECT id, screen_name FROM hashtags").use { cursor ->
-                        if (cursor != null && cursor.moveToFirst()) {
                             do {
-                                val screenName = cursor.getString(cursor.getColumnIndex(FollowersSQLiteHelper.COLUMN_SCREEN_NAME))
-                                val id = cursor.getLong(cursor.getColumnIndex(FollowersSQLiteHelper.COLUMN_ID))
 
                             } while (cursor.moveToNext())
+
+                            db.setTransactionSuccessful()
+                            db.endTransaction()
+
                         }
+
+
+
                     }
 
 
+
+
                 }
             }
         }
 
-        @JvmStatic fun transferHashtagData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                public override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferFavoriteUserNotificationsData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
-                    source.query(HashtagSQLiteHelper.TABLE_HASHTAGS, arrayOf(HashtagSQLiteHelper.COLUMN_TAG), null, null, null, null, null).use { cursor ->
+                    source.query(FavoriteUserNotificationSQLiteHelper.TABLE, arrayOf(FavoriteUserNotificationSQLiteHelper.COLUMN_TWEET_ID), null, null, null, null, null, "100").use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            val contentValues = ContentValues()
+
+                            db.beginTransaction()
+
+                            do {
+
+                                val tweetId = cursor.getLong(cursor.getColumnIndex(FavoriteUserNotificationSQLiteHelper.COLUMN_TWEET_ID))
+                                contentValues.put("tweet_id", tweetId)
+                                db.insert("favorite_user_notifications", SQLiteDatabase.CONFLICT_IGNORE, contentValues)
+
+                            } while (cursor.moveToNext())
+
+                            db.setTransactionSuccessful()
+                            db.endTransaction()
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+
+        @JvmStatic fun transferFavoriteUsersData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+
+                    source.query(FavoriteUsersSQLiteHelper.TABLE_HOME, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+
+                            do {
+
+
+
+                            } while (cursor.moveToNext())
+
+
+                        }
+
+
+
+                    }
+
+                }
+            }
+        }
+
+        @JvmStatic fun transferFollowersData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(FollowersSQLiteHelper.TABLE_HOME, null, null, null, null, null, FollowersSQLiteHelper.COLUMN_ID + " DESC" ).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            val userContentValues = ContentValues()
+                            val followerContentValues = ContentValues()
+
+
+                            db.beginTransaction()
+
+                            do {
+
+
+                            } while (cursor.moveToNext())
+
+                            db.setTransactionSuccessful()
+                            db.endTransaction()
+
+                        }
+                    }
+
+                }
+            }
+        }
+
+        @JvmStatic fun transferHashtagData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(HashtagSQLiteHelper.TABLE_HASHTAGS, arrayOf(HashtagSQLiteHelper.COLUMN_TAG), null, null, null, null, null, "500").use { cursor ->
+
+
+
 
                         if (cursor != null && cursor.moveToFirst()) {
                             val contentValues = ContentValues()
@@ -348,45 +518,124 @@ abstract class TalonDatabase : RoomDatabase() {
             }
         }
 
-        @JvmStatic fun transferHomeTweetsData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferHomeTweetsData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(HomeSQLiteHelper.TABLE_HOME, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            val userContentValues = ContentValues()
+                            val tweetContentValues = ContentValues()
+                            val homeTweetContentValues = ContentValues()
+
+                            db.beginTransaction()
+
+                            do {
+
+
+
+                            } while (cursor.moveToNext())
+
+                            db.setTransactionSuccessful()
+                            db.endTransaction()
+
+                        }
+
+                    }
 
                 }
             }
         }
 
 
-        @JvmStatic fun transferInteractionsData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferInteractionsData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(InteractionsSQLiteHelper.TABLE_INTERACTIONS, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            do {
+
+
+
+                            } while (cursor.moveToNext())
+
+                        }
+
+
+                    }
 
                 }
             }
         }
 
 
-        @JvmStatic fun transferListData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferListData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    val listSize = AppSettings.getInstance(context).listSize
+
+
+                    source.query(ListSQLiteHelper.TABLE_HOME,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            ListSQLiteHelper.COLUMN_ID + " DESC",
+                            listSize.toString()).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+
+                            do {
+
+
+                            } while (cursor.moveToNext())
+
+
+                        }
+
+                    }
 
                 }
             }
         }
 
 
-        @JvmStatic fun transferMentionsData(absolutePath: String, userIdLabeler: AtomicLong): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferMentionsData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(MentionsSQLiteHelper.TABLE_MENTIONS, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            do {
+
+
+                            } while (cursor.moveToNext())
+
+                        }
+
+
+                    }
+
+
 
                 }
             }
         }
 
 
-        @JvmStatic fun transferQueuedData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferQueuedData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
 
                     source.query(QueuedSQLiteHelper.TABLE_QUEUED, null, null, null, null, null, null).use { cursor ->
 
@@ -441,18 +690,53 @@ abstract class TalonDatabase : RoomDatabase() {
         }
 
 
-        fun transferSavedTweetsData(absolutePath: String, userLabeler: AtomicLong): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferSavedTweetsData(context: Context, absolutePath: String, userLabeler: AtomicLong): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    source.query(SavedTweetSQLiteHelper.TABLE_HOME, null, null, null, null, null, null).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+
+
+                            do {
+
+
+
+                            } while (cursor.moveToNext())
+
+                        }
+
+                    }
 
                 }
             }
         }
 
 
-        fun transferUserTweetsData(absolutePath: String): RoomDatabase.Callback {
-            return object : TransferCallback(absolutePath) {
-                override fun readDatabase(db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+        @JvmStatic fun transferUserTweetsData(context: Context, absolutePath: String): RoomDatabase.Callback {
+            return object : TransferCallback(absolutePath, context) {
+                override fun readDatabase(context: Context, db: SupportSQLiteDatabase, source: SQLiteDatabase) {
+
+                    val userTweetsSize = AppSettings.getInstance(context).userTweetsSize
+
+                    source.query(UserTweetsSQLiteHelper.TABLE_HOME, null, null, null, null, null, null, userTweetsSize.toString()).use { cursor ->
+
+                        if (cursor.moveToFirst()) {
+
+                            do {
+
+
+
+
+                            } while (cursor.moveToNext())
+
+
+
+                        }
+
+                    }
 
                 }
             }

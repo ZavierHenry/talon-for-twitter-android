@@ -6,6 +6,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.klinker.android.twitter_l.utils.TweetLinkUtils
 import twitter4j.Status
 
 
@@ -13,84 +14,29 @@ import twitter4j.Status
         foreignKeys = [
             ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["user_id"], onDelete = ForeignKey.CASCADE)
         ])
-class Tweet() {
-
-    @PrimaryKey
-    var id: Long = 0
-
-    //possibly make a surrogate key for twitter id to be consistent with user
-
-    @ColumnInfo
-    var text: String = ""
-
-    @ColumnInfo(name = "user_id")
-    var userId: Long = 0
-
-    @ColumnInfo
-    var time: Long = 0
-
-    @ColumnInfo
-    var urls: String? = null
-
-    @ColumnInfo
-    var users: String? = null
-
-    @ColumnInfo(name = "picture_urls")
-    var pictureUrls: String? = null
-
-    @ColumnInfo
-    var retweeter: String = ""
-
-    @ColumnInfo(name = "gif_url")
-    var gifUrl: String? = null
-
-    @ColumnInfo(name = "is_conversation")
-    var isConversation: Boolean = false
-
-    @ColumnInfo(name = "media_length")
-    var mediaLength: Int = 0
-
-    @ColumnInfo(name = "like_count")
-    var likeCount: Int = 0
-
-    @ColumnInfo(name = "retweet_count")
-    var retweetCount: Int = 0
-
-    @ColumnInfo(name = "client_source")
-    var clientSource: String? = null
-
-    @ColumnInfo
-    var hashtags: String? = null
+data class Tweet(@PrimaryKey val id: Long = 0,
+            //possibly make a surrogate key for twitter id to be consistent with user model
+            @ColumnInfo val text: String = "",
+            @ColumnInfo(name = "user_id") val userId: Long = 0,
+            @ColumnInfo val time: Long = 0,
+            @ColumnInfo val urls: String? = null,
+            @ColumnInfo val users: String? = null,
+            @ColumnInfo(name = "picture_urls") val pictureUrls: String? = null,
+            @ColumnInfo val retweeter: String = "",
+            @ColumnInfo(name = "gif_url") val gifUrl: String? = null,
+            @ColumnInfo(name = "media_length") val mediaLength: Int = -1,
+            @ColumnInfo(name = "is_conversation") val isConversation: Boolean = false,
+            @ColumnInfo(name = "like_count") val likeCount: Int = 0,
+            @ColumnInfo(name = "retweet_count") val retweetCount: Int = 0,
+            @ColumnInfo(name = "client_source") val clientSource: String? = null,
+            @ColumnInfo val hashtags: String? = null) {
 
     init {
 
     }
 
-    constructor(status: Status) : this() {
 
-
-        this.id = status.id
-        this.time = status.createdAt.time
-        this.retweeter = ""
-
-
-        if (status.isRetweet) {
-            this.retweeter = status.user.screenName
-            this.likeCount = status.retweetedStatus.favoriteCount
-            this.retweetCount = status.retweetedStatus.retweetCount
-            this.text = status.retweetedStatus.text
-
-        } else {
-
-            this.retweeter = ""
-            this.likeCount = status.favoriteCount
-            this.retweetCount = status.retweetCount
-            this.text = status.text
-
-
-        }
-
-    }
+    constructor(status: Status) : this()
 
 }
 

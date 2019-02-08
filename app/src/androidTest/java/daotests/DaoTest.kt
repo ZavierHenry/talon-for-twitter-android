@@ -252,6 +252,10 @@ abstract class DaoTest {
 
     //TODO: make template delete entity
 
+
+
+
+
     //TODO: make template insert entity
 
 

@@ -31,37 +31,8 @@ class HashtagTransferTest : TransferTest() {
 
     @Test
     fun testBasicHashtagTransfer() {
-        //fill table with data
-        val contentValues = ContentValues()
-        val hashtags : List<MockHashtag> = List(2) { MockHashtag("#tag_$it") }
-
-        beginSourceDatabaseTransaction()
-
-        val idCount = hashtags.asSequence().map{ hashtag ->
-            hashtag.setContentValues(contentValues)
-            insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
-        }.count { it != -1L }
-
-        endSuccessfulSourceDatabaseTransaction()
-
-        assertThat("At least one hashtag must be inserted to properly run this test", idCount, greaterThan(0))
-
-        applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
-
-        val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
-        assertThat("Incorrect number of tags managed to transfer to the new database", cursor.count, `is`(idCount))
-        assertThat("Error getting the first value of the query", cursor.moveToFirst())
-
-        val matchers = hashtags.map { matchesHashtag(it) }
-
-        do {
-
-            val testHashtag = MockHashtag.create(cursor)
-            assertThat("Source hashtag did not transfer to the test database", testHashtag, anyOf(matchers))
-
-        } while (cursor.moveToNext())
-
-        cursor.close()
+        val callback = TalonDatabase.transferHashtagData(context, sourceDatabasePath)
+        testBasicTransfer(callback, sourceTableName, destTableName, { MockHashtag("tag_$it")}, { matchesHashtag(it) }, { MockHashtag.create(it) })
     }
 
     @Test
@@ -69,62 +40,49 @@ class HashtagTransferTest : TransferTest() {
         val contentValues = ContentValues()
         val hashtags = List(3) { MockHashtag("#sampletag")}
 
-        beginSourceDatabaseTransaction()
-
-        val idCount = hashtags.asSequence().map { hashtag ->
-            hashtag.setContentValues(contentValues)
-            insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
-        }.count { it != -1L }
-
-        endSuccessfulSourceDatabaseTransaction()
+        val idCount = asTransaction {
+            hashtags.count { hashtag ->
+                insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, ContentValues().apply { hashtag.setContentValues(this) }) != -1L
+            }
+        }
 
         assertThat("Needs to have at least one element to properly run this test", idCount, greaterThan(0))
         applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
 
-        val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
-
-        assertThat("Incorrect number of tags transferred to the test database", cursor.count, `is`(1))
-        assertThat("Error moving to the first value of the cursor", cursor.moveToFirst())
-
-        val testHashtag = MockHashtag.create(cursor)
-        assertThat("Transferred hashtag does not match source hashtag", testHashtag, matchesHashtag(hashtags[0]))
-        cursor.close()
+        val cursor = queryTestDatabase("SELECT * FROM hashtags", null).use { cursor ->
+            assertThat("Incorrect number of tags transferred to the test database", cursor.count, `is`(1))
+            assertThat("Error moving to the first value of the cursor", cursor.moveToFirst())
+            assertThat("Transferred hashtag does not match source hashtag", MockHashtag.create(cursor), matchesHashtag(hashtags[0]))
+        }
 
     }
 
     @Test
     fun testTransferWithNullValues() {
-        val contentValues = ContentValues()
         val hashtags = List(3) { x -> if (x == 0) MockHashtag(null) else MockHashtag("#tag_$x")}
 
-        beginSourceDatabaseTransaction()
-
-        val ids = hashtags.map { hashtag ->
-            hashtag.setContentValues(contentValues)
-            insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, contentValues)
+        val ids = asTransaction {
+            hashtags.map { hashtag ->
+                insertIntoSourceDatabase(HashtagSQLiteHelper.TABLE_HASHTAGS, ContentValues().apply { hashtag.setContentValues(this) })
+            }
         }
 
-        endSuccessfulSourceDatabaseTransaction()
+        //assertThat("The null mock hashtag must be properly inserted in the database to properly run this test", ids[0], not(-1L))
 
-        assertThat("The null mock hashtag must be properly inserted in the database to properly run this test", ids[0], not(-1L))
+        assertThat("The null mock hashtag must be properly inserted in the database to properly run this test", ids, contains(not(-1L), anything(), anything()))
         applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
 
-        val cursor = queryTestDatabase("SELECT * FROM hashtags WHERE name IS NULL", null)
-        assertThat("Test database does not reject null values", cursor.count, `is`(0))
-        cursor.close()
+        queryTestDatabase("SELECT 1 FROM hashtags WHERE name IS NULL", null).use { cursor ->
+            assertThat("Test databaase does not reject null values", cursor.count, `is`(0))
+        }
 
     }
 
     @Test
-    fun testTransferIfEmptyTable() {
+    fun testHashtagTransferIfEmptyTable() {
 
         //copy source database to prevent deletion error
-
-        applyCallback(TalonDatabase.transferHashtagData(context, sourceDatabasePath))
-        val cursor = queryTestDatabase("SELECT * FROM hashtags", null)
-        assertThat("Something went wrong in the database transfer", cursor.count, `is`(0))
-        cursor.close()
-
+        testTransferIfEmptyTable(TalonDatabase.transferHashtagData(context, sourceDatabasePath), destTableName)
     }
 
     @Test
@@ -140,6 +98,9 @@ class HashtagTransferTest : TransferTest() {
     }
 
     companion object {
+
+        const val sourceTableName = HashtagSQLiteHelper.TABLE_HASHTAGS
+        const val destTableName = "hashtags"
 
         @BeforeClass
         @JvmStatic fun initDatabase() {

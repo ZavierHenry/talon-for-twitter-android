@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.roomdb.daos.*
 import com.klinker.android.twitter_l.data.roomdb.entities.*
@@ -43,6 +44,7 @@ import com.klinker.android.twitter_l.settings.AppSettings
 @Database(entities = [
 
     TweetInteraction::class,
+    UserInteraction::class,
     Activity::class,
     DirectMessage::class,
     Draft::class,
@@ -59,9 +61,8 @@ import com.klinker.android.twitter_l.settings.AppSettings
     QueuedTweet::class,
     SavedTweet::class,
     ScheduledTweet::class,
-    Tweet::class,
-    User::class,
     UserTweet::class ], version = 1, exportSchema = false)
+@TypeConverters(ListStringTypeConverter::class)
 abstract class TalonDatabase : RoomDatabase() {
 
     abstract fun activityDao(): ActivityDao
@@ -81,10 +82,11 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun savedTweetDao(): SavedTweetDao
     abstract fun scheduledTweetDao(): ScheduledTweetDao
     abstract fun userTweetDao(): UserTweetDao
-    abstract fun userDao() : UserDao
-    abstract fun tweetDao() : TweetDao
+    //abstract fun userDao() : UserDao
+    //abstract fun tweetDao() : TweetDao
 
     abstract fun tweetInteractionDao() : TweetInteractionDao
+    abstract fun userInteractionDao() : UserInteractionDao
 
 
     //delete databases
@@ -107,23 +109,6 @@ abstract class TalonDatabase : RoomDatabase() {
         } catch (e: Exception) {
             null
         }
-
-    }
-
-
-
-
-
-
-    private fun fillUserContentValues(user: User, contentValues: ContentValues) {
-        contentValues.put("id", user.id)
-        contentValues.put("name", user.name)
-        contentValues.put("screen_name", user.screenName)
-        contentValues.put("profile_pic", user.profilePic)
-        contentValues.put("is_verified", user.isVerified)
-    }
-
-    private fun fillTweetContentValues(tweet: Tweet, contentValues: ContentValues) {
 
     }
 

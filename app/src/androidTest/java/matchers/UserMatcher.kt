@@ -7,8 +7,7 @@ class UserMatcher private constructor(expected: User) : EntityMatcher<User>(expe
 
     override fun getMismatches(actual: User): Map<String, Mismatch> {
         return mapOf(
-                "id" to makeMismatch(expected.id, actual.id),
-                "twitterId" to makeMismatch(expected.twitterId, actual.twitterId),
+                "twitterId" to makeMismatch(expected.userId, actual.userId),
                 "name" to makeMismatch(expected.name, actual.name),
                 "screenName" to makeMismatch(expected.screenName, actual.screenName),
                 "profilePic" to makeMismatch(expected.profilePic, actual.profilePic),

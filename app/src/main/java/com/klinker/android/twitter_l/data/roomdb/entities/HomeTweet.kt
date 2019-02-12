@@ -7,7 +7,7 @@ import twitter4j.Status
 
 @Entity(tableName = "home_tweets",
         indices = [Index(value = ["tweet_id", "account"], unique = true)],
-        foreignKeys = [ForeignKey(entity = Tweet::class, childColumns = ["tweet_id"], parentColumns = ["id"], onDelete = ForeignKey.RESTRICT)])
+        foreignKeys = [ForeignKey(entity = TweetInteraction::class, childColumns = ["tweet_id"], parentColumns = ["id"], onDelete = ForeignKey.RESTRICT)])
 data class HomeTweet(@PrimaryKey(autoGenerate = true) val id: Long? = null,
                      @ColumnInfo val account: Int,
                      @ColumnInfo(name = "is_unread") val isUnread: Boolean = false,

@@ -18,7 +18,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "Activities", foreignKeys = [ForeignKey(entity = Tweet::class, childColumns = ["tweet_id"], parentColumns = ["id"])])
+@Entity(tableName = "Activities", foreignKeys = [ForeignKey(entity = TweetInteraction::class, childColumns = ["tweet_id"], parentColumns = ["id"])])
 data class Activity(@PrimaryKey(autoGenerate = true) val id: Long? = null,
                     val type: Int,
                     @ColumnInfo val account: Int = -1,

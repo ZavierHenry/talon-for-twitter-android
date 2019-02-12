@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "followers",
         indices = [ Index(value = ["user_id", "account"], unique = true), Index(value = ["account"]) ],
-        foreignKeys = [ ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["user_id"], onDelete = ForeignKey.RESTRICT) ])
+        foreignKeys = [ ForeignKey(entity = UserInteraction::class, parentColumns = ["id"], childColumns = ["user_id"], onDelete = ForeignKey.RESTRICT) ])
 data class Follower(@PrimaryKey(autoGenerate = true) val id: Long? = null,
                @ColumnInfo val account: Int = -1,
                @ColumnInfo(name = "user_id") val userId: Long = -1) {

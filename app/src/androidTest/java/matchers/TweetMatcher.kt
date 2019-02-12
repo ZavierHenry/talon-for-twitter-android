@@ -7,7 +7,7 @@ class TweetMatcher private constructor(expected: Tweet) : EntityMatcher<Tweet>(e
 
     override fun getMismatches(actual: Tweet): Map<String, Mismatch> {
         return mapOf(
-                "id" to makeMismatch(expected.id, actual.id),
+                "id" to makeMismatch(expected.twitterId, actual.twitterId),
                 "text" to makeMismatch(expected.text, actual.text),
                 "time" to makeMismatch(expected.time, actual.time),
                 "urls" to makeMismatch(expected.urls, actual.urls),

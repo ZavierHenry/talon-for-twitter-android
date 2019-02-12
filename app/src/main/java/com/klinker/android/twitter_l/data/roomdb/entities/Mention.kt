@@ -12,7 +12,7 @@ import twitter4j.Status
 
 @Entity(tableName = "mentions",
         indices = [Index(value = ["account", "tweet_id"], unique = true), Index(value = ["tweet_id"])],
-        foreignKeys = [ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.RESTRICT)])
+        foreignKeys = [ForeignKey(entity = TweetInteraction::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.RESTRICT)])
 data class Mention(@PrimaryKey(autoGenerate = true) val id: Long? = null,
                    @field:ColumnInfo val account: Int = -1,
                    @field:ColumnInfo(name = "tweet_id") val tweetId: Long = 0,

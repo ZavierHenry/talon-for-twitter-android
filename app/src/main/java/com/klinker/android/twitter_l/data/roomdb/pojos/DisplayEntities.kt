@@ -67,8 +67,8 @@ data class DisplayDirectMessage(@ColumnInfo(name = "id") val directMessageId: Lo
                                 @ColumnInfo(name = "message_id") val messageId: Long = 0,
                                 val time: Long,
                                 val text: String,
-                                @ColumnInfo(name = "picture_urls") val pictureUrls: String? = null,
-                                val urls: String? = null,
+                                @ColumnInfo(name = "picture_urls") val pictureUrls: List<String> = emptyList(),
+                                val urls: List<String> = emptyList(),
                                 @ColumnInfo(name = "gif_url") val gifUrl: String? = null,
                                 @ColumnInfo(name = "media_length") val mediaLength: Long = -1) {
 

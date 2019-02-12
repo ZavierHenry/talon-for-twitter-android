@@ -45,11 +45,7 @@ abstract class SavedTweetDao : TweetDao() {
 
     @Transaction
     open fun insertSavedTweet(context: Context, status: Status, account: Int) {
-        val tweet = Tweet(status)
-        val savedTweet = SavedTweet(status, account)
 
-        TalonDatabase.getInstance(context).tweetDao().insertTweet(tweet)
-        insertSavedTweet(savedTweet)
     }
 
 

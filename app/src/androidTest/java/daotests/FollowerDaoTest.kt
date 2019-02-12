@@ -19,36 +19,6 @@ class FollowerDaoTest : DaoTest() {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
 
 
-    @Test
-    fun saveFollower() {
-        val user = User(null, 1, "User 1", "user1", "https://img.twitter.com/1/pic.png", false)
-        val follower = Follower(account = 1)
-        val account = 1
-        val extendedFollower = DisplayFollower(user = user)
-
-        val insertedExtendedFollower = followerDao.saveFollower(context, extendedFollower, account)
-
-        queryDatabase("SELECT * FROM followers", null).use { cursor ->
-            assertThat("Follower info did not save to database", cursor.count, `is`(1))
-        }
-
-        queryDatabase("SELECT * FROM users", null).use { cursor ->
-            assertThat("User info did not save to database", cursor.count, `is`(1))
-        }
-
-
-    }
-
-
-    @Test
-    fun deleteFollowerTest() {
-
-        val user = User(null, 1, "User 1", "user1", "https://img.twitter.com/1/pic.png", false)
-
-
-    }
-
-
 
     @Test
     fun userDeletionFailsWhenFollowerExists() {

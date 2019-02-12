@@ -11,7 +11,7 @@ import twitter4j.Status
 
 @Entity(tableName = "favorite_tweets",
         indices = [Index(value = ["tweet_id", "account"], unique = true)],
-        foreignKeys = [ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.RESTRICT)])
+        foreignKeys = [ForeignKey(entity = TweetInteraction::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.RESTRICT)])
 data class FavoriteTweet(@PrimaryKey val id: Long? = null,
                          @ColumnInfo val account: Int = -1,
                          @ColumnInfo(name = "tweet_id") val tweetId: Long = 0,

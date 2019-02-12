@@ -6,9 +6,6 @@ class TweetInteractionDaoTest : DaoTest() {
 
 
 
-
-
-
     @After
     fun clearTables() {
         clearTestDatabase()

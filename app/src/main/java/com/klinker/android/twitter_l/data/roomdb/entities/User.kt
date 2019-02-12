@@ -8,9 +8,8 @@ import androidx.room.PrimaryKey
 
 import twitter4j.User as TwitterUser
 
-@Entity(tableName = "users", indices = [Index(value = ["screen_name"]), Index(value = ["twitter_id"])])
-data class User(@PrimaryKey(autoGenerate = true) val id: Long? = null,
-                @ColumnInfo(name = "twitter_id") val twitterId: Long?,
+
+data class User(@ColumnInfo(name = "user_twitter_id") val userId: Long?,
                 @ColumnInfo val name: String,
                 @ColumnInfo(name = "screen_name") val screenName: String,
                 @ColumnInfo(name = "profile_pic") val profilePic: String,
@@ -19,7 +18,6 @@ data class User(@PrimaryKey(autoGenerate = true) val id: Long? = null,
 
     constructor(user: TwitterUser) : this(
             null,
-            user.id,
             user.name,
             user.screenName,
             if (user.originalProfileImageURLHttps.isNullOrEmpty())
@@ -27,8 +25,7 @@ data class User(@PrimaryKey(autoGenerate = true) val id: Long? = null,
             user.isVerified)
 
     fun contentEquals(other: User) : Boolean {
-        return id == other.id &&
-                twitterId == other.twitterId &&
+        return userId == other.userId &&
                 name.contentEquals(other.name) &&
                 screenName.contentEquals(other.screenName) &&
                 profilePic.contentEquals(other.profilePic) &&

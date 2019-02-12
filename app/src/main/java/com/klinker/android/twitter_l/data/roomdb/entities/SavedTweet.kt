@@ -12,7 +12,7 @@ import twitter4j.Status
 @Entity(tableName = "saved_tweets",
         indices = [ Index(value = ["tweet_id", "account"], unique = true) ],
         foreignKeys = [
-            ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.CASCADE)
+            ForeignKey(entity = TweetInteraction::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.CASCADE)
                 ])
 class SavedTweet {
 

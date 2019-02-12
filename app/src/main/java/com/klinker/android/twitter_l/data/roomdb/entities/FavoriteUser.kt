@@ -8,12 +8,12 @@ import twitter4j.User as TwitterUser
 
 @Entity(tableName = "favorite_users",
         indices = [Index(value = ["user_id", "account"], unique = true), Index(value = ["account"])],
-        foreignKeys = [ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["user_id"], onDelete = ForeignKey.CASCADE)])
+        foreignKeys = [ForeignKey(entity = UserInteraction::class, parentColumns = ["id"], childColumns = ["user_id"], onDelete = ForeignKey.CASCADE)])
 data class FavoriteUser(@PrimaryKey(autoGenerate = true) val id: Long? = null,
                         @ColumnInfo val account: Int = 1,
                         @ColumnInfo(name = "user_id") val userId: Long) {
 
-    constructor(id: Long? = null, account: Int, user: User) : this(id, account, user.id!!)
+    constructor(id: Long? = null, account: Int, user: User) : this(id, account, user.userId!!)
 
 }
 

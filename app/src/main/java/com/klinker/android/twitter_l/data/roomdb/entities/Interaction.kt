@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
 import twitter4j.Status
 
 @Entity(tableName = "interactions",
-        foreignKeys = [ForeignKey(entity = User::class, parentColumns = ["id"], childColumns = ["interactor_id"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)],
+        foreignKeys = [ForeignKey(entity = UserInteraction::class, parentColumns = ["id"], childColumns = ["interactor_id"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)],
         indices = [Index(value = ["time"])])
 class Interaction() {
 

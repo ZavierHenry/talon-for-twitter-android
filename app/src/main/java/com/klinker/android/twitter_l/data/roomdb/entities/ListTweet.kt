@@ -10,7 +10,7 @@ import twitter4j.Status
 
 @Entity(tableName = "list_tweets",
         indices = [Index(value = ["list_id", "tweet_id"], unique = true)],
-        foreignKeys = [ForeignKey(entity = Tweet::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.CASCADE)])
+        foreignKeys = [ForeignKey(entity = TweetInteraction::class, parentColumns = ["id"], childColumns = ["tweet_id"], onDelete = ForeignKey.CASCADE)])
 class ListTweet {
 
 

@@ -12,9 +12,6 @@ import androidx.room.Query
 abstract class ActivityDao {
 
 
-
-
-
     //abstract fun getDisplayActivities(account: Int, page : Int = 1, pageSize: Int = 60);
 
     @Query("SELECT id FROM activities WHERE account = :account ORDER BY time DESC LIMIT :size")

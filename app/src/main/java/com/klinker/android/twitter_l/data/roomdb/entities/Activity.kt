@@ -18,16 +18,19 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "Activities", foreignKeys = [ForeignKey(entity = TweetInteraction::class, childColumns = ["tweet_id"], parentColumns = ["id"])])
+@Entity(tableName = "Activities",
+        foreignKeys = [
+            ForeignKey(entity = TweetInteraction::class, childColumns = ["tweet_id"], parentColumns = ["id"], onDelete = ForeignKey.CASCADE),
+            ForeignKey(entity = UserInteraction::class, childColumns = ["user_id"], parentColumns = ["id"], onDelete = ForeignKey.CASCADE)])
 data class Activity(@PrimaryKey(autoGenerate = true) val id: Long? = null,
                     val type: Int,
                     @ColumnInfo val account: Int = -1,
                     @ColumnInfo(name = "tweet_id") val tweetId: Long? = null,
+                    @ColumnInfo(name = "user_id") val userId: Long? = null,
                     val time: Long = 0,
                     val text: String = "",
                     val profilePicUrls: String? = null,
                     val title: String? = null,
-                    val userId: Long? = null,
                     val users: String = "") {
 
 

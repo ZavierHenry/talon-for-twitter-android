@@ -14,95 +14,29 @@ import androidx.room.PrimaryKey
 import twitter4j.Status
 
 @Entity(tableName = "interactions",
-        foreignKeys = [ForeignKey(entity = UserInteraction::class, parentColumns = ["id"], childColumns = ["interactor_id"], onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)],
+        foreignKeys = [
+            ForeignKey(entity = UserInteraction::class, parentColumns = ["id"], childColumns = ["tweet_interaction_id"], onDelete = ForeignKey.CASCADE),
+            ForeignKey(entity = TweetInteraction::class, parentColumns = ["id"], childColumns = ["user_interaction_id"], onDelete = ForeignKey.CASCADE)],
         indices = [Index(value = ["time"])])
-class Interaction() {
+data class Interaction(@PrimaryKey(autoGenerate = true) val id: Long? = null,
+                       @ColumnInfo(name = "tweet_interaction_id") val tweetInteractionId: Long? = null,
+                       @ColumnInfo(name = "user_interaction_id") val userInteractionId: Long? = null,
+                       @ColumnInfo val account: Int,
+                       @ColumnInfo(name = "is_unread") val isUnread: Boolean,
+                       @ColumnInfo val type: Int,
+                       @ColumnInfo val title: String,
+                       @ColumnInfo val time: Long) {
 
-    //FOLLOWER = 0
-    //RETWEET = 1
-    //FAVORITE = 2
-    //MENTION = 3
-    //FAV_USER = 4
-    //QUOTED_TWEET = 5
 
+    companion object {
 
-    @PrimaryKey(autoGenerate = true)
-    var id: Long? = null
-
-    @ColumnInfo(name = "tweet_id")
-    var tweetId : Long = 0
-
-    @ColumnInfo(name = "is_unread")
-    var isUnread: Boolean = false
-
-    @ColumnInfo
-    var account: Int = 0
-
-    @ColumnInfo(name = "interactor_id")
-    var interactorUserId: Long = 0
-
-    @ColumnInfo
-    var time: Long = 0
-
-    @ColumnInfo(name = "type")
-    var interactionType: Int = 0
-
-    @ColumnInfo
-    var users: String = ""
-
-    @ColumnInfo
-    var title: String = ""
-
-    init {
+        const val FOLLOWER = 0
+        const val RETWEET = 1
+        const val FAVORITE = 2
+        const val MENTION = 3
+        const val FAVORITE_USER = 4
+        const val QUOTED_TWEET = 5
 
     }
-
-
-    constructor(context: Context, status: Status?, source: twitter4j.User, account: Int, interactionType: Int) : this() {
-
-        this.account = account
-        this.isUnread = true
-        this.tweetId = status?.id ?: 0
-        this.interactionType = interactionType
-        this.time = GregorianCalendar().time.time
-        this.interactorUserId = source.id
-        this.users = "@" + source.screenName
-        this.interactionType = interactionType
-
-        when (interactionType) {
-
-            0 -> {
-
-            }
-
-            1 -> {
-                title = "<b>@${source.screenName}</b> ${context.getString(R.string.favorited)}"
-                tweetId = status!!.id
-            }
-
-            2 -> {
-                title = "<b>@${source.screenName}</b> ${context.getString(R.string.retweeted)}"
-                tweetId = status!!.id
-            }
-
-            3 -> {
-
-            }
-
-            4 -> {
-
-            }
-
-            5 -> {
-
-            }
-
-
-
-
-        }
-
-    }
-
 
 }

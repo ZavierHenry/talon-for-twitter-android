@@ -50,6 +50,7 @@ import com.klinker.android.twitter_l.activities.drawer_activities.DrawerActivity
 import com.klinker.android.twitter_l.activities.main_fragments.MainFragment;
 import com.klinker.android.twitter_l.activities.setup.material_login.MaterialLogin;
 import com.klinker.android.twitter_l.activities.setup.TutorialActivity;
+import com.klinker.android.twitter_l.utils.LvlCheck;
 import com.klinker.android.twitter_l.utils.NotificationUtils;
 import com.klinker.android.twitter_l.utils.PermissionModelUtils;
 import com.klinker.android.twitter_l.utils.UpdateUtils;
@@ -514,6 +515,8 @@ public class MainActivity extends DrawerActivity {
         }
 
         UpdateUtils.checkUpdate(this);
+
+        LvlCheck.check(this, true);
 
         if (sharedPrefs.getBoolean("force_reverse_click", true)) {
             sharedPrefs.edit().putBoolean("reverse_click_option", false)

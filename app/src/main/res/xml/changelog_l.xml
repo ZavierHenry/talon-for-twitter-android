@@ -1,7 +1,45 @@
 <changelog>
 
+    <version name="7.5.10">
+        <text>Bug fixes</text>
+    </version>
+
+    <version name="7.5.8">
+        <text>UI improvements</text>
+    </version>
+
+    <version name="7.5.7">
+        <text>Improvements to loading videos</text>
+    </version>
+
+    <version name="7.5.6">
+        <text>Fix Google Translate support</text>
+    </version>
+
+    <version name="7.5.5">
+        <text>Bug fixes</text>
+    </version>
+
+    <version name="7.5.4">
+        <text>Translation updates</text>
+    </version>
+
+    <version name="7.5.3">
+        <text>Improve load times of the article previews on the timeline</text>
+        <text>Bug fixes</text>
+    </version>
+
+    <version name="7.5.2">
+        <text>Bug fixes and build process improvements</text>
+    </version>
+
+    <version name="7.5.1">
+        <text>Bug fixes</text>
+    </version>
+
     <version name="7.5.0">
         <text>Open tweet details when looking through a users list of images on their profiles.</text>
+        <text>Improvements to handling tweets with multiple images</text>
         <text>Dependency updates and bug fixes</text>
     </version>
 
@@ -62,7 +100,7 @@
     </version>
 
     <version name="7.1.1">
-        <text>Twitter has a new policy that all apps using their service should stop allowing for tweeting, liking, and retweeting using multiple accounts at once: https://blog.twitter.com/developer/en_us/topics/tips/2018/automation-and-the-use-of-multiple-accounts.html. I have unfortunately had to remove this functionality from Talon.</text>
+        <text>Twitter has a new policy that all apps using their service should stop allowing for tweeting, liking, and retweeting using multiple accounts at once: https://blog.twitter.com/developer/en_us/topics/tips/2019/automation-and-the-use-of-multiple-accounts.html. I have unfortunately had to remove this functionality from Talon.</text>
         <text>Translation updates</text>
     </version>
 
@@ -82,7 +120,7 @@
 
     <version name="7.0.3">
         <text>Bug fixes around threads/discussion</text>
-        <text>Enable the 2018 supporter option in settings</text>
+        <text>Enable the 2019 supporter option in settings</text>
     </version>
 
     <version name="7.0.2">
@@ -364,7 +402,7 @@
     </version>
 
     <version name="5.8.0">
-        <text>If you love my work, become a 2017 supporter from the settings menu!</text>
+        <text>If you love my work, become a 2019 supporter from the settings menu!</text>
         <text>Search all the users on Twitter when auto-completing a mention in a tweet</text>
         <text>Option to change the widget's text size separate from the app's text size</text>
         <text>Absolute date formats can now be used on the compact tweet layout</text>

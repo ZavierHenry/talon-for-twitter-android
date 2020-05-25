@@ -18,6 +18,8 @@ package com.klinker.android.twitter_l.data;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 import androidx.core.os.BuildCompat;
@@ -28,13 +30,32 @@ import com.klinker.android.twitter_l.settings.AppSettings;
 import com.klinker.android.twitter_l.utils.DynamicShortcutUtils;
 import com.klinker.android.twitter_l.utils.EmojiUtils;
 import com.klinker.android.twitter_l.utils.NotificationChannelUtil;
+import com.klinker.android.twitter_l.utils.TLSSocketFactory;
 import com.klinker.android.twitter_l.utils.text.EmojiInitializer;
 
 import java.util.Locale;
 
+import twitter4j.AlternativeHttpClientImpl;
+import xyz.klinker.android.drag_dismiss.util.AndroidVersionUtils;
+
 public class App extends MultiDexApplication {
 
     public static long DATA_USED = 0;
+
+    static {
+        if (AndroidVersionUtils.isAndroidQ()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            AlternativeHttpClientImpl.setOnBuildOkHttpClient(builder -> {
+                try {
+                    builder.sslSocketFactory(new TLSSocketFactory());
+                } catch (Throwable t) {
+                }
+            });
+        }
+    }
 
     @Override
     public void onCreate() {

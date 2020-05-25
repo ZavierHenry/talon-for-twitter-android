@@ -26,6 +26,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.viewpager.widget.ViewPager;
 import android.transition.ChangeBounds;
 import android.util.Log;
@@ -55,6 +57,8 @@ import com.klinker.android.twitter_l.utils.NotificationUtils;
 import com.klinker.android.twitter_l.utils.PermissionModelUtils;
 import com.klinker.android.twitter_l.utils.UpdateUtils;
 import com.klinker.android.twitter_l.utils.Utils;
+
+import xyz.klinker.android.drag_dismiss.util.AndroidVersionUtils;
 
 
 public class MainActivity extends DrawerActivity {
@@ -200,6 +204,12 @@ public class MainActivity extends DrawerActivity {
         }
 
         if (!settings.isTwitterLoggedIn) {
+            // set the default theme for new users to be dark timeline style, with a dark app bar
+            AppSettings.getInstance(this).sharedPrefs.edit()
+                    .putString("timeline_pictures", "" + AppSettings.REVAMPED_TWEETS)
+                    .putString("main_theme_string", "" + (AndroidVersionUtils.isAndroidQ() ? 4 : 1))
+                    .putInt("material_theme_1", AppSettings.THEME_DARK_BACKGROUND_COLOR)
+                    .commit();
             Intent login = new Intent(context, MaterialLogin.class);
             startActivity(login);
         }
@@ -485,7 +495,7 @@ public class MainActivity extends DrawerActivity {
         sharedPrefs = AppSettings.getSharedPreferences(this);
 
         // check for night mode switching
-        int theme = AppSettings.getCurrentTheme(sharedPrefs);
+        int theme = AppSettings.getCurrentTheme(this, sharedPrefs);
 
         if (sharedPrefs.getBoolean("launcher_frag_switch", false) ||
                 (theme != settings.baseTheme)) {

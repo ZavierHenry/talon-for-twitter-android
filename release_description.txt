@@ -1,1 +1,1 @@
-This version contains bug fixes, including a fix for an issue with translating tweets.
+This update just contains bug fixes. More to come in the future!

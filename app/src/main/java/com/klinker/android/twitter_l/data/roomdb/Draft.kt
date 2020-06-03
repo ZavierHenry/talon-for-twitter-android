@@ -6,7 +6,7 @@ import androidx.room.*
 data class Draft(
         val text: String,
         val account: Int,
-        @PrimaryKey(autoGenerate = true) var id: Int? = null
+        @PrimaryKey(autoGenerate = true) var id: Long? = null
 )
 
 
@@ -22,6 +22,5 @@ interface DraftDao {
 
     @Query("SELECT * FROM drafts WHERE account = :account")
     fun getDrafts(account: Int) : List<Draft>
-
 
 }

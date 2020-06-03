@@ -1,0 +1,27 @@
+package com.klinker.android.twitter_l.data.roomdb
+
+import androidx.room.*
+
+
+@Entity(tableName = "scheduled_tweets")
+data class ScheduledTweet(
+        val text: String,
+        val time: Long,
+        val account: Int,
+        @PrimaryKey(autoGenerate = true) var id: Long? = null
+)
+
+
+@Dao
+interface ScheduledTweetDao {
+
+    @Insert
+    fun insertScheduledTweet(scheduledTweet: ScheduledTweet) : Long?
+
+    @Delete
+    fun deleteScheduledTweet(scheduledTweet: ScheduledTweet)
+
+    @Query("SELECT * FROM scheduled_tweets WHERE account = :account")
+    fun getScheduledTweets(account: Int) : List<ScheduledTweet>
+
+}

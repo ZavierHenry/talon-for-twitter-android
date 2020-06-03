@@ -58,7 +58,10 @@ android {
     
 }
 
+apply plugin: 'kotlin-kapt'
+
 dependencies {
+    def room_version = "2.2.5"
 
     wearApp project(':wear')
     
@@ -106,7 +109,10 @@ dependencies {
     implementation(name: 'datetimepicker', ext: 'aar')
     implementation(name: 'sectioned-recyclerview', ext: 'aar')
     implementation(name: 'material-camera', ext: 'aar')
-    
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
     implementation project(':searchview')
     implementation project(':shared_assets')
     implementation project(':lvl')

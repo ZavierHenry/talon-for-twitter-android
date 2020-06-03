@@ -21,7 +21,7 @@ interface ScheduledTweetDao {
     @Delete
     fun deleteScheduledTweet(scheduledTweet: ScheduledTweet)
 
-    @Query("SELECT * FROM scheduled_tweets WHERE account = :account")
+    @Query("SELECT * FROM scheduled_tweets WHERE account = :account ORDER BY time DESC")
     fun getScheduledTweets(account: Int) : List<ScheduledTweet>
 
 }

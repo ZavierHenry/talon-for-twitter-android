@@ -14,7 +14,7 @@ abstract class TalonDatabase : RoomDatabase() {
 
         fun getInstance(context: Context) : TalonDatabase {
             if (database == null) {
-                database = Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database").build()
+                Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database").build()
             }
             return database!!
         }

@@ -7,6 +7,7 @@ import androidx.room.*
 data class ScheduledTweet(
         val text: String,
         val time: Long,
+        @ColumnInfo(name = "alarm_id") val alarmId: Long,
         val account: Int,
         @PrimaryKey(autoGenerate = true) var id: Long? = null
 )

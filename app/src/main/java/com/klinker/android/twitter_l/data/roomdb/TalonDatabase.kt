@@ -6,17 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [Draft::class], version = 1)
+@Database(entities = [Draft::class, QueuedTweet::class, ScheduledTweet::class], version = 1)
 abstract class TalonDatabase : RoomDatabase() {
 
     companion object {
         var database: TalonDatabase? = null
 
         fun getInstance(context: Context) : TalonDatabase {
-            if (database == null) {
-                Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database").build()
-            }
-            return database!!
+            return database ?:
+                Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database")
+                        .build()
+                        .also { database = it }
         }
     }
 }

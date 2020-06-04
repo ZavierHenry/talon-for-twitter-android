@@ -3,7 +3,7 @@ package com.klinker.android.twitter_l.data.roomdb
 import androidx.room.*
 
 
-@Entity(tableName = "scheduled_tweets")
+@Entity(tableName = "scheduled_tweets", indices = [Index(value = ["alarm_id"], unique = true)])
 data class ScheduledTweet(
         val text: String,
         val time: Long,

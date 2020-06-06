@@ -8,7 +8,7 @@ import twitter4j.Status
 data class SavedTweet(
         @Embedded val tweet: Tweet,
         val account: Int,
-        val id: Long? = null
+        @PrimaryKey val id: Long? = null
 ) {
 
     constructor(status: Status, account: Int) : this(Tweet(status), account)

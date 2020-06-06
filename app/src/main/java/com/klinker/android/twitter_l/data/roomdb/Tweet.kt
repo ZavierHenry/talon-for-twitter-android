@@ -15,7 +15,6 @@ data class Tweet(
         val mentions: List<String>,
         val images: List<String>,
         val urls: List<String>,
-        val account: Int,
         val likes: Int? = null,
         val retweets: Int? = null,
         val liked: Boolean? = null,
@@ -24,29 +23,27 @@ data class Tweet(
         @Embedded(prefix = "retweeter_") val retweeter: User? = null
 ) {
 
-    constructor(status: Status, account: Int) : this(
+    constructor(status: Status) : this(
             status,
             if (status.isRetweet) status.retweetedStatus else status,
-            TweetLinkUtils.getLinksInStatus(if (status.isRetweet) status.retweetedStatus else status),
-            account
+            TweetLinkUtils.getLinksInStatus(if (status.isRetweet) status.retweetedStatus else status)
     )
 
-    private constructor(status: Status, originalStatus: Status, linksInStatus: Array<String>, account: Int) : this(
+    private constructor(status: Status, originalStatus: Status, linksInStatus: Array<String>) : this(
             status.id,
-            User(originalStatus.user, account),
+            User(originalStatus.user),
             linksInStatus[0],
             status.createdAt.time,
             linksInStatus[3].split(" "),
             linksInStatus[4].split(" "),
             linksInStatus[1].split(" "),
             linksInStatus[2].split(" "),
-            account,
             originalStatus.favoriteCount,
             originalStatus.retweetCount,
             originalStatus.isFavorited,
             originalStatus.isRetweetedByMe,
             HtmlCompat.fromHtml(originalStatus.source, HtmlCompat.FROM_HTML_MODE_LEGACY).toString(),
-            if (status.id != originalStatus.id) User(status.user, account) else null
+            if (status.id != originalStatus.id) User(status.user) else null
     )
 
 }

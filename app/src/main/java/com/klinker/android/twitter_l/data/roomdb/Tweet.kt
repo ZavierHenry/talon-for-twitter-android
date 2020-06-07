@@ -34,10 +34,17 @@ data class Tweet(
             User(originalStatus.user),
             linksInStatus[0],
             status.createdAt.time,
-            linksInStatus[3].split(" "),
-            linksInStatus[4].split(" "),
-            linksInStatus[1].split(" "),
-            linksInStatus[2].split(" "),
+            linksInStatus[3].split("|"),
+            linksInStatus[4].split("|"),
+            linksInStatus[1].split("|").map { media ->
+                if (media.contains("/tweet_video/"))
+                    media.replace("tweet_video", "tweet_video_thumb")
+                            .replace(".mp4", ".png")
+                            .replace(".m3u8", ".png")
+                else
+                    media
+            },
+            linksInStatus[2].split("|"),
             originalStatus.favoriteCount,
             originalStatus.retweetCount,
             originalStatus.isFavorited,

@@ -20,7 +20,9 @@ data class Tweet(
         val liked: Boolean? = null,
         val retweeted: Boolean? = null,
         val source: String? = null,
-        @Embedded(prefix = "retweeter_") val retweeter: User? = null
+        @Embedded(prefix = "retweeter_") val retweeter: User? = null,
+        @ColumnInfo(name = "gif_url") val gifUrl: String? = null,
+        @ColumnInfo(name = "media_length") val mediaLength: Long? = null
 ) {
 
     constructor(status: Status) : this(
@@ -29,7 +31,7 @@ data class Tweet(
             TweetLinkUtils.getLinksInStatus(if (status.isRetweet) status.retweetedStatus else status)
     )
 
-    private constructor(status: Status, originalStatus: Status, linksInStatus: Array<String>) : this(
+    private constructor(status: Status, originalStatus: Status, linksInStatus: Array<String>, mediaInfo: TweetLinkUtils.TweetMediaInformation) : this(
             status.id,
             User(originalStatus.user),
             linksInStatus[0],
@@ -50,7 +52,16 @@ data class Tweet(
             originalStatus.isFavorited,
             originalStatus.isRetweetedByMe,
             HtmlCompat.fromHtml(originalStatus.source, HtmlCompat.FROM_HTML_MODE_LEGACY).toString(),
-            if (status.id != originalStatus.id) User(status.user) else null
+            if (status.id != originalStatus.id) User(status.user) else null,
+            mediaInfo.url,
+            if (mediaInfo.duration == -1L) null else mediaInfo.duration
+    )
+
+    private constructor(status: Status, originalStatus: Status, linksInStatus: Array<String>) : this(
+            status,
+            originalStatus,
+            linksInStatus,
+            TweetLinkUtils.getGIFUrl(originalStatus, linksInStatus[2])
     )
 
 }

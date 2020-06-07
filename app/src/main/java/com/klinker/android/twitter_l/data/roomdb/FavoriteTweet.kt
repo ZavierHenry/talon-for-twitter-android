@@ -21,7 +21,7 @@ interface FavoriteTweetDao {
     @Delete
     fun deleteFavoriteTweet(favoriteTweet: FavoriteTweet)
 
-    @Query("SELECT * FROM favorite_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET (:page - 1)")
+    @Query("SELECT * FROM favorite_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getFavoriteTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<FavoriteTweet>
 }
 

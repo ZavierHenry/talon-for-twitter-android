@@ -13,7 +13,7 @@ data class Follower(
     constructor(user: TwitterUser, account: Int) : this(User(user), account)
 }
 
-
+@Dao
 interface FollowerDao {
 
     @Insert

@@ -13,7 +13,7 @@ data class FavoriteUser(
     constructor(user: TwitterUser, account: Int) : this(User(user), account)
 }
 
-
+@Dao
 interface FavoriteUserDao {
 
     @Insert

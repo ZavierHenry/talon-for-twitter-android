@@ -15,7 +15,7 @@ data class SavedTweet(
 
 }
 
-
+@Dao
 interface SavedTweetDao {
 
     @Insert

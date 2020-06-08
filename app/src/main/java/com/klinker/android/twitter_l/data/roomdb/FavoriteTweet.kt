@@ -8,7 +8,7 @@ import twitter4j.Status
 data class FavoriteTweet(
         @Embedded val tweet: Tweet,
         val account: Int,
-        @PrimaryKey val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(status: Status, account: Int) : this(Tweet(status), account)
 }
@@ -16,7 +16,7 @@ data class FavoriteTweet(
 @Dao
 interface FavoriteTweetDao {
     @Insert
-    fun insertFavoriteTweet(favoriteTweet: FavoriteTweet)
+    fun insertFavoriteTweet(favoriteTweet: FavoriteTweet) : Long?
 
     @Delete
     fun deleteFavoriteTweet(favoriteTweet: FavoriteTweet)

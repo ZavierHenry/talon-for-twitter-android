@@ -8,7 +8,7 @@ import twitter4j.User as TwitterUser
 data class Follower(
         @Embedded val user: User,
         val account: Int,
-        @PrimaryKey val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(user: TwitterUser, account: Int) : this(User(user), account)
 }
@@ -22,7 +22,7 @@ interface FollowerDao {
     @Delete
     fun deleteFollower(follower: Follower)
 
-    @Query("SELECT * FROM followers WHERE account = :account")
-    fun getFollowers(account: Int)
+    @Query("SELECT * FROM followers WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    fun getFollowers(account: Int, page: Int = 1, pageSize: Int = 200) : List<Follower>
 
 }

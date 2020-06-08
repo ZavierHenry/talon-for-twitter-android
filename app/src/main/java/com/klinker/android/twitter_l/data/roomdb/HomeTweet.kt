@@ -9,7 +9,7 @@ data class HomeTweet(
         @Embedded val tweet: Tweet,
         val account: Int,
         @ColumnInfo(name = "is_unread") val isUnread: Boolean,
-        @PrimaryKey val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(status: Status, account: Int, isUnread: Boolean) : this(Tweet(status), account, isUnread)
 }

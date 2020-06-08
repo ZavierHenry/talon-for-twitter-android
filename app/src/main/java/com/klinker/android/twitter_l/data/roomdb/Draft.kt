@@ -6,14 +6,14 @@ import androidx.room.*
 data class Draft(
         val text: String,
         val account: Int,
-        @PrimaryKey(autoGenerate = true) var id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 )
 
 
 @Dao
 interface DraftDao {
     @Insert
-    fun insertDraft(draft: Draft) : Int
+    fun insertDraft(draft: Draft) : Long?
 
     @Delete
     fun deleteDraft(draft: Draft)

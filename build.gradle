@@ -170,8 +170,11 @@ subprojects {
                 }
 
                 sourceSets {
-                    androidTest {
+                    test {
                         setRoot('src/test')
+                    }
+                    androidTest {
+                        setRoot('src/androidTest')
                     }
                 }
             }

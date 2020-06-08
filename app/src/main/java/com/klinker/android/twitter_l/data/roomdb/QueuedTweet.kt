@@ -6,14 +6,14 @@ import androidx.room.*
 data class QueuedTweet(
         val text: String,
         val account: Int,
-        @PrimaryKey var id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 )
 
 @Dao
 interface QueuedTweetDao {
 
     @Insert
-    fun insertQueuedTweet(tweet: QueuedTweet) : Long
+    fun insertQueuedTweet(tweet: QueuedTweet) : Long?
 
     @Delete
     fun deleteQueuedTweet(tweet: QueuedTweet)

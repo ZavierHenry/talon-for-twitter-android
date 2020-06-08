@@ -4,10 +4,37 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 
-@Database(entities = [Draft::class, QueuedTweet::class, ScheduledTweet::class], version = 1)
+@Database(entities = [
+    DirectMessage::class,
+    Draft::class,
+    FavoriteTweet::class,
+    FavoriteUser::class,
+    Follower::class,
+    HomeTweet::class,
+    ListTweet::class,
+    Mention::class,
+    QueuedTweet::class,
+    SavedTweet::class,
+    ScheduledTweet::class,
+    UserTweet::class], version = 1)
+@TypeConverters(ListStringConverter::class)
 abstract class TalonDatabase : RoomDatabase() {
+
+    abstract fun directMessageDao(): DirectMessageDao
+    abstract fun draftDao(): DraftDao
+    abstract fun favoriteTweetDao(): FavoriteTweetDao
+    abstract fun favoriteUserDao(): FavoriteUserDao
+    abstract fun followerDao(): FollowerDao
+    abstract fun homeTweetDao(): HomeTweetDao
+    abstract fun listTweetDao(): ListTweetDao
+    abstract fun mentionDao(): MentionDao
+    abstract fun queuedTweetDao(): QueuedTweetDao
+    abstract fun savedTweetDao(): SavedTweetDao
+    abstract fun scheduledTweetDao(): ScheduledTweetDao
+    abstract fun userTweetDao(): UserTweetDao
 
     companion object {
         var database: TalonDatabase? = null

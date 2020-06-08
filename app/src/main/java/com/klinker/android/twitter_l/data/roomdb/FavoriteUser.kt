@@ -8,7 +8,7 @@ import twitter4j.User as TwitterUser
 data class FavoriteUser(
         @Embedded val user: User,
         val account: Int,
-        @PrimaryKey val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(user: TwitterUser, account: Int) : this(User(user), account)
 }
@@ -17,13 +17,13 @@ data class FavoriteUser(
 interface FavoriteUserDao {
 
     @Insert
-    fun insertFavoriteUser(favoriteUser: FavoriteUser)
+    fun insertFavoriteUser(favoriteUser: FavoriteUser) : Long?
 
     @Delete
     fun deleteFavoriteUser(favoriteUser: FavoriteUser)
 
     @Query("SELECT * FROM favorite_users WHERE account = :account")
-    fun getFavoriteUsers(account: Int)
+    fun getFavoriteUsers(account: Int) : List<FavoriteUser>
 
 }
 

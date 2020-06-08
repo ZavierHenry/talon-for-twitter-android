@@ -9,7 +9,7 @@ data class ListTweet(
         @Embedded val tweet: Tweet,
         @ColumnInfo(name = "list_id") val listId: Long,
         val account: Int,
-        @PrimaryKey val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(status: Status, listId: Long, account: Int) : this(Tweet(status), listId, account)
 }
@@ -25,5 +25,5 @@ interface ListTweetDao {
     fun deleteListTweet(listTweet: ListTweet)
 
     @Query("SELECT * FROM list_tweets WHERE account = :account AND list_id = :listId ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getListTweets(account: Int, listId: Long, page: Int = 1, pageSize: Int = 200)
+    fun getListTweets(account: Int, listId: Long, page: Int = 1, pageSize: Int = 200) : List<ListTweet>
 }

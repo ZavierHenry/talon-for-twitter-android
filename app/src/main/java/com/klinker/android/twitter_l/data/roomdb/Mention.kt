@@ -9,7 +9,7 @@ data class Mention(
         @Embedded val tweet: Tweet,
         val account: Int,
         @ColumnInfo(name = "is_unread") val isUnread: Boolean,
-        @PrimaryKey val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(status: Status, account: Int, is_unread: Boolean) : this(Tweet(status), account, is_unread)
 }
@@ -24,9 +24,9 @@ interface MentionDao {
     fun deleteMention(mention: Mention)
 
     @Query("SELECT * FROM mentions WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getMentions(account: Int, page: Int = 1, pageSize: Int = 200)
+    fun getMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
 
     @Query("SELECT * FROM mentions WHERE account = :account AND is_unread ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getUnreadMentions(account: Int, page: Int = 1, pageSize: Int = 200)
+    fun getUnreadMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
 
 }

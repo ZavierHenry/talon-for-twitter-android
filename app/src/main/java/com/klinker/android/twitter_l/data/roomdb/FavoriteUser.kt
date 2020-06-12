@@ -22,8 +22,8 @@ interface FavoriteUserDao {
     @Delete
     fun deleteFavoriteUser(favoriteUser: FavoriteUser)
 
-    @Query("SELECT * FROM favorite_users WHERE account = :account")
-    fun getFavoriteUsers(account: Int) : List<FavoriteUser>
+    @Query("SELECT * FROM favorite_users WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    fun getFavoriteUsers(account: Int, page: Int = 1, pageSize: Int = 200) : List<FavoriteUser>
 
 }
 

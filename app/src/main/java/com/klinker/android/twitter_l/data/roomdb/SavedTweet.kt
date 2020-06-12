@@ -24,6 +24,6 @@ interface SavedTweetDao {
     @Delete
     fun deleteSavedTweet(savedTweet: SavedTweet)
 
-    @Query("SELECT * FROM saved_tweets WHERE account = :account ORDER BY tweet_id ASC")
-    fun getSavedTweets(account: Int) : List<SavedTweet>
+    @Query("SELECT * FROM saved_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    fun getSavedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<SavedTweet>
 }

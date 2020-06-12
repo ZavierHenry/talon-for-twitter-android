@@ -22,7 +22,7 @@ interface ScheduledTweetDao {
     @Delete
     fun deleteScheduledTweet(scheduledTweet: ScheduledTweet)
 
-    @Query("SELECT * FROM scheduled_tweets WHERE account = :account ORDER BY time DESC")
-    fun getScheduledTweets(account: Int) : List<ScheduledTweet>
+    @Query("SELECT * FROM scheduled_tweets WHERE account = :account ORDER BY time DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    fun getScheduledTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<ScheduledTweet>
 
 }

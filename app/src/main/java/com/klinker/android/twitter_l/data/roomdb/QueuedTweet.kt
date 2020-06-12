@@ -19,7 +19,7 @@ interface QueuedTweetDao {
     fun deleteQueuedTweet(tweet: QueuedTweet)
 
 
-    @Query("SELECT * FROM queued_tweets WHERE account = :account")
-    fun getQueuedTweets(account: Int) : List<QueuedTweet>
+    @Query("SELECT * FROM queued_tweets WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    fun getQueuedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<QueuedTweet>
 
 }

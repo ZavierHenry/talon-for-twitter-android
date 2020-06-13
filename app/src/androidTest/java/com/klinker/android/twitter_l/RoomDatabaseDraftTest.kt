@@ -38,6 +38,17 @@ class RoomDatabaseDraftTest {
         assertThat(drafts[0].id, equalTo(id))
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun testDeleteDraft() {
+        val draft = makeMockDraft(1)
+        val id = draftDao.insertDraft(draft)
+        assertThat(id, notNullValue())
+        draftDao.deleteDraft(draft.copy(id = id))
+        val draftsSize = draftDao.getDrafts(1).size
+        assertThat(draftsSize, equalTo(0))
+    }
+
 
 
 }

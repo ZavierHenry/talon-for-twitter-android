@@ -49,4 +49,18 @@ class RoomDatabaseFavoriteUserTest {
         assertThat(favoriteUsers[0].id, equalTo(id))
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun updateFavoriteUser() {
+        val image1 = "Image_1.jpg"
+        val image2 = "Image_2.jpg"
+
+        val favoriteUser = makeMockFavoriteUser(account = 1, profilePic = image1)
+        val id = favoriteUserDao.insertFavoriteUser(favoriteUser)
+        assertThat(id, notNullValue())
+        favoriteUserDao.updateFavoriteUser(favoriteUser.copy(id = id, user = favoriteUser.user.copy(profilePic = image2)))
+        val favoriteUsers = favoriteUserDao.getFavoriteUsers(1)
+        assertThat(favoriteUsers.size, equalTo(1))
+        assertThat(favoriteUsers[0].user.profilePic, equalTo(image2))
+    }
 }

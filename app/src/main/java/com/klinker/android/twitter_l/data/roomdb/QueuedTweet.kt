@@ -15,6 +15,9 @@ interface QueuedTweetDao {
     @Insert
     fun insertQueuedTweet(tweet: QueuedTweet) : Long?
 
+    @Update
+    fun updateQueuedTweet(tweet: QueuedTweet)
+
     @Delete
     fun deleteQueuedTweet(tweet: QueuedTweet)
 

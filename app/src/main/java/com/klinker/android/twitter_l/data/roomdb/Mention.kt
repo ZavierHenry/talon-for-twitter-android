@@ -20,6 +20,9 @@ interface MentionDao {
     @Insert
     fun insertMention(mention: Mention) : Long?
 
+    @Update
+    fun updateMention(mention: Mention)
+
     @Delete
     fun deleteMention(mention: Mention)
 

@@ -21,6 +21,9 @@ interface SavedTweetDao {
     @Insert
     fun insertSavedTweet(savedTweet: SavedTweet) : Long?
 
+    @Update
+    fun updateSavedTweet(savedTweet: SavedTweet)
+
     @Delete
     fun deleteSavedTweet(savedTweet: SavedTweet)
 

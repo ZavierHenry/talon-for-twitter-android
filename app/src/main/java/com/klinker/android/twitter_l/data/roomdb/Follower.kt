@@ -19,6 +19,9 @@ interface FollowerDao {
     @Insert
     fun insertFollower(follower: Follower) : Long?
 
+    @Update
+    fun updateFollower(follower: Follower)
+
     @Delete
     fun deleteFollower(follower: Follower)
 

@@ -20,6 +20,9 @@ interface UserTweetDao {
     @Insert
     fun insertUserTweet(userTweet: UserTweet) : Long?
 
+    @Update
+    fun updateUserTweet(userTweet: UserTweet)
+
     @Delete
     fun deleteUserTweet(userTweet: UserTweet)
 

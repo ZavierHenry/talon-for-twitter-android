@@ -21,6 +21,9 @@ interface ListTweetDao {
     @Insert
     fun insertListTweet(listTweet: ListTweet) : Long?
 
+    @Update
+    fun updateListTweet(listTweet: ListTweet)
+
     @Delete
     fun deleteListTweet(listTweet: ListTweet)
 

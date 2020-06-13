@@ -18,6 +18,9 @@ interface FavoriteTweetDao {
     @Insert
     fun insertFavoriteTweet(favoriteTweet: FavoriteTweet) : Long?
 
+    @Update
+    fun updateFavoriteTweet(favoriteTweet: FavoriteTweet)
+
     @Delete
     fun deleteFavoriteTweet(favoriteTweet: FavoriteTweet)
 

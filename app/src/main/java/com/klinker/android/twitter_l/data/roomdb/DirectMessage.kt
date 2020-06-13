@@ -25,6 +25,9 @@ interface DirectMessageDao {
 
     @Insert
     fun insertDirectMessage(directMessage: DirectMessage) : Long?
+    
+    @Update
+    fun updateDirectMessage(directMessage: DirectMessage)
 
     @Delete
     fun deleteDirectMessage(directMessage: DirectMessage)

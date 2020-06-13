@@ -19,6 +19,9 @@ interface FavoriteUserDao {
     @Insert
     fun insertFavoriteUser(favoriteUser: FavoriteUser) : Long?
 
+    @Update
+    fun updateFavoriteUser(favoriteUser: FavoriteUser)
+
     @Delete
     fun deleteFavoriteUser(favoriteUser: FavoriteUser)
 

@@ -19,6 +19,9 @@ interface ScheduledTweetDao {
     @Insert
     fun insertScheduledTweet(scheduledTweet: ScheduledTweet) : Long?
 
+    @Update
+    fun updateScheduledTweet(scheduledTweet: ScheduledTweet)
+
     @Delete
     fun deleteScheduledTweet(scheduledTweet: ScheduledTweet)
 

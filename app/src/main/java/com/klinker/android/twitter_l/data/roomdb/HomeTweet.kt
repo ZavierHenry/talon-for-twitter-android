@@ -21,6 +21,9 @@ interface HomeTweetDao {
     @Insert
     fun insertHomeTweet(homeTweet: HomeTweet) : Long?
 
+    @Update
+    fun updateHomeTweet(homeTweet: HomeTweet)
+
     @Delete
     fun deleteHomeTweet(homeTweet: HomeTweet)
 

@@ -15,6 +15,9 @@ interface DraftDao {
     @Insert
     fun insertDraft(draft: Draft) : Long?
 
+    @Update
+    fun updateDraft(draft: Draft)
+
     @Delete
     fun deleteDraft(draft: Draft)
 

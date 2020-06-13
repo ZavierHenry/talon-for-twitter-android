@@ -1,27 +1,21 @@
 package com.klinker.android.twitter_l
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.FavoriteUser
 import com.klinker.android.twitter_l.data.roomdb.FavoriteUserDao
-import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 import com.klinker.android.twitter_l.data.roomdb.User
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.IOException
 import org.hamcrest.Matchers.*
-
+import org.junit.Rule
 
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class RoomDatabaseFavoriteUserTest {
 
-    private lateinit var db : TalonDatabase
+    //private lateinit var db : TalonDatabase
     private lateinit var favoriteUserDao: FavoriteUserDao
 
     private fun makeMockFavoriteUser(
@@ -37,21 +31,12 @@ class RoomDatabaseFavoriteUserTest {
         )
     }
 
+    @get:Rule val database = TestDatabase()
 
     @Before
-    fun createTalonDatabase() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, TalonDatabase::class.java).build()
-        favoriteUserDao = db.favoriteUserDao()
+    fun createFavoriteUserDao() {
+        favoriteUserDao = database.database.favoriteUserDao()
     }
-
-
-    @After
-    @Throws(IOException::class)
-    fun closeTalonDatabase() {
-        db.close()
-    }
-
 
     @Test
     @Throws(Exception::class)

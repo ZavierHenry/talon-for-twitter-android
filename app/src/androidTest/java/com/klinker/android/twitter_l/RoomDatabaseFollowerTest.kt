@@ -59,7 +59,7 @@ class RoomDatabaseFollowerTest {
     @Throws(Exception::class)
     fun getFollowersFilterAccount() {
         val followers = List(10) {
-            makeMockFollower("chrislhayes${it}", "Chris Hayes ${it}", "image ${it}", it.toLong(), if (it > 5) 2 else 1)
+            makeMockFollower("chrislhayes${it}", "Chris Hayes $it", "image $it", it.toLong(), if (it > 5) 2 else 1)
         }
         val insertedFollowers = followers.mapNotNull {
             follower -> followerDao.insertFollower(follower)?.let { id -> follower.copy(id = id) }

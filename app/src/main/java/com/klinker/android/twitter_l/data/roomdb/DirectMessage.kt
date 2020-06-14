@@ -7,6 +7,7 @@ import twitter4j.DirectMessage as TwitterDM
 @Entity(tableName = "direct_messages")
 data class DirectMessage(
         val text: String,
+        val time: Long,
         @Embedded(prefix = "sender_") val sender: User,
         @Embedded(prefix = "recipient_") val recipient: User,
         val account: Int,
@@ -14,6 +15,7 @@ data class DirectMessage(
 ) {
     constructor(directMessage: TwitterDM, account: Int) : this(
             directMessage.text,
+            directMessage.createdAt.time,
             User(directMessage.sender),
             User(directMessage.recipient),
             account
@@ -34,5 +36,8 @@ interface DirectMessageDao {
 
     @Query("SELECT * FROM direct_messages WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getDirectMessages(account: Int, page: Int = 1, pageSize: Int = 200) : List<DirectMessage>
+
+    @Query("DELETE FROM direct_messages WHERE account = :account AND id NOT IN (SELECT * FROM direct_messages WHERE account = :account ORDER BY id DESC LIMIT :size)")
+    fun trimDatabase(account: Int, size: Int)
 
 }

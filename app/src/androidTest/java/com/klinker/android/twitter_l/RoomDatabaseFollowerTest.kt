@@ -27,7 +27,7 @@ class RoomDatabaseFollowerTest {
         return Follower(User(screenName, name, profilePic, userId), account)
     }
 
-    @get:Rule val database = TestDatabase()
+    @get:Rule val database = TestDatabase("followers")
 
     @Before
     fun createFollowerDao() {
@@ -51,8 +51,11 @@ class RoomDatabaseFollowerTest {
         val follower = makeMockFollower(account = 1)
         val id = followerDao.insertFollower(follower)
         assertThat(id, notNullValue())
+        assertThat(database.size, equalTo(1))
         followerDao.deleteFollower(follower.copy(id = id))
-        assertThat(followerDao.getFollowers(1).size, equalTo(0))
+        assertThat(database.size, equalTo(0))
+
+        //assertThat(followerDao.getFollowers(1).size, equalTo(0))
     }
 
     @Test

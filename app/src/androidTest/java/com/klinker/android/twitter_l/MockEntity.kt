@@ -1,7 +1,9 @@
 package com.klinker.android.twitter_l
 
+import android.content.ContentValues
 import android.database.Cursor
+import androidx.sqlite.db.SupportSQLiteQuery
 
 interface MockEntity {
-    fun toArgs() : Array<Any>
+    fun toContentValues() : ContentValues
 }

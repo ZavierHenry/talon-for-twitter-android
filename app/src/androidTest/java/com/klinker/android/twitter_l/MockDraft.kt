@@ -1,20 +1,25 @@
 package com.klinker.android.twitter_l
 
+import android.content.ContentValues
 import android.database.Cursor
 import com.klinker.android.twitter_l.data.roomdb.Draft
 
 
-class MockDraft(account: Int, text: String = "", id: Long? = null) : MockEntity {
-    val draft: Draft = Draft(text, account, id)
-    override fun toArgs(): Array<Any> {
-        TODO("Not yet implemented")
-    }
+data class MockDraft(val draft: Draft) : MockEntity {
 
-    companion object {
-        const val tableName = "drafts"
-        fun toMockDraft(cursor: Cursor) : MockDraft {
-            return MockDraft(1)
+    override fun toContentValues(): ContentValues {
+        return ContentValues().apply {
+            put("text", draft.text)
+            put("account", draft.account)
         }
     }
 
+    companion object {
+        fun toMockDraft(cursor: Cursor) : MockDraft {
+            val text = cursor.getString(cursor.getColumnIndex("text"))
+            val account = cursor.getInt(cursor.getColumnIndex("account"))
+            val id = cursor.getLong(cursor.getColumnIndex("id"))
+            return MockDraft(Draft(text, account, id))
+        }
+    }
 }

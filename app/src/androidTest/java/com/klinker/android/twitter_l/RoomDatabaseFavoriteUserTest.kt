@@ -31,7 +31,7 @@ class RoomDatabaseFavoriteUserTest {
         )
     }
 
-    @get:Rule val database = TestDatabase()
+    @get:Rule val database = TestDatabase("favorite_users")
 
     @Before
     fun createFavoriteUserDao() {
@@ -44,9 +44,7 @@ class RoomDatabaseFavoriteUserTest {
         val favoriteUser = makeMockFavoriteUser(account = 1)
         val id = favoriteUserDao.insertFavoriteUser(favoriteUser)
         assertThat(id, notNullValue())
-        val favoriteUsers = favoriteUserDao.getFavoriteUsers(1)
-        assertThat(favoriteUsers.size, equalTo(1))
-        assertThat(favoriteUsers[0].id, equalTo(id))
+        assertThat(database.size, equalTo(1))
     }
 
     @Test

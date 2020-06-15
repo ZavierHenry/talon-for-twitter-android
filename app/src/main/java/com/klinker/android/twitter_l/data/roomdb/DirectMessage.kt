@@ -37,7 +37,7 @@ interface DirectMessageDao {
     @Query("SELECT * FROM direct_messages WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getDirectMessages(account: Int, page: Int = 1, pageSize: Int = 200) : List<DirectMessage>
 
-    @Query("DELETE FROM direct_messages WHERE account = :account AND id NOT IN (SELECT * FROM direct_messages WHERE account = :account ORDER BY id DESC LIMIT :size)")
+    @Query("DELETE FROM direct_messages WHERE account = :account AND id NOT IN (SELECT id FROM direct_messages WHERE account = :account ORDER BY id DESC LIMIT :size)")
     fun trimDatabase(account: Int, size: Int)
 
 }

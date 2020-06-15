@@ -4,8 +4,7 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.Draft
 import com.klinker.android.twitter_l.data.roomdb.DraftDao
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,11 +15,7 @@ import org.junit.runner.RunWith
 class RoomDatabaseDraftTest {
     private lateinit var draftDao: DraftDao
 
-    private fun makeMockDraft(account: Int, text: String = "") : Draft {
-        return Draft(text, account)
-    }
-
-    @get:Rule val database = TestDatabase()
+    @get:Rule val database = TestDatabase("drafts")
 
     @Before
     fun getDraftDao() {
@@ -30,25 +25,24 @@ class RoomDatabaseDraftTest {
     @Test
     @Throws(Exception::class)
     fun testInsertDraft() {
-        val draft = makeMockDraft(1)
+        val draft = Draft("", 1)
         val id = draftDao.insertDraft(draft)
         assertThat(id, notNullValue())
-        val drafts = draftDao.getDrafts(1)
-        assertThat(drafts.size, equalTo(1))
-        assertThat(drafts[0].id, equalTo(id))
+        assertThat(database.size, equalTo(1))
     }
 
     @Test
     @Throws(Exception::class)
     fun testDeleteDraft() {
-        val draft = makeMockDraft(1)
-        val id = draftDao.insertDraft(draft)
+        val draft = Draft("", 1)
+        val mockDraft = MockDraft(draft)
+        val id = database.insertIntoDatabase(mockDraft)
+
         assertThat(id, notNullValue())
+        assertThat(database.size, equalTo(1))
+
         draftDao.deleteDraft(draft.copy(id = id))
-        val draftsSize = draftDao.getDrafts(1).size
-        assertThat(draftsSize, equalTo(0))
+        assertThat(database.size, equalTo(0))
     }
-
-
 
 }

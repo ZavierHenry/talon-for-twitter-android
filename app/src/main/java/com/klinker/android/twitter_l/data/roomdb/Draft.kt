@@ -21,7 +21,7 @@ interface DraftDao {
     @Delete
     fun deleteDraft(draft: Draft)
 
-    @Query("SELECT * FROM drafts")
+    @Query("DELETE FROM drafts")
     fun deleteAllDrafts()
 
     @Query("SELECT * FROM drafts WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")

@@ -45,4 +45,19 @@ class RoomDatabaseDraftTest {
         assertThat(database.size, equalTo(0))
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun testUpdateDraft() {
+        val draft = Draft("old draft", 1)
+        val mockDraft = MockDraft(draft)
+        val id = database.insertIntoDatabase(mockDraft)
+
+        assertThat(id, notNullValue())
+        assertThat(database.size, equalTo(1))
+
+        draftDao.updateDraft(draft.copy(id = id, text = "new draft"))
+        //get new draft from the database
+        //assert that text equals the new value
+    }
+
 }

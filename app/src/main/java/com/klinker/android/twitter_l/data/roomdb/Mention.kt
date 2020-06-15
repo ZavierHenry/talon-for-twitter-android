@@ -32,4 +32,7 @@ interface MentionDao {
     @Query("SELECT * FROM mentions WHERE account = :account AND is_unread ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getUnreadMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
 
+    @Query("DELETE FROM mentions WHERE account = :account AND id NOT IN (SELECT id FROM mentions WHERE account = :account ORDER BY id DESC LIMIT :size)")
+    fun trimDatabase(account: Int, size: Int)
+
 }

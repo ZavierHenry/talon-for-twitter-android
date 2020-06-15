@@ -29,4 +29,8 @@ interface UserTweetDao {
     @Query("SELECT * FROM user_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getUserTweets(account: Int, page: Int = 1, pageSize: Int = 250) : List<UserTweet>
 
+
+    @Query("DELETE FROM user_tweets WHERE user_user_id = :userId and id NOT IN (SELECT id FROM user_tweets WHERE user_user_id = :userId ORDER BY id DESC LIMIT :size)")
+    fun trimDatabase(userId: Long, size: Int)
+
 }

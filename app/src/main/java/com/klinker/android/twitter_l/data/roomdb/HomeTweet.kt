@@ -30,5 +30,7 @@ interface HomeTweetDao {
     @Query("SELECT * FROM home_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getHomeTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<HomeTweet>
 
+    @Query("DELETE FROM home_tweets WHERE account = :account AND id NOT IN (SELECT id FROM home_tweets WHERE account = :account ORDER BY id DESC LIMIT :size)")
+    fun trimDatabase(account: Int, size: Int)
 
 }

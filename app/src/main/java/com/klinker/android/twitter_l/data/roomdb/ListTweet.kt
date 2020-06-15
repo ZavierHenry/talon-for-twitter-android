@@ -29,4 +29,8 @@ interface ListTweetDao {
 
     @Query("SELECT * FROM list_tweets WHERE account = :account AND list_id = :listId ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     fun getListTweets(account: Int, listId: Long, page: Int = 1, pageSize: Int = 200) : List<ListTweet>
+
+
+    @Query("DELETE FROM list_tweets WHERE list_id = :listId AND id NOT IN (SELECT id FROM list_tweets WHERE list_id = :listId ORDER BY id DESC LIMIT :size)")
+    fun trimDatabase(listId: Long, size: Int)
 }

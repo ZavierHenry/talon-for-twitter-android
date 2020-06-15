@@ -16,13 +16,13 @@ import org.junit.runner.RunWith
 class RoomDatabaseFollowerTest {
 
     private lateinit var followerDao : FollowerDao
-    
-    private fun makeMockFollower(
-            screenName: String = "chrislhayes", 
+
+    private fun makeExampleFollower(
+            account: Int,
+            screenName: String = "chrislhayes",
             name: String? = "Chris Hayes",
             profilePic: String? = "",
-            userId: Long? = 1023123L,
-            account: Int = 1
+            userId: Long? = 1023123L
     ) : Follower {
         return Follower(User(screenName, name, profilePic, userId), account)
     }
@@ -37,32 +37,29 @@ class RoomDatabaseFollowerTest {
     @Test
     @Throws(Exception::class)
     fun insertFollower() {
-        val follower = makeMockFollower(account = 1)
+        val follower = makeExampleFollower(1)
         val id = followerDao.insertFollower(follower)
-        val followers = followerDao.getFollowers(1)
-        assertThat(followers.size, equalTo(1))
-        assertThat(followers[0].id, equalTo(id))
+        assertThat(id, notNullValue())
+        assertThat(database.size, equalTo(1))
     }
 
 
     @Test
     @Throws(Exception::class)
     fun deleteFollower() {
-        val follower = makeMockFollower(account = 1)
+        val follower = makeExampleFollower(1)
         val id = followerDao.insertFollower(follower)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
         followerDao.deleteFollower(follower.copy(id = id))
         assertThat(database.size, equalTo(0))
-
-        //assertThat(followerDao.getFollowers(1).size, equalTo(0))
     }
 
     @Test
     @Throws(Exception::class)
     fun getFollowersFilterAccount() {
         val followers = List(10) {
-            makeMockFollower("chrislhayes${it}", "Chris Hayes $it", "image $it", it.toLong(), if (it > 5) 2 else 1)
+            makeExampleFollower(if (it > 5) 2 else 1,"chrislhayes${it}", "Chris Hayes $it", "image $it", it.toLong())
         }
         val insertedFollowers = followers.mapNotNull {
             follower -> followerDao.insertFollower(follower)?.let { id -> follower.copy(id = id) }

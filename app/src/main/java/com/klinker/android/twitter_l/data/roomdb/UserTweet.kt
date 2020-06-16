@@ -13,24 +13,22 @@ data class UserTweet(
     constructor(status: Status, account: Int) : this(Tweet(status), account)
 }
 
-
 @Dao
-interface UserTweetDao {
+abstract class UserTweetDao {
 
     @Insert
-    fun insertUserTweet(userTweet: UserTweet) : Long?
+    abstract fun insertUserTweet(userTweet: UserTweet) : Long?
 
     @Update
-    fun updateUserTweet(userTweet: UserTweet)
+    abstract fun updateUserTweet(userTweet: UserTweet)
 
     @Delete
-    fun deleteUserTweet(userTweet: UserTweet)
+    abstract fun deleteUserTweet(userTweet: UserTweet)
 
     @Query("SELECT * FROM user_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getUserTweets(account: Int, page: Int = 1, pageSize: Int = 250) : List<UserTweet>
-
+    abstract fun getUserTweets(account: Int, page: Int = 1, pageSize: Int = 250) : List<UserTweet>
 
     @Query("DELETE FROM user_tweets WHERE user_user_id = :userId and id NOT IN (SELECT id FROM user_tweets WHERE user_user_id = :userId ORDER BY id DESC LIMIT :size)")
-    fun trimDatabase(userId: Long, size: Int)
+    abstract fun trimDatabase(userId: Long, size: Int)
 
 }

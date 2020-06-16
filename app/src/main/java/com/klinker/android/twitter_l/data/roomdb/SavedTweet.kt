@@ -16,17 +16,17 @@ data class SavedTweet(
 }
 
 @Dao
-interface SavedTweetDao {
+abstract class SavedTweetDao {
 
     @Insert
-    fun insertSavedTweet(savedTweet: SavedTweet) : Long?
+    abstract fun insertSavedTweet(savedTweet: SavedTweet) : Long?
 
     @Update
-    fun updateSavedTweet(savedTweet: SavedTweet)
+    abstract fun updateSavedTweet(savedTweet: SavedTweet)
 
     @Delete
-    fun deleteSavedTweet(savedTweet: SavedTweet)
+    abstract fun deleteSavedTweet(savedTweet: SavedTweet)
 
     @Query("SELECT * FROM saved_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getSavedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<SavedTweet>
+    abstract fun getSavedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<SavedTweet>
 }

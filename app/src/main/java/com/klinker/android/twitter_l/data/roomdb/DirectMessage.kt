@@ -23,21 +23,21 @@ data class DirectMessage(
 }
 
 @Dao
-interface DirectMessageDao {
+abstract class DirectMessageDao {
 
     @Insert
-    fun insertDirectMessage(directMessage: DirectMessage) : Long?
+    abstract fun insertDirectMessage(directMessage: DirectMessage) : Long?
     
     @Update
-    fun updateDirectMessage(directMessage: DirectMessage)
+    abstract fun updateDirectMessage(directMessage: DirectMessage)
 
     @Delete
-    fun deleteDirectMessage(directMessage: DirectMessage)
+    abstract fun deleteDirectMessage(directMessage: DirectMessage)
 
     @Query("SELECT * FROM direct_messages WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getDirectMessages(account: Int, page: Int = 1, pageSize: Int = 200) : List<DirectMessage>
+    abstract fun getDirectMessages(account: Int, page: Int = 1, pageSize: Int = 200) : List<DirectMessage>
 
     @Query("DELETE FROM direct_messages WHERE account = :account AND id NOT IN (SELECT id FROM direct_messages WHERE account = :account ORDER BY id DESC LIMIT :size)")
-    fun trimDatabase(account: Int, size: Int)
+    abstract fun trimDatabase(account: Int, size: Int)
 
 }

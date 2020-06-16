@@ -14,18 +14,18 @@ data class Follower(
 }
 
 @Dao
-interface FollowerDao {
+abstract class FollowerDao {
 
     @Insert
-    fun insertFollower(follower: Follower) : Long?
+    abstract fun insertFollower(follower: Follower) : Long?
 
     @Update
-    fun updateFollower(follower: Follower)
+    abstract fun updateFollower(follower: Follower)
 
     @Delete
-    fun deleteFollower(follower: Follower)
+    abstract fun deleteFollower(follower: Follower)
 
     @Query("SELECT * FROM followers WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getFollowers(account: Int, page: Int = 1, pageSize: Int = 200) : List<Follower>
+    abstract fun getFollowers(account: Int, page: Int = 1, pageSize: Int = 200) : List<Follower>
 
 }

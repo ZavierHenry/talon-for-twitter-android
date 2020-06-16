@@ -11,20 +11,20 @@ data class Draft(
 
 
 @Dao
-interface DraftDao {
+abstract class DraftDao {
     @Insert
-    fun insertDraft(draft: Draft) : Long?
+    abstract fun insertDraft(draft: Draft) : Long?
 
     @Update
-    fun updateDraft(draft: Draft)
+    abstract fun updateDraft(draft: Draft)
 
     @Delete
-    fun deleteDraft(draft: Draft)
+    abstract fun deleteDraft(draft: Draft)
 
     @Query("DELETE FROM drafts WHERE account = :account")
-    fun deleteAllDrafts(account: Int)
+    abstract fun deleteAllDrafts(account: Int)
 
     @Query("SELECT * FROM drafts WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getDrafts(account: Int, page: Int = 1, pageSize: Int = 200) : List<Draft>
+    abstract fun getDrafts(account: Int, page: Int = 1, pageSize: Int = 200) : List<Draft>
 
 }

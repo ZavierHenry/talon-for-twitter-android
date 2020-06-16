@@ -15,24 +15,24 @@ data class Mention(
 }
 
 @Dao
-interface MentionDao {
+abstract class MentionDao {
 
     @Insert
-    fun insertMention(mention: Mention) : Long?
+    abstract fun insertMention(mention: Mention) : Long?
 
     @Update
-    fun updateMention(mention: Mention)
+    abstract fun updateMention(mention: Mention)
 
     @Delete
-    fun deleteMention(mention: Mention)
+    abstract fun deleteMention(mention: Mention)
 
     @Query("SELECT * FROM mentions WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
+    abstract fun getMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
 
     @Query("SELECT * FROM mentions WHERE account = :account AND is_unread ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getUnreadMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
+    abstract fun getUnreadMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>
 
     @Query("DELETE FROM mentions WHERE account = :account AND id NOT IN (SELECT id FROM mentions WHERE account = :account ORDER BY id DESC LIMIT :size)")
-    fun trimDatabase(account: Int, size: Int)
+    abstract fun trimDatabase(account: Int, size: Int)
 
 }

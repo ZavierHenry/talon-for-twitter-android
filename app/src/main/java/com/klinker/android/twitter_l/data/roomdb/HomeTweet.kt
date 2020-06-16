@@ -16,21 +16,21 @@ data class HomeTweet(
 
 
 @Dao
-interface HomeTweetDao {
+abstract class HomeTweetDao {
 
     @Insert
-    fun insertHomeTweet(homeTweet: HomeTweet) : Long?
+    abstract fun insertHomeTweet(homeTweet: HomeTweet) : Long?
 
     @Update
-    fun updateHomeTweet(homeTweet: HomeTweet)
+    abstract fun updateHomeTweet(homeTweet: HomeTweet)
 
     @Delete
-    fun deleteHomeTweet(homeTweet: HomeTweet)
+    abstract fun deleteHomeTweet(homeTweet: HomeTweet)
 
     @Query("SELECT * FROM home_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getHomeTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<HomeTweet>
+    abstract fun getHomeTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<HomeTweet>
 
     @Query("DELETE FROM home_tweets WHERE account = :account AND id NOT IN (SELECT id FROM home_tweets WHERE account = :account ORDER BY id DESC LIMIT :size)")
-    fun trimDatabase(account: Int, size: Int)
+    abstract fun trimDatabase(account: Int, size: Int)
 
 }

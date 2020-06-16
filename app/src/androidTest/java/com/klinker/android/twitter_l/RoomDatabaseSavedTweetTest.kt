@@ -4,6 +4,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.SavedTweetDao
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 
 
@@ -18,6 +19,12 @@ class RoomDatabaseSavedTweetTest {
     @Before
     fun getSavedTweetDao() {
         savedTweetDao = database.database.savedTweetDao()
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testInsertSavedTweet() {
+
     }
 
 }

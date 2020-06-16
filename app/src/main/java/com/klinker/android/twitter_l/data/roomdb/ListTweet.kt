@@ -16,21 +16,20 @@ data class ListTweet(
 
 
 @Dao
-interface ListTweetDao {
+abstract class ListTweetDao {
 
     @Insert
-    fun insertListTweet(listTweet: ListTweet) : Long?
+    abstract fun insertListTweet(listTweet: ListTweet) : Long?
 
     @Update
-    fun updateListTweet(listTweet: ListTweet)
+    abstract fun updateListTweet(listTweet: ListTweet)
 
     @Delete
-    fun deleteListTweet(listTweet: ListTweet)
+    abstract fun deleteListTweet(listTweet: ListTweet)
 
     @Query("SELECT * FROM list_tweets WHERE account = :account AND list_id = :listId ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getListTweets(account: Int, listId: Long, page: Int = 1, pageSize: Int = 200) : List<ListTweet>
-
+    abstract fun getListTweets(account: Int, listId: Long, page: Int = 1, pageSize: Int = 200) : List<ListTweet>
 
     @Query("DELETE FROM list_tweets WHERE list_id = :listId AND id NOT IN (SELECT id FROM list_tweets WHERE list_id = :listId ORDER BY id DESC LIMIT :size)")
-    fun trimDatabase(listId: Long, size: Int)
+    abstract fun trimDatabase(listId: Long, size: Int)
 }

@@ -10,19 +10,18 @@ data class QueuedTweet(
 )
 
 @Dao
-interface QueuedTweetDao {
+abstract class QueuedTweetDao {
 
     @Insert
-    fun insertQueuedTweet(tweet: QueuedTweet) : Long?
+    abstract fun insertQueuedTweet(tweet: QueuedTweet) : Long?
 
     @Update
-    fun updateQueuedTweet(tweet: QueuedTweet)
+    abstract fun updateQueuedTweet(tweet: QueuedTweet)
 
     @Delete
-    fun deleteQueuedTweet(tweet: QueuedTweet)
-
+    abstract fun deleteQueuedTweet(tweet: QueuedTweet)
 
     @Query("SELECT * FROM queued_tweets WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    fun getQueuedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<QueuedTweet>
+    abstract fun getQueuedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<QueuedTweet>
 
 }

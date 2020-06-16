@@ -5,6 +5,7 @@ import com.klinker.android.twitter_l.data.roomdb.ListTweet
 import com.klinker.android.twitter_l.data.roomdb.ListTweetDao
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 
 
@@ -19,6 +20,12 @@ class RoomDatabaseListTweetTest {
     @Before
     fun getListTweetDao() {
         listTweetDao = database.database.listTweetDao()
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testInsertListTweet() {
+
     }
 
 }

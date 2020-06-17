@@ -1,6 +1,7 @@
 package com.klinker.android.twitter_l
 
 import android.content.Context
+import android.database.Cursor
 import androidx.room.OnConflictStrategy
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -24,6 +25,11 @@ class TestDatabase(val tableName: String) : TestRule {
     fun insertIntoDatabase(entity: MockEntity) : Long? {
         val id = database.openHelper.writableDatabase.insert(tableName, OnConflictStrategy.IGNORE, entity.toContentValues())
         return if (id == -1L) null else id
+    }
+
+    fun queryFromDatabase(query: String, args: Array<Any>? = null) : Cursor {
+        return database.query(query, args)
+
     }
 
     override fun apply(base: Statement?, description: Description?): Statement {

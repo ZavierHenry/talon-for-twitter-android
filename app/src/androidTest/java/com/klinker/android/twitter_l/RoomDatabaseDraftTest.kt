@@ -25,8 +25,8 @@ class RoomDatabaseDraftTest {
     @Test
     @Throws(Exception::class)
     fun testInsertDraft() {
-        val draft = Draft("", 1)
-        val id = draftDao.insertDraft(draft)
+        val draft = MockDraft(1)
+        val id = draftDao.insertDraft(draft.draft)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }
@@ -34,30 +34,32 @@ class RoomDatabaseDraftTest {
     @Test
     @Throws(Exception::class)
     fun testDeleteDraft() {
-        val draft = Draft("", 1)
-        val mockDraft = MockDraft(draft)
-        val id = database.insertIntoDatabase(mockDraft)
+        val draft = MockDraft(1)
+        val id = database.insertIntoDatabase(draft)
 
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
 
-        draftDao.deleteDraft(draft.copy(id = id))
+        draftDao.deleteDraft(draft.draft.copy(id = id))
         assertThat(database.size, equalTo(0))
     }
 
     @Test
     @Throws(Exception::class)
     fun testUpdateDraft() {
-        val draft = Draft("old draft", 1)
-        val mockDraft = MockDraft(draft)
-        val id = database.insertIntoDatabase(mockDraft)
+        val draft = MockDraft(1, "old draft")
+        val id = database.insertIntoDatabase(draft)
 
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
 
-        draftDao.updateDraft(draft.copy(id = id, text = "new draft"))
-        //get new draft from the database
-        //assert that text equals the new value
+        draftDao.updateDraft(draft.draft.copy(id = id, text = "new draft"))
+        database.queryFromDatabase("SELECT * FROM drafts WHERE id = ?", arrayOf(id as Any)).use { cursor ->
+            cursor.moveToFirst()
+            val databaseDraft = MockDraft(cursor)
+            assertThat(databaseDraft.draft.text, equalTo("new draft"))
+        }
+        
     }
 
 }

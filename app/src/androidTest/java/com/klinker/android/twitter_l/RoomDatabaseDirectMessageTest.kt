@@ -27,12 +27,22 @@ class RoomDatabaseDirectMessageTest {
     @Test
     @Throws(Exception::class)
     fun testInsertDirectMessage() {
-        val sender = User("chrislhayes", "Chris Hayes", "Image 1.jpg", 10123L)
-        val recipient = User("samswey", "Samuel S", "Image 2.jpg", 12343L)
-        val directMessage = DirectMessage("Hi there bro!", 2312324L, sender, recipient, 1)
-        val id = directMessageDao.insertDirectMessage(directMessage)
+        val directMessage = MockDirectMessage(1)
+        val id = directMessageDao.insertDirectMessage(directMessage.directMessage)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testDeleteDirectMessage() {
+        val directMessage = MockDirectMessage(1)
+        val id = database.insertIntoDatabase(directMessage)
+        assertThat(id, notNullValue())
+        assertThat(database.size, equalTo(1))
+
+        directMessageDao.deleteDirectMessage(directMessage.directMessage.copy(id = id))
+        assertThat(database.size, equalTo(0))
     }
 
 }

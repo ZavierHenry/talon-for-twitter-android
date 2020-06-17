@@ -2,12 +2,13 @@ package com.klinker.android.twitter_l
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.klinker.android.twitter_l.data.roomdb.FavoriteUser
+import com.klinker.android.twitter_l.data.roomdb.Follower
 import com.klinker.android.twitter_l.data.roomdb.User
 
-data class MockFavoriteUser(val favoriteUser: FavoriteUser) : MockEntity {
+data class MockFollower(val follower: Follower) : MockEntity {
 
-    constructor(account: Int, user: User = MockUtilities.makeMockUser(), id: Long? = null) : this(FavoriteUser(user, account, id))
+   constructor(account: Int, user: User = MockUtilities.makeMockUser(), id: Long? = null) :
+           this(Follower(user, account, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),
@@ -16,11 +17,10 @@ data class MockFavoriteUser(val favoriteUser: FavoriteUser) : MockEntity {
     )
 
     override fun toContentValues(): ContentValues {
-        val userContentValues = MockUtilities.userToContentValues(favoriteUser.user)
+        val user = MockUtilities.userToContentValues(follower.user)
         return ContentValues().apply {
-            putAll(userContentValues)
-            put("account", favoriteUser.account)
+            putAll(user)
+            put("account", follower.account)
         }
     }
-
 }

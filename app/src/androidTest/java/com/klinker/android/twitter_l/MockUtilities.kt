@@ -9,6 +9,7 @@ import com.klinker.android.twitter_l.data.roomdb.User
 class MockUtilities {
 
     companion object {
+
         fun userToContentValues(user: User, prefix: String = "") : ContentValues {
             return ContentValues().apply {
                 put("${prefix}name", user.name)
@@ -46,11 +47,16 @@ class MockUtilities {
             }
         }
 
+        fun<T> getNullableField(cursor: Cursor, columnName: String, getColumnValue: (Int) -> T) : T? {
+            val index = cursor.getColumnIndex(columnName)
+            return if (cursor.isNull(index)) null else getColumnValue(index)
+        }
+
         fun cursorToUser(cursor: Cursor, prefix: String = "") : User {
             val screenName = cursor.getString(cursor.getColumnIndex("${prefix}screen_name"))
-            val name = cursor.getString(cursor.getColumnIndex("${prefix}name"))
-            val profilePic = cursor.getString(cursor.getColumnIndex("${prefix}profile_pic"))
-            val userId = cursor.getLong(cursor.getColumnIndex("${prefix}user_id"))
+            val name = getNullableField(cursor, "${prefix}name") { cursor.getString(it) }
+            val profilePic = getNullableField(cursor, "${prefix}profile_pic") { cursor.getString(it) }
+            val userId = getNullableField(cursor, "${prefix}user_id") { cursor.getLong(it) }
             return User(screenName, name, profilePic, userId)
         }
 
@@ -65,13 +71,14 @@ class MockUtilities {
             val mentions = cursor.getString(cursor.getColumnIndex("${prefix}mentions"))
             val images = cursor.getString(cursor.getColumnIndex("${prefix}images"))
             val urls = cursor.getString(cursor.getColumnIndex("${prefix}urls"))
-            val likes = cursor.getInt(cursor.getColumnIndex("${prefix}likes"))
-            val retweets = cursor.getInt(cursor.getColumnIndex("${prefix}retweets"))
-            val liked = cursor.getInt(cursor.getColumnIndex("${prefix}liked"))
-            val retweeted = cursor.getInt(cursor.getColumnIndex("${prefix}retweeted"))
-            val source = cursor.getString(cursor.getColumnIndex("${prefix}source"))
-            val gifUrl = cursor.getString(cursor.getColumnIndex("${prefix}gif_url"))
-            val mediaLength = cursor.getLong(cursor.getColumnIndex("${prefix}media_length"))
+
+            val likes = getNullableField(cursor, "${prefix}likes") { cursor.getInt(it) }
+            val retweets = getNullableField(cursor, "${prefix}retweets") { cursor.getInt(it) }
+            val liked = getNullableField(cursor, "${prefix}liked") { cursor.getInt(it) == 1 }
+            val retweeted = getNullableField(cursor, "${prefix}retweeted") { cursor.getInt(it) == 1 }
+            val source = getNullableField(cursor, "${prefix}source") { cursor.getString(it) }
+            val gifUrl = getNullableField(cursor, "${prefix}gif_url") { cursor.getString(it) }
+            val mediaLength = getNullableField(cursor, "${prefix}media_length") { cursor.getLong(it) }
 
             val retweeter = cursorToUser(cursor, "${prefix}retweeter_")
 
@@ -86,13 +93,44 @@ class MockUtilities {
                     converter.toListString(urls),
                     likes,
                     retweets,
-                    liked == 1,
-                    retweeted == 1,
+                    liked,
+                    retweeted,
                     source,
                     if (retweeter.screenName == "") null else retweeter,
                     gifUrl,
                     mediaLength
             )
         }
+
+        fun makeMockUser(
+                screenName: String = "chrislhayes",
+                name: String? = "Chris Hayes",
+                profilePic: String? = "Image_Avatar.jpg",
+                userId: Long = 43298L
+        ) : User {
+            return User(screenName, name, profilePic, userId)
+        }
+
+        fun makeMockTweet(
+                tweetId: Long = 1L,
+                author: User = makeMockUser(),
+                text: String = "",
+                time: Long = 0L,
+                hashtags: List<String> = List(0) { "" },
+                mentions: List<String> = List(0) { "" },
+                images: List<String> = List(0) { "" },
+                urls: List<String> = List(0) { "" },
+                likes: Int? = 0,
+                retweets: Int? = 0,
+                liked: Boolean? = false,
+                retweeted: Boolean? = false,
+                source: String? = null,
+                retweeter: User? = null,
+                gifUrl: String? = null,
+                mediaLength: Long? = null
+        ) : Tweet {
+            return Tweet(tweetId, author, text, time, hashtags, mentions, images, urls, likes, retweets, liked, retweeted, source, retweeter, gifUrl, mediaLength)
+        }
+
     }
 }

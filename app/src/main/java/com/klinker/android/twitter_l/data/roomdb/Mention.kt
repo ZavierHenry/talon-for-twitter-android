@@ -4,7 +4,7 @@ import androidx.room.*
 import twitter4j.Status
 
 
-@Entity(tableName = "mentions")
+@Entity(tableName = "mentions", indices = [Index(value = ["tweet_id", "account"], unique = true)])
 data class Mention(
         @Embedded val tweet: Tweet,
         val account: Int,

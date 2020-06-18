@@ -10,15 +10,17 @@ data class MockDirectMessage(val directMessage: DirectMessage) : MockEntity {
 
     constructor(
             account: Int,
+            twitterId: Long = 1L,
             text: String = "",
             time: Long = 0L,
             sender: User = makeMockUser("chrislhayes", "Chris Hayes", "Sender.jpg", 23243L),
             recipient: User = makeMockUser("parkermolloy", "Parker Molloy", "Recipient.jpg", 28393L),
             id: Long? = null
-    ) : this(DirectMessage(text, time, sender, recipient, account, id))
+    ) : this(DirectMessage(twitterId, text, time, sender, recipient, account, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),
+            cursor.getLong(cursor.getColumnIndex("twitter_id")),
             cursor.getString(cursor.getColumnIndex("text")),
             cursor.getLong(cursor.getColumnIndex("time")),
             MockUtilities.cursorToUser(cursor, "sender_"),
@@ -32,6 +34,7 @@ data class MockDirectMessage(val directMessage: DirectMessage) : MockEntity {
         return ContentValues().apply {
             putAll(sender)
             putAll(recipient)
+            put("twitter_id", directMessage.twitterId)
             put("text", directMessage.text)
             put("time", directMessage.time)
             put("account", directMessage.account)

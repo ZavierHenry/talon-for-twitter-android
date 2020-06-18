@@ -4,7 +4,7 @@ import androidx.room.*
 import twitter4j.Status
 
 
-@Entity(tableName = "list_tweets")
+@Entity(tableName = "list_tweets", indices = [Index(value = ["tweet_id", "list_id"], unique = true)])
 data class ListTweet(
         @Embedded val tweet: Tweet,
         @ColumnInfo(name = "list_id") val listId: Long,

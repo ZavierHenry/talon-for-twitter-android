@@ -4,8 +4,9 @@ import androidx.room.*
 import twitter4j.DirectMessage as TwitterDM
 
 
-@Entity(tableName = "direct_messages")
+@Entity(tableName = "direct_messages", indices = [Index(value = ["twitter_id", "account"], unique = true)])
 data class DirectMessage(
+        @ColumnInfo(name = "twitter_id") val twitterId: Long,
         val text: String,
         val time: Long,
         @Embedded(prefix = "sender_") val sender: User,
@@ -14,6 +15,7 @@ data class DirectMessage(
         @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     constructor(directMessage: TwitterDM, account: Int) : this(
+            directMessage.id,
             directMessage.text,
             directMessage.createdAt.time,
             User(directMessage.sender),

@@ -1,9 +1,9 @@
-package com.klinker.android.twitter_l.data.roomdb
+package com.klinker.android.twitter_l.data.roomdb.transfers
 
 import android.content.Context
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.klinker.android.twitter_l.data.roomdb.transfers.TalonDatabaseCallback
 import com.klinker.android.twitter_l.data.sq_lite.UserTweetsSQLiteHelper
 
 

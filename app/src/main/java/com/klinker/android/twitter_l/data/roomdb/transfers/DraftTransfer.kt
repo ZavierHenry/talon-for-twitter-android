@@ -1,10 +1,9 @@
-package com.klinker.android.twitter_l.data.roomdb
+package com.klinker.android.twitter_l.data.roomdb.transfers
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import androidx.room.OnConflictStrategy
-import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
 

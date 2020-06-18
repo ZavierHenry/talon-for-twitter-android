@@ -1,4 +1,4 @@
-package com.klinker.android.twitter_l.data.roomdb
+package com.klinker.android.twitter_l.data.roomdb.transfers
 
 import android.content.Context
 import android.database.Cursor

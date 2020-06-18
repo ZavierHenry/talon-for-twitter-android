@@ -1,4 +1,4 @@
-package com.klinker.android.twitter_l.data.roomdb
+package com.klinker.android.twitter_l.data.roomdb.transfers
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,7 +6,6 @@ import android.database.Cursor
 import androidx.room.OnConflictStrategy
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
-import java.util.*
 
 class QueuedTweetTransfer(context: Context) : TalonDatabaseCallback(context.getDatabasePath("queued.db"), QueuedSQLiteHelper.TABLE_QUEUED) {
     override fun onEachTableRow(cursor: Cursor, newDatabase: SupportSQLiteDatabase) {

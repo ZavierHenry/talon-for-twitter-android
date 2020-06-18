@@ -1,4 +1,4 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.daotests
 
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner

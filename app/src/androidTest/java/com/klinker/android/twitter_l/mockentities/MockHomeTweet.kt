@@ -1,15 +1,14 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.mockentities
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.klinker.android.twitter_l.data.roomdb.Mention
+import com.klinker.android.twitter_l.data.roomdb.HomeTweet
 import com.klinker.android.twitter_l.data.roomdb.Tweet
 
-
-data class MockMention(val mention: Mention) : MockEntity {
+data class MockHomeTweet(val homeTweet: HomeTweet) : MockEntity {
 
     constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long? = null) :
-            this(Mention(tweet, account, isUnread, id))
+            this(HomeTweet(tweet, account, isUnread, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),
@@ -19,11 +18,11 @@ data class MockMention(val mention: Mention) : MockEntity {
     )
 
     override fun toContentValues(): ContentValues {
-        val tweet = MockUtilities.tweetToContentValues(mention.tweet)
+        val tweet = MockUtilities.tweetToContentValues(homeTweet.tweet)
         return ContentValues().apply {
             putAll(tweet)
-            put("account", mention.account)
-            put("is_unread", mention.isUnread)
+            put("account", homeTweet.account)
+            put("is_unread", homeTweet.isUnread)
         }
     }
 

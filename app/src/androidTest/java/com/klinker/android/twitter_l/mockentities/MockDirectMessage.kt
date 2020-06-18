@@ -1,8 +1,8 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.mockentities
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.klinker.android.twitter_l.MockUtilities.Companion.makeMockUser
+import com.klinker.android.twitter_l.mockentities.MockUtilities.Companion.makeMockUser
 import com.klinker.android.twitter_l.data.roomdb.DirectMessage
 import com.klinker.android.twitter_l.data.roomdb.User
 

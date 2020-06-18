@@ -1,8 +1,8 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.daotests
 
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.klinker.android.twitter_l.data.roomdb.Draft
+import com.klinker.android.twitter_l.mockentities.MockDraft
 import com.klinker.android.twitter_l.data.roomdb.DraftDao
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
@@ -59,7 +59,7 @@ class RoomDatabaseDraftTest {
             val databaseDraft = MockDraft(cursor)
             assertThat(databaseDraft.draft.text, equalTo("new draft"))
         }
-        
+
     }
 
 }

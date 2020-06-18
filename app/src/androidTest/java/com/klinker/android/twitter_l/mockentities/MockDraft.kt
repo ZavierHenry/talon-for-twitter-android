@@ -1,12 +1,13 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.mockentities
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.klinker.android.twitter_l.data.roomdb.QueuedTweet
+import com.klinker.android.twitter_l.data.roomdb.Draft
 
-data class MockQueuedTweet(val queuedTweet: QueuedTweet) : MockEntity {
 
-    constructor(account: Int, text: String = "", id: Long? = null) : this(QueuedTweet(text, account, id))
+data class MockDraft(val draft: Draft) : MockEntity {
+
+    constructor(account: Int, text: String = "", id: Long? = null) : this(Draft(text, account, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),
@@ -16,9 +17,8 @@ data class MockQueuedTweet(val queuedTweet: QueuedTweet) : MockEntity {
 
     override fun toContentValues(): ContentValues {
         return ContentValues().apply {
-            put("account", queuedTweet.account)
-            put("text", queuedTweet.text)
+            put("text", draft.text)
+            put("account", draft.account)
         }
     }
-
 }

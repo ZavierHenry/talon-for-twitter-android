@@ -1,10 +1,9 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.daotests
 
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.klinker.android.twitter_l.data.roomdb.DirectMessage
+import com.klinker.android.twitter_l.mockentities.MockDirectMessage
 import com.klinker.android.twitter_l.data.roomdb.DirectMessageDao
-import com.klinker.android.twitter_l.data.roomdb.User
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Before

@@ -1,7 +1,6 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.daotests
 
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.klinker.android.twitter_l.data.roomdb.ListTweet
 import com.klinker.android.twitter_l.data.roomdb.ListTweetDao
 import org.junit.Before
 import org.junit.Rule

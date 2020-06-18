@@ -1,4 +1,4 @@
-package com.klinker.android.twitter_l
+package com.klinker.android.twitter_l.mockentities
 
 import android.content.ContentValues
 import android.database.Cursor

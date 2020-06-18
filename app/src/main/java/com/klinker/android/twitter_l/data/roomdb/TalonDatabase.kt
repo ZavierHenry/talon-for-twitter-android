@@ -37,7 +37,7 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun userTweetDao(): UserTweetDao
 
     companion object {
-        var database: TalonDatabase? = null
+        private var database: TalonDatabase? = null
 
         fun getInstance(context: Context) : TalonDatabase {
             return database ?:

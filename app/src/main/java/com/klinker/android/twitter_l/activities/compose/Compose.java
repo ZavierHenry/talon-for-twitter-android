@@ -75,6 +75,8 @@ import com.google.android.gms.location.LocationServices;
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.activities.GiphySearch;
 import com.klinker.android.twitter_l.data.ThemeColor;
+import com.klinker.android.twitter_l.data.roomdb.Draft;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedDataSource;
 import com.klinker.android.twitter_l.utils.FingerprintDialog;
@@ -790,7 +792,13 @@ public abstract class Compose extends Activity implements
                         .setContentText(notiId != 0 ? getResources().getString(R.string.original_probably_deleted) : getResources().getString(R.string.tap_to_retry));
 
         Intent resultIntent = new Intent(this, RetryCompose.class);
+
+        //Draft draft = new Draft(text, settings.currentAccount, null);
+        //TalonDatabase.Companion.getInstance(context).draftDao().insertDraft(draft);
+
         QueuedDataSource.getInstance(this).createDraft(text, settings.currentAccount);
+
+
         resultIntent.setAction(Intent.ACTION_SEND);
         resultIntent.putExtra("failed_notification_text", text);
 

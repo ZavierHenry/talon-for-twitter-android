@@ -43,6 +43,8 @@ import com.bumptech.glide.Glide;
 import com.github.ajalt.reprint.core.Reprint;
 import com.klinker.android.twitter_l.BuildConfig;
 import com.klinker.android.twitter_l.R;
+import com.klinker.android.twitter_l.data.roomdb.Draft;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedDataSource;
 import com.klinker.android.twitter_l.settings.AppSettings;
 import com.klinker.android.twitter_l.utils.PermissionModelUtils;
@@ -731,6 +733,9 @@ public class ComposeActivity extends Compose {
         sharedPrefs.edit().putString("draft", "").apply();
         try {
             if (!(doneClicked || discardClicked)) {
+//                Draft draft = new Draft(reply.getText().toString(), currentAccount, null);
+//                TalonDatabase.Companion.getInstance(context).draftDao().insertDraft(draft);
+
                 QueuedDataSource.getInstance(context).createDraft(reply.getText().toString(), currentAccount);
             }
         } catch (Exception e) {

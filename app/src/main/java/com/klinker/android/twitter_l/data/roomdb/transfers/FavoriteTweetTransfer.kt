@@ -10,5 +10,4 @@ class FavoriteTweetTransfer(context: Context) : TalonDatabaseCallback(context.ge
     override fun onEachTableRow(cursor: Cursor, newDatabase: SupportSQLiteDatabase) {
         TODO("Not yet implemented")
     }
-
 }

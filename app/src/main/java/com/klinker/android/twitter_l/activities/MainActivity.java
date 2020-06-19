@@ -38,6 +38,7 @@ import android.view.animation.AnimationUtils;
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.adapters.MainDrawerArrayAdapter;
 import com.klinker.android.twitter_l.adapters.TimelinePagerAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.DMDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.FavoriteUsersDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.FollowersDataSource;
@@ -457,6 +458,8 @@ public class MainActivity extends DrawerActivity {
 
     @Override
     public void onDestroy() {
+
+        //TalonDatabase.Companion.closeDatabase();
         try {
             HomeDataSource.getInstance(context).close();
         } catch (Exception e) { }

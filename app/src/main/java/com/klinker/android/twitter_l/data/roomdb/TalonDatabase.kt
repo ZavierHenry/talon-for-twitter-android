@@ -45,5 +45,10 @@ abstract class TalonDatabase : RoomDatabase() {
                         .build()
                         .also { database = it }
         }
+
+        fun closeDatabase() {
+            database?.close()
+            database = null
+        }
     }
 }

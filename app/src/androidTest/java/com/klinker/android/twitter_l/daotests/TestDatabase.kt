@@ -18,7 +18,7 @@ class TestDatabase(val tableName: String) : TestRule {
     }
 
     val size: Int
-        get() = database.query("SELECT COUNT(*) FROM $tableName", emptyArray()).use { cursor ->
+        get() = database.query("SELECT COUNT(1) FROM $tableName", emptyArray()).use { cursor ->
                     cursor.moveToFirst()
                     cursor.getInt(0)
                 }

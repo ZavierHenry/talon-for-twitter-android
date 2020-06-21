@@ -12,6 +12,7 @@ abstract class TalonDatabaseCallback(private val oldDatabaseFile: File, private 
 
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
+
         val oldDatabase = SQLiteDatabase.openDatabase(oldDatabaseFile.path, null, SQLiteDatabase.OPEN_READONLY)
         oldDatabase.query(tableName, null, null, null, null, null, primaryKey?.let { "$it ASC" }).use { cursor ->
             cursor.moveToFirst()

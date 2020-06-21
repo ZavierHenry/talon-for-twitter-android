@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
 
-class DraftTransfer(context: Context) : TalonDatabaseCallback(context.getDatabasePath("queued.db"), QueuedSQLiteHelper.TABLE_QUEUED) {
+class DraftTransfer(context: Context) : TalonDatabaseCallback(context.getDatabasePath("queued.db"), QueuedSQLiteHelper.TABLE_QUEUED, QueuedSQLiteHelper.COLUMN_ID) {
 
     override fun onEachTableRow(cursor: Cursor, newDatabase: SupportSQLiteDatabase) {
         val type = cursor.getInt(cursor.getColumnIndex(QueuedSQLiteHelper.COLUMN_TYPE))
@@ -23,7 +23,4 @@ class DraftTransfer(context: Context) : TalonDatabaseCallback(context.getDatabas
         }
     }
 
-    override fun onCreate(db: SupportSQLiteDatabase) {
-        super.onCreate(db)
-    }
 }

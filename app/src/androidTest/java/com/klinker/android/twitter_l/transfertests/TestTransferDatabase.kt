@@ -4,60 +4,98 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import androidx.room.OnConflictStrategy
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 import com.klinker.android.twitter_l.data.roomdb.transfers.TalonDatabaseCallback
+import org.junit.rules.TemporaryFolder
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
+class TestTransferDatabase(private val sourceTableName: String, private val destTableName: String, callback: TalonDatabaseCallback, columns: List<String>, private val primaryKey: String? = null) : TestRule {
 
-class TestTransferDatabase(private val callback: TalonDatabaseCallback, private val tableName: String, columns: List<String>) : TestRule {
+    private var sourceDatabase: SQLiteDatabase? = null
+    private var destDatabase: TalonDatabase? = null
+    private val createTableSql = columns.joinToString(
+            prefix = "create table $sourceTableName (",
+            separator = ", ",
+            postfix = ");"
+    )
 
-    private val sourceDatabase = SQLiteDatabase.create(null)
-    private lateinit var destDatabase: TalonDatabase
+    private val testCallback = TestCallback(callback)
 
-    init {
-        val createTable = columns.joinToString(
-                prefix = "create table $tableName (",
-                separator = ", ",
-                postfix = ");"
-        )
-        sourceDatabase.execSQL(createTable)
-    }
+    val sourceSize: Int
+        get() = sourceDatabase?.query(sourceTableName, arrayOf("COUNT(1)"), null, null, null, null, null)?.use { cursor ->
+            cursor.moveToFirst()
+            cursor.getInt(0)
+        } ?: 0
+
+    val destSize: Int
+        get() = destDatabase?.query("SELECT COUNT(1) FROM $destTableName", emptyArray())?.use { cursor ->
+            cursor.moveToFirst()
+            cursor.getInt(0)
+        } ?: 0
+
 
     fun insertIntoSQLiteDatabase(contentValues: ContentValues) : Long? {
-        val id = sourceDatabase.insert(tableName, null, contentValues)
-        return if (id == -1L) null else id
+        val id = sourceDatabase?.insert(sourceTableName, null, contentValues)
+        return if (id == null || id == -1L) null else id
     }
 
-    fun buildRoomDatabase() {
+    fun buildDestinationDatabase() {
         destDatabase = with(ApplicationProvider.getApplicationContext<Context>()) {
             Room.inMemoryDatabaseBuilder(this, TalonDatabase::class.java)
-                    .addCallback(callback)
+                    .addCallback(testCallback)
                     .build()
         }
     }
 
-    fun queryFromTalonDatabase(query: String, args: Array<Any>) : Cursor {
-        return destDatabase.query(query, args)
+    fun queryFromTalonDatabase(query: String, args: Array<Any>? = null) : Cursor? {
+        return destDatabase?.query(query, args)
     }
 
-
     override fun apply(base: Statement?, description: Description?): Statement {
-        return object : Statement() {
+        val temporaryFolder = TemporaryFolder()
+
+        val baseStatement = object : Statement() {
             override fun evaluate() {
+
                 try {
+
+                    val tempFile = temporaryFolder.newFile("test_database.db")
+                    sourceDatabase = SQLiteDatabase.openOrCreateDatabase(tempFile, null).apply {
+                        execSQL(createTableSql)
+                    }
+
                     base?.evaluate()
                 } finally {
-                    destDatabase.close()
-                    sourceDatabase.close()
+                    destDatabase?.close()
+                    destDatabase = null
+                    sourceDatabase?.close()
+                    sourceDatabase = null
                 }
             }
         }
 
+        return temporaryFolder.apply(baseStatement, description)
+
+    }
+
+    private inner class TestCallback(private val callback: TalonDatabaseCallback) : RoomDatabase.Callback() {
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+
+            sourceDatabase?.query(sourceTableName, null, null, null, null, null, primaryKey?.let { "$it ASC" })?.use { cursor ->
+                cursor.moveToFirst()
+                while (!cursor.isAfterLast) {
+                    callback.onEachTableRow(cursor, db)
+                    cursor.moveToNext()
+                }
+            }
+        }
     }
 
 

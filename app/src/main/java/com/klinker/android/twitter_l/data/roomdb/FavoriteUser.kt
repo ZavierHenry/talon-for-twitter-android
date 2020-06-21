@@ -14,16 +14,7 @@ data class FavoriteUser(
 }
 
 @Dao
-abstract class FavoriteUserDao {
-
-    @Insert
-    abstract fun insertFavoriteUser(favoriteUser: FavoriteUser) : Long?
-
-    @Update
-    abstract fun updateFavoriteUser(favoriteUser: FavoriteUser)
-
-    @Delete
-    abstract fun deleteFavoriteUser(favoriteUser: FavoriteUser)
+abstract class FavoriteUserDao : BaseDao<FavoriteUser>() {
 
     @Query("SELECT * FROM favorite_users WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getFavoriteUsers(account: Int, page: Int = 1, pageSize: Int = 200) : List<FavoriteUser>

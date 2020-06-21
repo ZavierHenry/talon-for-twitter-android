@@ -27,7 +27,7 @@ class RoomDatabaseDirectMessageTest {
     @Throws(Exception::class)
     fun testInsertDirectMessage() {
         val directMessage = MockDirectMessage(1)
-        val id = directMessageDao.insertDirectMessage(directMessage.directMessage)
+        val id = directMessageDao.insert(directMessage.directMessage)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }
@@ -40,7 +40,7 @@ class RoomDatabaseDirectMessageTest {
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
 
-        directMessageDao.deleteDirectMessage(directMessage.directMessage.copy(id = id))
+        directMessageDao.delete(directMessage.directMessage.copy(id = id))
         assertThat(database.size, equalTo(0))
     }
 

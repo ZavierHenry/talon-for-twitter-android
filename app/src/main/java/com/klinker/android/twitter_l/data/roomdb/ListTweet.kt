@@ -16,16 +16,7 @@ data class ListTweet(
 
 
 @Dao
-abstract class ListTweetDao {
-
-    @Insert
-    abstract fun insertListTweet(listTweet: ListTweet) : Long?
-
-    @Update
-    abstract fun updateListTweet(listTweet: ListTweet)
-
-    @Delete
-    abstract fun deleteListTweet(listTweet: ListTweet)
+abstract class ListTweetDao : BaseDao<ListTweet>() {
 
     @Query("SELECT * FROM list_tweets WHERE account = :account AND list_id = :listId ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getListTweets(account: Int, listId: Long, page: Int = 1, pageSize: Int = 200) : List<ListTweet>

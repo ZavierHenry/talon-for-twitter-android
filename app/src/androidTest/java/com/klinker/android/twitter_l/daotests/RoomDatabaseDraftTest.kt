@@ -26,7 +26,7 @@ class RoomDatabaseDraftTest {
     @Throws(Exception::class)
     fun testInsertDraft() {
         val draft = MockDraft(1)
-        val id = draftDao.insertDraft(draft.draft)
+        val id = draftDao.insert(draft.draft)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }
@@ -40,7 +40,7 @@ class RoomDatabaseDraftTest {
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
 
-        draftDao.deleteDraft(draft.draft.copy(id = id))
+        draftDao.delete(draft.draft.copy(id = id))
         assertThat(database.size, equalTo(0))
     }
 
@@ -53,7 +53,7 @@ class RoomDatabaseDraftTest {
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
 
-        draftDao.updateDraft(draft.draft.copy(id = id, text = "new draft"))
+        draftDao.update(draft.draft.copy(id = id, text = "new draft"))
         database.queryFromDatabase("SELECT * FROM drafts WHERE id = ?", arrayOf(id as Any)).use { cursor ->
             cursor.moveToFirst()
             val databaseDraft = MockDraft(cursor)

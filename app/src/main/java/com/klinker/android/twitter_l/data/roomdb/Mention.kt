@@ -15,16 +15,7 @@ data class Mention(
 }
 
 @Dao
-abstract class MentionDao {
-
-    @Insert
-    abstract fun insertMention(mention: Mention) : Long?
-
-    @Update
-    abstract fun updateMention(mention: Mention)
-
-    @Delete
-    abstract fun deleteMention(mention: Mention)
+abstract class MentionDao : BaseDao<Mention>() {
 
     @Query("SELECT * FROM mentions WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getMentions(account: Int, page: Int = 1, pageSize: Int = 200) : List<Mention>

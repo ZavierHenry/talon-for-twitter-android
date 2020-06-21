@@ -16,16 +16,7 @@ data class HomeTweet(
 
 
 @Dao
-abstract class HomeTweetDao {
-
-    @Insert
-    abstract fun insertHomeTweet(homeTweet: HomeTweet) : Long?
-
-    @Update
-    abstract fun updateHomeTweet(homeTweet: HomeTweet)
-
-    @Delete
-    abstract fun deleteHomeTweet(homeTweet: HomeTweet)
+abstract class HomeTweetDao : BaseDao<HomeTweet>() {
 
     @Query("SELECT * FROM home_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getHomeTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<HomeTweet>

@@ -16,16 +16,7 @@ data class SavedTweet(
 }
 
 @Dao
-abstract class SavedTweetDao {
-
-    @Insert
-    abstract fun insertSavedTweet(savedTweet: SavedTweet) : Long?
-
-    @Update
-    abstract fun updateSavedTweet(savedTweet: SavedTweet)
-
-    @Delete
-    abstract fun deleteSavedTweet(savedTweet: SavedTweet)
+abstract class SavedTweetDao : BaseDao<SavedTweet>() {
 
     @Query("SELECT * FROM saved_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getSavedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<SavedTweet>

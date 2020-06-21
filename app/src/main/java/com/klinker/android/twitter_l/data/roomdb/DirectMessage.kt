@@ -25,16 +25,7 @@ data class DirectMessage(
 }
 
 @Dao
-abstract class DirectMessageDao {
-
-    @Insert
-    abstract fun insertDirectMessage(directMessage: DirectMessage) : Long?
-    
-    @Update
-    abstract fun updateDirectMessage(directMessage: DirectMessage)
-
-    @Delete
-    abstract fun deleteDirectMessage(directMessage: DirectMessage)
+abstract class DirectMessageDao : BaseDao<DirectMessage>() {
 
     @Query("SELECT * FROM direct_messages WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getDirectMessages(account: Int, page: Int = 1, pageSize: Int = 200) : List<DirectMessage>

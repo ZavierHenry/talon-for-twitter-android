@@ -28,7 +28,7 @@ class RoomDatabaseFavoriteTweetTest {
     @Throws(Exception::class)
     fun testInsertFavoriteTweet() {
         val favoriteTweet = MockFavoriteTweet(1)
-        val id = favoriteTweetDao.insertFavoriteTweet(favoriteTweet.favoriteTweet)
+        val id = favoriteTweetDao.insert(favoriteTweet.favoriteTweet)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }

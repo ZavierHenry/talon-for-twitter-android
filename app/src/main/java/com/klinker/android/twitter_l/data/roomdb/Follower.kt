@@ -14,16 +14,7 @@ data class Follower(
 }
 
 @Dao
-abstract class FollowerDao {
-
-    @Insert
-    abstract fun insertFollower(follower: Follower) : Long?
-
-    @Update
-    abstract fun updateFollower(follower: Follower)
-
-    @Delete
-    abstract fun deleteFollower(follower: Follower)
+abstract class FollowerDao : BaseDao<Follower>() {
 
     @Query("SELECT * FROM followers WHERE account = :account LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getFollowers(account: Int, page: Int = 1, pageSize: Int = 200) : List<Follower>

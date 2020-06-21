@@ -42,7 +42,7 @@ class RoomDatabaseFavoriteUserTest {
     @Throws(Exception::class)
     fun insertFavoriteUser() {
         val favoriteUser = makeMockFavoriteUser(account = 1)
-        val id = favoriteUserDao.insertFavoriteUser(favoriteUser)
+        val id = favoriteUserDao.insert(favoriteUser)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }
@@ -54,9 +54,9 @@ class RoomDatabaseFavoriteUserTest {
         val image2 = "Image_2.jpg"
 
         val favoriteUser = makeMockFavoriteUser(account = 1, profilePic = image1)
-        val id = favoriteUserDao.insertFavoriteUser(favoriteUser)
+        val id = favoriteUserDao.insert(favoriteUser)
         assertThat(id, notNullValue())
-        favoriteUserDao.updateFavoriteUser(favoriteUser.copy(id = id, user = favoriteUser.user.copy(profilePic = image2)))
+        favoriteUserDao.update(favoriteUser.copy(id = id, user = favoriteUser.user.copy(profilePic = image2)))
         val favoriteUsers = favoriteUserDao.getFavoriteUsers(1)
         assertThat(favoriteUsers.size, equalTo(1))
         assertThat(favoriteUsers[0].user.profilePic, equalTo(image2))

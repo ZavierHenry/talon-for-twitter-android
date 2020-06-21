@@ -11,15 +11,7 @@ data class Draft(
 
 
 @Dao
-abstract class DraftDao {
-    @Insert
-    abstract fun insertDraft(draft: Draft) : Long?
-
-    @Update
-    abstract fun updateDraft(draft: Draft)
-
-    @Delete
-    abstract fun deleteDraft(draft: Draft)
+abstract class DraftDao : BaseDao<Draft>() {
 
     @Query("DELETE FROM drafts WHERE account = :account")
     abstract fun deleteAllDrafts(account: Int)

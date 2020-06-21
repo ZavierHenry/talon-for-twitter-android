@@ -28,7 +28,7 @@ class RoomDatabaseMentionTest {
     @Throws(Exception::class)
     fun testInsertMention() {
         val mention = MockMention(1)
-        val id = mentionDao.insertMention(mention.mention)
+        val id = mentionDao.insert(mention.mention)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }

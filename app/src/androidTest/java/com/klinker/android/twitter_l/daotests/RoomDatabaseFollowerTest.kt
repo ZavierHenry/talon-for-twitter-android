@@ -5,6 +5,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.Follower
 import com.klinker.android.twitter_l.data.roomdb.FollowerDao
 import com.klinker.android.twitter_l.data.roomdb.User
+import com.klinker.android.twitter_l.mockentities.MockFollower
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -38,7 +39,7 @@ class RoomDatabaseFollowerTest {
     @Throws(Exception::class)
     fun insertFollower() {
         val follower = makeExampleFollower(1)
-        val id = followerDao.insertFollower(follower)
+        val id = followerDao.insert(follower)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
     }
@@ -47,11 +48,11 @@ class RoomDatabaseFollowerTest {
     @Test
     @Throws(Exception::class)
     fun deleteFollower() {
-        val follower = makeExampleFollower(1)
-        val id = followerDao.insertFollower(follower)
+        val follower = MockFollower(1)
+        val id = database.insertIntoDatabase(follower)
         assertThat(id, notNullValue())
         assertThat(database.size, equalTo(1))
-        followerDao.deleteFollower(follower.copy(id = id))
+        followerDao.delete(follower.follower.copy(id = id))
         assertThat(database.size, equalTo(0))
     }
 
@@ -62,7 +63,7 @@ class RoomDatabaseFollowerTest {
             makeExampleFollower(if (it > 5) 2 else 1,"chrislhayes${it}", "Chris Hayes $it", "image $it", it.toLong())
         }
         val insertedFollowers = followers.mapNotNull {
-            follower -> followerDao.insertFollower(follower)?.let { id -> follower.copy(id = id) }
+            follower -> followerDao.insert(follower)?.let { id -> follower.copy(id = id) }
         }
         assertThat(insertedFollowers.size, equalTo(followers.size))
         val databaseFollowers = followerDao.getFollowers(2)

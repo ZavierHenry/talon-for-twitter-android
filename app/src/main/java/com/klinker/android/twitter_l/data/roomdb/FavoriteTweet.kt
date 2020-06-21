@@ -14,15 +14,7 @@ data class FavoriteTweet(
 }
 
 @Dao
-abstract class FavoriteTweetDao {
-    @Insert
-    abstract fun insertFavoriteTweet(favoriteTweet: FavoriteTweet) : Long?
-
-    @Update
-    abstract fun updateFavoriteTweet(favoriteTweet: FavoriteTweet)
-
-    @Delete
-    abstract fun deleteFavoriteTweet(favoriteTweet: FavoriteTweet)
+abstract class FavoriteTweetDao : BaseDao<FavoriteTweet>() {
 
     @Query("SELECT * FROM favorite_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getFavoriteTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<FavoriteTweet>

@@ -1,7 +1,11 @@
 package com.klinker.android.twitter_l.daotests
 
+import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.SavedTweetDao
+import com.klinker.android.twitter_l.mockentities.MockSavedTweet
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -24,7 +28,10 @@ class RoomDatabaseSavedTweetTest {
     @Test
     @Throws(Exception::class)
     fun testInsertSavedTweet() {
-
+        val savedTweet = MockSavedTweet(1)
+        val id = savedTweetDao.insert(savedTweet.savedTweet)
+        assertThat(id, notNullValue())
+        assertThat(database.size, equalTo(1))
     }
 
 }

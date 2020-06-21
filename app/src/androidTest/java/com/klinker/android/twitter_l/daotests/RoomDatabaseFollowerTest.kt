@@ -6,6 +6,7 @@ import com.klinker.android.twitter_l.data.roomdb.Follower
 import com.klinker.android.twitter_l.data.roomdb.FollowerDao
 import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.mockentities.MockFollower
+import com.klinker.android.twitter_l.mockentities.MockUtilities
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -59,12 +60,15 @@ class RoomDatabaseFollowerTest {
     @Test
     @Throws(Exception::class)
     fun getFollowersFilterAccount() {
+
         val followers = List(10) {
-            makeExampleFollower(if (it > 5) 2 else 1,"chrislhayes${it}", "Chris Hayes $it", "image $it", it.toLong())
+            MockFollower(if (it > 5) 2 else 1, MockUtilities.makeMockUser(screenName = "chrislhayes$it", name = "Chris Hayes $it", userId = it.toLong()))
         }
-        val insertedFollowers = followers.mapNotNull {
-            follower -> followerDao.insert(follower)?.let { id -> follower.copy(id = id) }
+
+        val insertedFollowers = followers.mapNotNull { follower ->
+            database.insertIntoDatabase(follower)?.let { id -> follower.follower.copy(id = id) }
         }
+
         assertThat(insertedFollowers.size, equalTo(followers.size))
         val databaseFollowers = followerDao.getFollowers(2)
         assertThat(

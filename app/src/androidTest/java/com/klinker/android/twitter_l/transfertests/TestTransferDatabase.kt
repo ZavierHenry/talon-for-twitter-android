@@ -62,14 +62,11 @@ class TestTransferDatabase(private val sourceTableName: String, private val dest
 
         val baseStatement = object : Statement() {
             override fun evaluate() {
-
                 try {
-
                     val tempFile = temporaryFolder.newFile("test_database.db")
                     sourceDatabase = SQLiteDatabase.openOrCreateDatabase(tempFile, null).apply {
                         execSQL(createTableSql)
                     }
-
                     base?.evaluate()
                 } finally {
                     destDatabase?.close()

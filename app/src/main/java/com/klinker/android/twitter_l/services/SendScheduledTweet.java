@@ -31,6 +31,7 @@ import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.activities.MainActivity;
 import com.klinker.android.twitter_l.activities.compose.RetryCompose;
 import com.klinker.android.twitter_l.data.ScheduledTweet;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedDataSource;
 import com.klinker.android.twitter_l.settings.AppSettings;
 import com.klinker.android.twitter_l.utils.NotificationChannelUtil;
@@ -58,7 +59,19 @@ public class SendScheduledTweet extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
 
+//        Long nextScheduledTweetTime = TalonDatabase.Companion.getInstance(context).scheduledTweetDao().getNextTime(new Date().getTime());
+
         Log.v("talon_scheduled", "scheduling next run");
+
+//        if (nextScheduledTweetTime != null) {
+//            Log.v("talon_scheduled", "scheduling tweet: " + new Date(nextScheduledTweetTime).toString());
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextScheduledTweetTime, pendingIntent);
+//            } else {
+//                alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextScheduledTweetTime, pendingIntent);
+//            }
+//        }
 
         if (tweets.size() > 0) {
             long nextTime = 0L;
@@ -86,6 +99,27 @@ public class SendScheduledTweet extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v("talon_scheduled_tweet", "started service");
+
+//        long earliestTime = new Date().getTime() - (60 * 60 * 1000);
+//        com.klinker.android.twitter_l.data.roomdb.ScheduledTweet scheduledTweet = TalonDatabase.Companion.getInstance(context).scheduledTweetDao().getNextScheduledTweet(earliestTime);
+//        if (scheduledTweet != null) {
+//            final AppSettings settings = AppSettings.getInstance(context);
+//
+//            new Thread(() -> {
+//                sendingNotification(context);
+//                boolean sent = sendTweet(settings, context, tweet.text, settings.currentAccount);
+//
+//                if (sent) {
+//                    finishedTweetingNotification(context);
+//                    QueuedDataSource.getInstance(context).deleteScheduledTweet(tweet.alarmId);
+//                } else {
+//                    makeFailedNotification(context, tweet.text, settings);
+//                }
+//            }).start();
+//        }
+//
+//        scheduleNextRun(context);
+
 
         ArrayList<ScheduledTweet> tweets = QueuedDataSource.getInstance(context).getScheduledTweets();
         if (tweets.size() != 0) {

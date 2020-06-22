@@ -30,8 +30,8 @@ class RoomDatabaseScheduledTweetTest {
     fun testInsertScheduledTweet() {
         val scheduledTweet = MockScheduledTweet(1)
         val id = scheduledTweetDao.insert(scheduledTweet.scheduledTweet)
-        assertThat(id, notNullValue())
-        assertThat(database.size, equalTo(1))
+        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 
 }

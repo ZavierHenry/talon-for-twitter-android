@@ -41,8 +41,8 @@ class RoomDatabaseFollowerTest {
     fun insertFollower() {
         val follower = makeExampleFollower(1)
         val id = followerDao.insert(follower)
-        assertThat(id, notNullValue())
-        assertThat(database.size, equalTo(1))
+        assertThat("Did not get a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 
 
@@ -51,10 +51,10 @@ class RoomDatabaseFollowerTest {
     fun deleteFollower() {
         val follower = MockFollower(1)
         val id = database.insertIntoDatabase(follower)
-        assertThat(id, notNullValue())
-        assertThat(database.size, equalTo(1))
+        assertThat("Problem setting up entity in database", id, notNullValue())
+        assertThat("Initial entity did not save into database", database.size, equalTo(1))
         followerDao.delete(follower.follower.copy(id = id))
-        assertThat(database.size, equalTo(0))
+        assertThat("Entity did not delete from the database", database.size, equalTo(0))
     }
 
     @Test
@@ -69,9 +69,10 @@ class RoomDatabaseFollowerTest {
             database.insertIntoDatabase(follower)?.let { id -> follower.follower.copy(id = id) }
         }
 
-        assertThat(insertedFollowers.size, equalTo(followers.size))
+        assertThat("Problem with setting up initial entities into database", insertedFollowers.size, equalTo(followers.size))
         val databaseFollowers = followerDao.getFollowers(2)
         assertThat(
+                "Did not properly filter results by account",
                 databaseFollowers.map { it.id }.sortedBy { it },
                 contains(*insertedFollowers.filter { it.account == 2}.map { it.id }.sortedBy { it }.toTypedArray())
         )

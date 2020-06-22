@@ -5,6 +5,8 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.FavoriteUser
 import com.klinker.android.twitter_l.data.roomdb.FavoriteUserDao
 import com.klinker.android.twitter_l.data.roomdb.User
+import com.klinker.android.twitter_l.mockentities.MockFavoriteUser
+import com.klinker.android.twitter_l.mockentities.MockUtilities
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,8 +45,8 @@ class RoomDatabaseFavoriteUserTest {
     fun insertFavoriteUser() {
         val favoriteUser = makeMockFavoriteUser(account = 1)
         val id = favoriteUserDao.insert(favoriteUser)
-        assertThat(id, notNullValue())
-        assertThat(database.size, equalTo(1))
+        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 
     @Test
@@ -53,12 +55,20 @@ class RoomDatabaseFavoriteUserTest {
         val image1 = "Image_1.jpg"
         val image2 = "Image_2.jpg"
 
-        val favoriteUser = makeMockFavoriteUser(account = 1, profilePic = image1)
-        val id = favoriteUserDao.insert(favoriteUser)
-        assertThat(id, notNullValue())
-        favoriteUserDao.update(favoriteUser.copy(id = id, user = favoriteUser.user.copy(profilePic = image2)))
-        val favoriteUsers = favoriteUserDao.getFavoriteUsers(1)
-        assertThat(favoriteUsers.size, equalTo(1))
-        assertThat(favoriteUsers[0].user.profilePic, equalTo(image2))
+        val favoriteUser = MockFavoriteUser(1, user = MockUtilities.makeMockUser(profilePic = image1))
+        val id = database.insertIntoDatabase(favoriteUser)
+        assertThat("Problem setting up initial entity in database", id, notNullValue())
+
+        val newFavoriteUser = MockFavoriteUser(1, user = MockUtilities.makeMockUser(profilePic = image2), id = id)
+        favoriteUserDao.update(newFavoriteUser.favoriteUser)
+        assertThat("Update somehow changes the number of entities in the database", database.size, equalTo(1))
+
+        val profilePic = database.queryFromDatabase("SELECT profile_pic FROM favorite_users WHERE id = ?", arrayOf(id as Any)).use { cursor ->
+            cursor.moveToFirst()
+            cursor.getString(0)
+        }
+
+        assertThat("Profile pic did not update properly", profilePic, equalTo(image2))
+
     }
 }

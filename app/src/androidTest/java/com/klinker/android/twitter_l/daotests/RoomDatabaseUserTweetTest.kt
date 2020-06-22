@@ -29,8 +29,8 @@ class RoomDatabaseUserTweetTest {
     fun testInsertUserTweet() {
         val userTweet = MockUserTweet(1)
         val id = userTweetDao.insert(userTweet.userTweet)
-        assertThat(id, notNullValue())
-        assertThat(database.size, equalTo(1))
+        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 
 }

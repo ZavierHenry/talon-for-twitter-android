@@ -19,7 +19,6 @@ class RoomDatabaseQueuedTweetTest {
 
     @get:Rule val database = TestDatabase("queued_tweets")
 
-
     @Before
     fun getQueuedTweetDao() {
         queuedTweetDao = database.database.queuedTweetDao()
@@ -30,9 +29,8 @@ class RoomDatabaseQueuedTweetTest {
     fun testInsertQueuedTweet() {
         val queuedTweet = MockQueuedTweet(1)
         val id = queuedTweetDao.insert(queuedTweet.queuedTweet)
-        assertThat(id, notNullValue())
-        assertThat(database.size, equalTo(1))
+        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
-
 
 }

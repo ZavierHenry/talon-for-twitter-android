@@ -55,7 +55,7 @@ class DraftTransferDatabaseTest {
 
         database.buildDestinationDatabase()
 
-        assertThat(database.destSize, equalTo(1))
+        assertThat("Entity did not transfer into the new database", database.destSize, equalTo(1))
         val draft = database.queryFromTalonDatabase("SELECT * FROM drafts LIMIT 1")!!.use { cursor ->
             cursor.moveToFirst()
             MockDraft(cursor)

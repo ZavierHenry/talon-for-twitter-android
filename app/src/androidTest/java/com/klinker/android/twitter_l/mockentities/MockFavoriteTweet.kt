@@ -7,6 +7,8 @@ import com.klinker.android.twitter_l.data.roomdb.Tweet
 
 data class MockFavoriteTweet(val favoriteTweet: FavoriteTweet) : MockEntity {
 
+    override val id get() = favoriteTweet.id
+
     constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), isUnread: Boolean = false, id: Long? = null) :
             this(FavoriteTweet(tweet, account, isUnread, id))
 

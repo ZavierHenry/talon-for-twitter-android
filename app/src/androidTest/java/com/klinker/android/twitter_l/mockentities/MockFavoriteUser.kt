@@ -7,6 +7,8 @@ import com.klinker.android.twitter_l.data.roomdb.User
 
 data class MockFavoriteUser(val favoriteUser: FavoriteUser) : MockEntity {
 
+    override val id get() = favoriteUser.id
+
     constructor(account: Int, user: User = MockUtilities.makeMockUser(), id: Long? = null) : this(FavoriteUser(user, account, id))
 
     constructor(cursor: Cursor) : this(

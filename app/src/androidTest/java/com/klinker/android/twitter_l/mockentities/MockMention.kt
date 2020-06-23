@@ -8,6 +8,9 @@ import com.klinker.android.twitter_l.data.roomdb.Tweet
 
 data class MockMention(val mention: Mention) : MockEntity {
 
+    override val id: Long?
+        get() = mention.id
+
     constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long? = null) :
             this(Mention(tweet, account, isUnread, id))
 

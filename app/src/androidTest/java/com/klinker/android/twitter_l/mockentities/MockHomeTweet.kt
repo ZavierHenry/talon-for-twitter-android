@@ -7,6 +7,8 @@ import com.klinker.android.twitter_l.data.roomdb.Tweet
 
 data class MockHomeTweet(val homeTweet: HomeTweet) : MockEntity {
 
+    override val id get() = homeTweet.id
+
     constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long? = null) :
             this(HomeTweet(tweet, account, isUnread, id))
 

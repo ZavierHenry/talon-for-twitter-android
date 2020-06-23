@@ -6,6 +6,9 @@ import com.klinker.android.twitter_l.data.roomdb.ScheduledTweet
 
 data class MockScheduledTweet(val scheduledTweet: ScheduledTweet) : MockEntity {
 
+    override val id: Long?
+        get() = scheduledTweet.id
+
     constructor(account: Int, text: String = "", time: Long = 0L, alarmId: Long = 1L, id: Long? = null) :
             this(ScheduledTweet(text, time, alarmId, account, id))
 

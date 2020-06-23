@@ -8,6 +8,8 @@ import com.klinker.android.twitter_l.data.roomdb.User
 
 data class MockDirectMessage(val directMessage: DirectMessage) : MockEntity {
 
+    override val id get() = directMessage.id
+
     constructor(
             account: Int,
             twitterId: Long = 1L,

@@ -21,6 +21,7 @@ data class Tweet(
         val retweeted: Boolean? = null,
         val source: String? = null,
         @Embedded(prefix = "retweeter_") val retweeter: User? = null,
+        @ColumnInfo(name = "is_reply") val isReply: Boolean? = null,
         @ColumnInfo(name = "gif_url") val gifUrl: String? = null,
         @ColumnInfo(name = "media_length") val mediaLength: Long? = null
 ) {
@@ -53,6 +54,7 @@ data class Tweet(
             originalStatus.isRetweetedByMe,
             HtmlCompat.fromHtml(originalStatus.source, HtmlCompat.FROM_HTML_MODE_LEGACY).toString(),
             if (status.id != originalStatus.id) User(status.user) else null,
+            originalStatus.inReplyToStatusId != -1L,
             mediaInfo.url,
             if (mediaInfo.duration == -1L) null else mediaInfo.duration
     )

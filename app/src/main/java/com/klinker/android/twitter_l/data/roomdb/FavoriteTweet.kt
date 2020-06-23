@@ -8,9 +8,10 @@ import twitter4j.Status
 data class FavoriteTweet(
         @Embedded val tweet: Tweet,
         val account: Int,
+        @ColumnInfo(name = "is_unread") val isUnread: Boolean = false,
         @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
-    constructor(status: Status, account: Int) : this(Tweet(status), account)
+    constructor(status: Status, account: Int, isUnread: Boolean = false) : this(Tweet(status), account, isUnread)
 }
 
 @Dao

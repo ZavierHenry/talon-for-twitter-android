@@ -7,12 +7,13 @@ import com.klinker.android.twitter_l.data.roomdb.Tweet
 
 data class MockFavoriteTweet(val favoriteTweet: FavoriteTweet) : MockEntity {
 
-    constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long? = null) :
-            this(FavoriteTweet(tweet, account, id))
+    constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), isUnread: Boolean = false, id: Long? = null) :
+            this(FavoriteTweet(tweet, account, isUnread, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),
             MockUtilities.cursorToTweet(cursor),
+            cursor.getInt(cursor.getColumnIndex("is_unread")) == 1,
             cursor.getLong(cursor.getColumnIndex("id"))
     )
 

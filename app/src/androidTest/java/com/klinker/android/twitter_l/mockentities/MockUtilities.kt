@@ -77,6 +77,7 @@ class MockUtilities {
             val liked = getNullableField(cursor, "${prefix}liked") { cursor.getInt(it) == 1 }
             val retweeted = getNullableField(cursor, "${prefix}retweeted") { cursor.getInt(it) == 1 }
             val source = getNullableField(cursor, "${prefix}source") { cursor.getString(it) }
+            val isReply = cursor.getInt(cursor.getColumnIndex("${prefix}is_reply"))
             val gifUrl = getNullableField(cursor, "${prefix}gif_url") { cursor.getString(it) }
             val mediaLength = getNullableField(cursor, "${prefix}media_length") { cursor.getLong(it) }
 
@@ -97,6 +98,7 @@ class MockUtilities {
                     retweeted,
                     source,
                     if (retweeter.screenName == "") null else retweeter,
+                    isReply == 1,
                     gifUrl,
                     mediaLength
             )
@@ -126,10 +128,11 @@ class MockUtilities {
                 retweeted: Boolean? = false,
                 source: String? = null,
                 retweeter: User? = null,
+                isReply: Boolean = false,
                 gifUrl: String? = null,
                 mediaLength: Long? = null
         ) : Tweet {
-            return Tweet(tweetId, author, text, time, hashtags, mentions, images, urls, likes, retweets, liked, retweeted, source, retweeter, gifUrl, mediaLength)
+            return Tweet(tweetId, author, text, time, hashtags, mentions, images, urls, likes, retweets, liked, retweeted, source, retweeter, isReply, gifUrl, mediaLength)
         }
 
     }

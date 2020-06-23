@@ -22,7 +22,7 @@ class MockEntityMatcher<T>(private val expected: T) : TypeSafeDiagnosingMatcher<
             val key = property.key
             val expected = property.value
             val actual = itemContentValues.get(key)
-            mismatchDescription?.appendText("Field: $key, Expected: $expected, Actual: $actual\n")
+            mismatchDescription?.appendText("Field: $key, Expected: $expected, Actual: ${actual}\n")
         }
 
         return difference.isEmpty()

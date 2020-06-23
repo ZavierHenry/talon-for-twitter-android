@@ -8,6 +8,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.DraftTransfer
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
 import com.klinker.android.twitter_l.mockentities.MockDraft
+import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
 import org.hamcrest.CoreMatchers.*
 import org.junit.Rule
 import org.junit.Test
@@ -61,8 +62,8 @@ class DraftTransferDatabaseTest {
             MockDraft(cursor)
         }
 
-        assertThat("Problem transferring draft account", draft.draft.account, equalTo(1))
-        assertThat("Problem transferring draft text", draft.draft.text, equalTo("Test draft"))
+        val expected = MockDraft(1, "Test draft", draft.id)
+        assertThat(expected, matchesMockEntity(draft))
 
     }
 

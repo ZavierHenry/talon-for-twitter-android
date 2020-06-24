@@ -76,6 +76,7 @@ import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.activities.GiphySearch;
 import com.klinker.android.twitter_l.data.ThemeColor;
 import com.klinker.android.twitter_l.data.roomdb.Draft;
+import com.klinker.android.twitter_l.data.roomdb.Hashtag;
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.HashtagDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.QueuedDataSource;
@@ -1621,11 +1622,15 @@ public abstract class Compose extends Activity implements
                                 @Override
                                 public void run() {
                                     ArrayList<String> tags = new ArrayList<String>();
+                                    //List<Hashtag> tags = new ArrayList<>();
                                     for (final String split : text) {
                                         if (split.contains("#")) {
                                             tags.add(split);
+                                            //tags.add(new Hashtag(split, null));
                                         }
                                     }
+
+                                    //TalonDatabase.Companion.getInstance(context).hashtagDao().insert(tags);
 
                                     HashtagDataSource source = HashtagDataSource.getInstance(context);
 

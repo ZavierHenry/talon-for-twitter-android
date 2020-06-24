@@ -31,7 +31,6 @@ class FavoriteTweetTransfer(context: Context) : TalonDatabaseCallback(context.ge
         val mediaLength = cursor.getLong(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_MEDIA_LENGTH))
 
         val contentValues = ContentValues().apply {
-            val converter = ListStringConverter()
 
             put("tweet_id", tweetId)
             put("user_screen_name", screenName)
@@ -41,21 +40,10 @@ class FavoriteTweetTransfer(context: Context) : TalonDatabaseCallback(context.ge
             put("text", text)
             put("time", time)
 
-            picUrls.split(" ").also {
-                put("images", converter.fromListString(it))
-            }
-
-            urls.split("  ").also {
-                put("urls", converter.fromListString(it))
-            }
-
-            users.split("  ").also {
-                put("mentions", converter.fromListString(it))
-            }
-
-            hashtags.split("  ").also {
-                put("hashtags", converter.fromListString(it))
-            }
+            put("images", reserializeListString(picUrls, " "))
+            put("urls", reserializeListString(urls, "  "))
+            put("mentions", reserializeListString(users, "  "))
+            put("hashtags", reserializeListString(hashtags, "  "))
 
             put("liked", true)
             put("source", source)

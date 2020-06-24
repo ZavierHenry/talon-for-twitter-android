@@ -1,9 +1,11 @@
 package com.klinker.android.twitter_l.data.roomdb.transfers
 
+import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.klinker.android.twitter_l.data.roomdb.ListStringConverter
 import java.io.File
 
 abstract class TalonDatabaseCallback(private val oldDatabaseFile: File, private val tableName: String, private val primaryKey: String? = null) : RoomDatabase.Callback() {
@@ -22,4 +24,9 @@ abstract class TalonDatabaseCallback(private val oldDatabaseFile: File, private 
             }
         }
     }
+
+    fun reserializeListString(list: String, oldDelimiter: String) : String {
+        return list.split(oldDelimiter).let { ListStringConverter().fromListString(it) }
+    }
+
 }

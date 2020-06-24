@@ -13,6 +13,7 @@ import androidx.room.TypeConverters
     FavoriteTweet::class,
     FavoriteUser::class,
     Follower::class,
+    Hashtag::class,
     HomeTweet::class,
     ListTweet::class,
     Mention::class,
@@ -28,6 +29,7 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun favoriteTweetDao(): FavoriteTweetDao
     abstract fun favoriteUserDao(): FavoriteUserDao
     abstract fun followerDao(): FollowerDao
+    abstract fun hashtagDao() : HashtagDao
     abstract fun homeTweetDao(): HomeTweetDao
     abstract fun listTweetDao(): ListTweetDao
     abstract fun mentionDao(): MentionDao

@@ -11,7 +11,7 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-class TestDatabase(val tableName: String) : TestRule {
+class TestDatabase(private val tableName: String) : TestRule {
 
     val database = with(ApplicationProvider.getApplicationContext<Context>()) {
         Room.inMemoryDatabaseBuilder(this, TalonDatabase::class.java).build()
@@ -28,9 +28,8 @@ class TestDatabase(val tableName: String) : TestRule {
         return if (id == -1L) null else id
     }
 
-    fun queryFromDatabase(query: String, args: Array<Any>? = null) : Cursor {
+    fun queryFromDatabase(query: String, args: Array<*>? = null) : Cursor {
         return database.query(query, args)
-
     }
 
     override fun apply(base: Statement?, description: Description?): Statement {

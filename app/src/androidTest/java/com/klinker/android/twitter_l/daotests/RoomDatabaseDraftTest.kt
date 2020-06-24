@@ -54,7 +54,7 @@ class RoomDatabaseDraftTest {
         assertThat(database.size, equalTo(1))
 
         draftDao.update(draft.draft.copy(id = id, text = "new draft"))
-        database.queryFromDatabase("SELECT * FROM drafts WHERE id = ?", arrayOf(id as Any)).use { cursor ->
+        database.queryFromDatabase("SELECT * FROM drafts WHERE id = ?", arrayOf(id)).use { cursor ->
             cursor.moveToFirst()
             val databaseDraft = MockDraft(cursor)
             assertThat(databaseDraft.draft.text, equalTo("new draft"))

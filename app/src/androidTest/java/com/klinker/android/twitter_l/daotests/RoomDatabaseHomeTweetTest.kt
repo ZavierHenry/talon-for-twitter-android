@@ -19,7 +19,6 @@ class RoomDatabaseHomeTweetTest {
 
     @get:Rule val database = TestDatabase("home_tweets")
 
-
     @Before
     fun getHomeTweetDao() {
         homeTweetDao = database.database.homeTweetDao()

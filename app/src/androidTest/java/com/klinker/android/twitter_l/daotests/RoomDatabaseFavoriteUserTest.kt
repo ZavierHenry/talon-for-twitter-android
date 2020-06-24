@@ -17,21 +17,7 @@ import org.junit.Rule
 @RunWith(AndroidJUnit4ClassRunner::class)
 class RoomDatabaseFavoriteUserTest {
 
-    //private lateinit var db : TalonDatabase
     private lateinit var favoriteUserDao: FavoriteUserDao
-
-    private fun makeMockFavoriteUser(
-            screenName: String = "chrislhayes",
-            name: String? = "Chris Hayes",
-            profilePic: String? = "",
-            userId: Long? = 1023123L,
-            account: Int = 1
-    ) : FavoriteUser {
-        return FavoriteUser(
-                User(screenName, name, profilePic, userId),
-                account
-        )
-    }
 
     @get:Rule val database = TestDatabase("favorite_users")
 
@@ -43,8 +29,8 @@ class RoomDatabaseFavoriteUserTest {
     @Test
     @Throws(Exception::class)
     fun insertFavoriteUser() {
-        val favoriteUser = makeMockFavoriteUser(account = 1)
-        val id = favoriteUserDao.insert(favoriteUser)
+        val favoriteUser = MockFavoriteUser(1)
+        val id = favoriteUserDao.insert(favoriteUser.favoriteUser)
         assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
@@ -63,7 +49,7 @@ class RoomDatabaseFavoriteUserTest {
         favoriteUserDao.update(newFavoriteUser.favoriteUser)
         assertThat("Update somehow changes the number of entities in the database", database.size, equalTo(1))
 
-        val profilePic = database.queryFromDatabase("SELECT profile_pic FROM favorite_users WHERE id = ?", arrayOf(id as Any)).use { cursor ->
+        val profilePic = database.queryFromDatabase("SELECT profile_pic FROM favorite_users WHERE id = ?", arrayOf(id)).use { cursor ->
             cursor.moveToFirst()
             cursor.getString(0)
         }

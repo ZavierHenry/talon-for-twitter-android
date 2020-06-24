@@ -10,6 +10,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 import com.klinker.android.twitter_l.data.roomdb.transfers.TalonDatabaseCallback
+import com.klinker.android.twitter_l.mockentities.MockEntity
+import com.klinker.android.twitter_l.mockentities.MockTransferEntity
 import org.junit.rules.TemporaryFolder
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -40,7 +42,8 @@ class TestTransferDatabase(private val sourceTableName: String, private val dest
         } ?: 0
 
 
-    fun insertIntoSQLiteDatabase(contentValues: ContentValues) : Long? {
+    fun insertIntoSQLiteDatabase(mockTransferEntity: MockTransferEntity<MockEntity>) : Long? {
+        val contentValues = mockTransferEntity.toSQLiteContentValues()
         val id = sourceDatabase?.insert(sourceTableName, null, contentValues)
         return if (id == null || id == -1L) null else id
     }
@@ -53,7 +56,7 @@ class TestTransferDatabase(private val sourceTableName: String, private val dest
         }
     }
 
-    fun queryFromTalonDatabase(query: String, args: Array<Any>? = null) : Cursor? {
+    fun queryFromTalonDatabase(query: String, args: Array<*>? = null) : Cursor? {
         return destDatabase?.query(query, args)
     }
 

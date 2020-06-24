@@ -8,6 +8,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.DraftTransfer
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
 import com.klinker.android.twitter_l.mockentities.MockDraft
+import com.klinker.android.twitter_l.mockentities.MockTransferDraft
 import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
 import org.hamcrest.CoreMatchers.*
 import org.junit.Rule
@@ -42,15 +43,9 @@ class DraftTransferDatabaseTest {
     @Throws(Exception::class)
     fun basicDraftTransfer() {
 
-        val sourceContentValues = ContentValues().apply {
-            put(QueuedSQLiteHelper.COLUMN_ACCOUNT, 1)
-            put(QueuedSQLiteHelper.COLUMN_TEXT, "Test draft")
-            put(QueuedSQLiteHelper.COLUMN_TIME, 1L)
-            put(QueuedSQLiteHelper.COLUMN_TYPE, QueuedSQLiteHelper.TYPE_DRAFT)
-            put(QueuedSQLiteHelper.COLUMN_ALARM_ID, 1L)
-        }
+        val mockDraft = MockTransferDraft(1, "Test draft")
 
-        val oldId = database.insertIntoSQLiteDatabase(sourceContentValues)
+        val oldId = database.insertIntoSQLiteDatabase(mockDraft)
         assertThat("Failed insertion into database", oldId, notNullValue())
         assertThat("Failed insertion into source SQLite database", database.sourceSize, equalTo(1))
 
@@ -62,9 +57,8 @@ class DraftTransferDatabaseTest {
             MockDraft(cursor)
         }
 
-        val expected = MockDraft(1, "Test draft", draft.id)
-        assertThat(expected, matchesMockEntity(draft))
-
+        val expected = mockDraft.copyId(draft.id).mockEntity
+        assertThat("Entities are different", expected, matchesMockEntity(draft))
     }
 
 

@@ -19,16 +19,6 @@ class RoomDatabaseFollowerTest {
 
     private lateinit var followerDao : FollowerDao
 
-    private fun makeExampleFollower(
-            account: Int,
-            screenName: String = "chrislhayes",
-            name: String? = "Chris Hayes",
-            profilePic: String? = "",
-            userId: Long? = 1023123L
-    ) : Follower {
-        return Follower(User(screenName, name, profilePic, userId), account)
-    }
-
     @get:Rule val database = TestDatabase("followers")
 
     @Before
@@ -39,8 +29,8 @@ class RoomDatabaseFollowerTest {
     @Test
     @Throws(Exception::class)
     fun insertFollower() {
-        val follower = makeExampleFollower(1)
-        val id = followerDao.insert(follower)
+        val follower = MockFollower(1)
+        val id = followerDao.insert(follower.follower)
         assertThat("Did not get a valid id. Most likely a problem inserting entity into database", id, notNullValue())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }

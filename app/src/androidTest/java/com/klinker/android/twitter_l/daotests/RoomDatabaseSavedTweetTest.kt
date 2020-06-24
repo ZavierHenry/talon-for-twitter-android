@@ -19,7 +19,6 @@ class RoomDatabaseSavedTweetTest {
 
     @get:Rule val database = TestDatabase("saved_tweets")
 
-
     @Before
     fun getSavedTweetDao() {
         savedTweetDao = database.database.savedTweetDao()

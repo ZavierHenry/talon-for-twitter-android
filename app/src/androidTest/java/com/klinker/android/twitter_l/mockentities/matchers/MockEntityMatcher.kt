@@ -18,11 +18,11 @@ class MockEntityMatcher<T>(private val expected: T) : TypeSafeDiagnosingMatcher<
 
         val difference = expectedContentValues.valueSet().subtract(itemContentValues.valueSet())
 
-        for (property in difference) {
-            val key = property.key
-            val expected = property.value
-            val actual = itemContentValues.get(key)
-            mismatchDescription?.appendText("Field: $key, Expected: $expected, Actual: ${actual}\n")
+        for (field in difference) {
+            val fieldKey = field.key
+            val expectedField = field.value
+            val actualField = itemContentValues.get(fieldKey)
+            mismatchDescription?.appendText("Field: $fieldKey, Expected: $expectedField, Actual: ${actualField}\n")
         }
 
         return difference.isEmpty()

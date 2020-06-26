@@ -1,10 +1,14 @@
 package com.klinker.android.twitter_l.mockentities
 
 import android.content.ContentValues
+import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.data.sq_lite.FollowersSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockUtilities.Companion.makeMockUser
 
 data class MockTransferFollower(override val mockEntity: MockFollower) : MockTransferEntity<MockFollower> {
     private val follower = mockEntity.follower
+
+    constructor(account: Int, user: User = makeMockUser(), id: Long = 0) : this(MockFollower(account, user, id))
 
     override fun copyId(id: Long): MockTransferEntity<MockFollower> {
         return this.copy(mockEntity = mockEntity.copy( follower = follower.copy(id = id)))

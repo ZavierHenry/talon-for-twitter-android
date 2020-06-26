@@ -7,6 +7,7 @@ import com.klinker.android.twitter_l.data.roomdb.FollowerDao
 import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.mockentities.MockFollower
 import com.klinker.android.twitter_l.mockentities.MockUtilities
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -29,9 +30,8 @@ class RoomDatabaseFollowerTest {
     @Test
     @Throws(Exception::class)
     fun insertFollower() {
-        val follower = MockFollower(1)
-        val id = followerDao.insert(follower.follower)
-        assertThat("Did not get a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        val follower = followerDao.insert(MockFollower(1).follower)
+        assertThat("Invalid id", MockFollower(follower), hasValidId())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 
@@ -41,7 +41,7 @@ class RoomDatabaseFollowerTest {
     fun deleteFollower() {
         val follower = MockFollower(1)
         val id = database.insertIntoDatabase(follower)
-        assertThat("Problem setting up entity in database", id, notNullValue())
+        assertThat("Problem setting up entity in database", id, not(equalTo(-1L)))
         assertThat("Initial entity did not save into database", database.size, equalTo(1))
         followerDao.delete(follower.follower.copy(id = id))
         assertThat("Entity did not delete from the database", database.size, equalTo(0))
@@ -55,11 +55,13 @@ class RoomDatabaseFollowerTest {
             MockFollower(if (it > 5) 2 else 1, MockUtilities.makeMockUser(screenName = "chrislhayes$it", name = "Chris Hayes $it", userId = it.toLong()))
         }
 
-        val insertedFollowers = followers.mapNotNull { follower ->
-            database.insertIntoDatabase(follower)?.let { id -> follower.follower.copy(id = id) }
+        val insertedFollowers = followers.map { follower ->
+            database.insertIntoDatabase(follower).let { id -> follower.follower.copy(id = id) }
         }
 
-        assertThat("Problem with setting up initial entities into database", insertedFollowers.size, equalTo(followers.size))
+        assertThat("Problem with setting up initial entities into database", database.size, equalTo(insertedFollowers.size))
+        assertThat(insertedFollowers.map { it.id }, not(hasItem(-1L)))
+
         val databaseFollowers = followerDao.getFollowers(2)
         assertThat(
                 "Did not properly filter results by account",

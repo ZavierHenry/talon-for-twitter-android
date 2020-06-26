@@ -3,7 +3,6 @@ package com.klinker.android.twitter_l.mockentities.matchers
 import com.klinker.android.twitter_l.mockentities.MockEntity
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeDiagnosingMatcher
-import org.hamcrest.TypeSafeMatcher
 
 class MockEntityMatcher<T>(private val expected: T) : TypeSafeDiagnosingMatcher<T>() where T : MockEntity {
 

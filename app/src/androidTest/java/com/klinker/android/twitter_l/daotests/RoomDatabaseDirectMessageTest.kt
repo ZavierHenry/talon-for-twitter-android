@@ -4,8 +4,8 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.mockentities.MockDirectMessage
 import com.klinker.android.twitter_l.data.roomdb.DirectMessageDao
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.notNullValue
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
+import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,8 +27,8 @@ class RoomDatabaseDirectMessageTest {
     @Throws(Exception::class)
     fun testInsertDirectMessage() {
         val directMessage = MockDirectMessage(1)
-        val id = directMessageDao.insert(directMessage.directMessage)
-        assertThat(id, notNullValue())
+        val insertedEntity = directMessageDao.insert(directMessage.directMessage)
+        assertThat(MockDirectMessage(insertedEntity), hasValidId())
         assertThat(database.size, equalTo(1))
     }
 
@@ -37,7 +37,7 @@ class RoomDatabaseDirectMessageTest {
     fun testDeleteDirectMessage() {
         val directMessage = MockDirectMessage(1)
         val id = database.insertIntoDatabase(directMessage)
-        assertThat(id, notNullValue())
+        assertThat(id, not(equalTo(-1L)))
         assertThat(database.size, equalTo(1))
 
         directMessageDao.delete(directMessage.directMessage.copy(id = id))

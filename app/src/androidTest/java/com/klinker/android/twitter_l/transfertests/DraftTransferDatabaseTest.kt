@@ -46,7 +46,7 @@ class DraftTransferDatabaseTest {
         val mockDraft = MockTransferDraft(1, "Test draft")
 
         val oldId = database.insertIntoSQLiteDatabase(mockDraft)
-        assertThat("Failed insertion into database", oldId, notNullValue())
+        assertThat("Failed insertion into database", oldId, not(equalTo(-1L)))
         assertThat("Failed insertion into source SQLite database", database.sourceSize, equalTo(1))
 
         database.buildDestinationDatabase()

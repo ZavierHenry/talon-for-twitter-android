@@ -4,8 +4,9 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.mockentities.MockFavoriteTweet
 import com.klinker.android.twitter_l.data.roomdb.FavoriteTweetDao
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.notNullValue
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasInvalidId
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
+import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,9 +28,23 @@ class RoomDatabaseFavoriteTweetTest {
     @Test
     @Throws(Exception::class)
     fun testInsertFavoriteTweet() {
+        val favoriteTweet = favoriteTweetDao.insert(MockFavoriteTweet(1).favoriteTweet)
+        assertThat(MockFavoriteTweet(favoriteTweet), hasValidId())
+        assertThat(database.size, equalTo(1))
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testInsertFavoriteTweet_DuplicateId() {
         val favoriteTweet = MockFavoriteTweet(1)
-        val id = favoriteTweetDao.insert(favoriteTweet.favoriteTweet)
-        assertThat(id, notNullValue())
+        val id = database.insertIntoDatabase(favoriteTweet)
+        assertThat(database.size, equalTo(1))
+        assertThat(id, not(equalTo(-1L)))
+
+        val duplicateFavoriteTweet = favoriteTweet.favoriteTweet.copy(id = id)
+        val duplicateInsertedTweet = favoriteTweetDao.insert(duplicateFavoriteTweet)
+        assertThat(MockFavoriteTweet(duplicateInsertedTweet), hasInvalidId())
         assertThat(database.size, equalTo(1))
     }
 

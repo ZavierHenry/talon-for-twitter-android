@@ -7,6 +7,7 @@ import com.klinker.android.twitter_l.data.roomdb.FavoriteUserDao
 import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.mockentities.MockFavoriteUser
 import com.klinker.android.twitter_l.mockentities.MockUtilities
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,9 +30,8 @@ class RoomDatabaseFavoriteUserTest {
     @Test
     @Throws(Exception::class)
     fun insertFavoriteUser() {
-        val favoriteUser = MockFavoriteUser(1)
-        val id = favoriteUserDao.insert(favoriteUser.favoriteUser)
-        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        val favoriteUser = favoriteUserDao.insert(MockFavoriteUser(1).favoriteUser)
+        assertThat("Invalid id", MockFavoriteUser(favoriteUser), hasValidId())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 
@@ -43,7 +43,7 @@ class RoomDatabaseFavoriteUserTest {
 
         val favoriteUser = MockFavoriteUser(1, user = MockUtilities.makeMockUser(profilePic = image1))
         val id = database.insertIntoDatabase(favoriteUser)
-        assertThat("Problem setting up initial entity in database", id, notNullValue())
+        assertThat("Problem setting up initial entity in database", id, not(equalTo(-1L)))
 
         val newFavoriteUser = MockFavoriteUser(1, user = MockUtilities.makeMockUser(profilePic = image2), id = id)
         favoriteUserDao.update(newFavoriteUser.favoriteUser)

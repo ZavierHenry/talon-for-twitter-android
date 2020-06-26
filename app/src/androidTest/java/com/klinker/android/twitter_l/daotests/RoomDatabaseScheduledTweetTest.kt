@@ -5,6 +5,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.ScheduledTweetDao
 import com.klinker.android.twitter_l.mockentities.MockSavedTweet
 import com.klinker.android.twitter_l.mockentities.MockScheduledTweet
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -28,9 +29,8 @@ class RoomDatabaseScheduledTweetTest {
     @Test
     @Throws(Exception::class)
     fun testInsertScheduledTweet() {
-        val scheduledTweet = MockScheduledTweet(1)
-        val id = scheduledTweetDao.insert(scheduledTweet.scheduledTweet)
-        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        val scheduledTweet = scheduledTweetDao.insert(MockScheduledTweet(1).scheduledTweet)
+        assertThat("Invalid id", MockScheduledTweet(scheduledTweet), hasValidId())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 

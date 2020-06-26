@@ -23,9 +23,8 @@ class TestDatabase(private val tableName: String) : TestRule {
                     cursor.getInt(0)
                 }
 
-    fun insertIntoDatabase(entity: MockEntity) : Long? {
-        val id = database.openHelper.writableDatabase.insert(tableName, OnConflictStrategy.IGNORE, entity.toContentValues())
-        return if (id == -1L) null else id
+    fun insertIntoDatabase(entity: MockEntity) : Long {
+        return database.openHelper.writableDatabase.insert(tableName, OnConflictStrategy.IGNORE, entity.toContentValues())
     }
 
     fun queryFromDatabase(query: String, args: Array<*>? = null) : Cursor {

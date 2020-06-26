@@ -6,10 +6,10 @@ import com.klinker.android.twitter_l.data.roomdb.QueuedTweet
 
 data class MockQueuedTweet(val queuedTweet: QueuedTweet) : MockEntity {
 
-    override val id: Long?
+    override val id: Long
         get() = queuedTweet.id
 
-    constructor(account: Int, text: String = "", id: Long? = null) : this(QueuedTweet(text, account, id))
+    constructor(account: Int, text: String = "", id: Long = 0) : this(QueuedTweet(text, account, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),

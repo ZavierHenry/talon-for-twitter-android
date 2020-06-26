@@ -5,11 +5,11 @@ import twitter4j.Status
 
 
 @Entity(tableName = "home_tweets", indices = [Index(value = ["tweet_id", "account"], unique = true)])
-data class HomeTweet(
+data class HomeTweet @JvmOverloads constructor(
         @Embedded val tweet: Tweet,
         val account: Int,
         @ColumnInfo(name = "is_unread") val isUnread: Boolean,
-        @PrimaryKey(autoGenerate = true) val id: Long? = null
+        @PrimaryKey(autoGenerate = true) val id: Long = 0
 ) {
     constructor(status: Status, account: Int, isUnread: Boolean) : this(Tweet(status), account, isUnread)
 }
@@ -17,6 +17,23 @@ data class HomeTweet(
 
 @Dao
 abstract class HomeTweetDao : BaseDao<HomeTweet>() {
+
+    fun insert(vararg entities: HomeTweet): List<HomeTweet> {
+        return insertEntities(*entities).mapIndexed { index, id ->
+            entities[index].copy(id = id)
+        }
+    }
+
+    fun insert(entities: List<HomeTweet>): List<HomeTweet> {
+        return insertEntities(entities).mapIndexed { index, id ->
+            entities[index].copy(id = id)
+        }
+    }
+
+    fun insert(entity: HomeTweet): HomeTweet {
+        val id = insertEntity(entity)
+        return entity.copy(id = id)
+    }
 
     @Query("SELECT * FROM home_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getHomeTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<HomeTweet>

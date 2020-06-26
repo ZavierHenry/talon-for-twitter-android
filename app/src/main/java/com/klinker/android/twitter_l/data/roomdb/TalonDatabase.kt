@@ -41,6 +41,7 @@ abstract class TalonDatabase : RoomDatabase() {
     companion object {
         private var database: TalonDatabase? = null
 
+        @JvmStatic
         fun getInstance(context: Context) : TalonDatabase {
             return database ?:
                 Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database")
@@ -48,6 +49,7 @@ abstract class TalonDatabase : RoomDatabase() {
                         .also { database = it }
         }
 
+        @JvmStatic
         fun closeDatabase() {
             database?.close()
             database = null

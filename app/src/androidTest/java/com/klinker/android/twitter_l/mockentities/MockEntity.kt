@@ -5,6 +5,6 @@ import android.database.Cursor
 import androidx.sqlite.db.SupportSQLiteQuery
 
 interface MockEntity {
-    val id: Long?
+    val id: Long
     fun toContentValues() : ContentValues
 }

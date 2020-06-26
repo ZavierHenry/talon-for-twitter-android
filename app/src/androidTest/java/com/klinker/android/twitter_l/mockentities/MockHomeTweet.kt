@@ -9,7 +9,7 @@ data class MockHomeTweet(val homeTweet: HomeTweet) : MockEntity {
 
     override val id get() = homeTweet.id
 
-    constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long? = null) :
+    constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long = 0) :
             this(HomeTweet(tweet, account, isUnread, id))
 
     constructor(cursor: Cursor) : this(

@@ -4,6 +4,7 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.HomeTweetDao
 import com.klinker.android.twitter_l.mockentities.MockHomeTweet
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Before
@@ -27,9 +28,8 @@ class RoomDatabaseHomeTweetTest {
     @Test
     @Throws(Exception::class)
     fun testInsertHomeTweet() {
-        val homeTweet = MockHomeTweet(1)
-        val id = homeTweetDao.insert(homeTweet.homeTweet)
-        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        val homeTweet = homeTweetDao.insert(MockHomeTweet(1).homeTweet)
+        assertThat("Invalid id", MockHomeTweet(homeTweet), hasValidId())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 

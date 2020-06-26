@@ -27,9 +27,8 @@ class RoomDatabaseMentionTest {
     @Test
     @Throws(Exception::class)
     fun testInsertMention() {
-        val mention = MockMention(1)
-        val id = mentionDao.insert(mention.mention)
-        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        val mention = mentionDao.insert(MockMention(1).mention)
+        assertThat("Invalid id", MockMention(mention), notNullValue())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 

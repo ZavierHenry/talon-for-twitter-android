@@ -4,8 +4,9 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.HashtagDao
 import com.klinker.android.twitter_l.mockentities.MockHashtag
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.notNullValue
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasInvalidId
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
+import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,10 +28,37 @@ class RoomDatabaseHashtagTest {
     @Test
     @Throws(Exception::class)
     fun testInsertHashtag() {
-        val hashtag = MockHashtag()
-        val id = hashtagDao.insert(hashtag.hashtag)
-        assertThat(id, notNullValue())
+        val hashtag = hashtagDao.insert(MockHashtag().hashtag)
+        assertThat(MockHashtag(hashtag), hasValidId())
         assertThat(database.size, equalTo(1))
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testDeleteHashtag() {
+        val hashtag = MockHashtag("#nascar")
+        val id = database.insertIntoDatabase(hashtag)
+        assertThat(id, not(equalTo(-1L)))
+        assertThat(database.size, equalTo(1))
+
+        hashtagDao.delete(hashtag.hashtag.copy(id = id))
+        assertThat(database.size, equalTo(0))
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testTagUniqueness() {
+        val hashtag = MockHashtag("#nascar")
+        val id = database.insertIntoDatabase(hashtag)
+        assertThat(id, not(equalTo(-1L)))
+        assertThat(database.size, equalTo(1))
+
+        val duplicate = hashtagDao.insert(hashtag.copy().hashtag)
+        assertThat(MockHashtag(duplicate), hasInvalidId())
+        assertThat(database.size, equalTo(1))
+
     }
 
 }

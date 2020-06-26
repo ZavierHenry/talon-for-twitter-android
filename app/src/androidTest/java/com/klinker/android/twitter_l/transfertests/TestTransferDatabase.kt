@@ -42,10 +42,10 @@ class TestTransferDatabase(private val sourceTableName: String, private val dest
         } ?: 0
 
 
-    fun insertIntoSQLiteDatabase(mockTransferEntity: MockTransferEntity<MockEntity>) : Long? {
+    fun insertIntoSQLiteDatabase(mockTransferEntity: MockTransferEntity<MockEntity>) : Long {
         val contentValues = mockTransferEntity.toSQLiteContentValues()
         val id = sourceDatabase?.insert(sourceTableName, null, contentValues)
-        return if (id == null || id == -1L) null else id
+        return id ?: -1
     }
 
     fun buildDestinationDatabase() {

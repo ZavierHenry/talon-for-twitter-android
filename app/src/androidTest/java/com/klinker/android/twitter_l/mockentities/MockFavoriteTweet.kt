@@ -9,7 +9,7 @@ data class MockFavoriteTweet(val favoriteTweet: FavoriteTweet) : MockEntity {
 
     override val id get() = favoriteTweet.id
 
-    constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), isUnread: Boolean = false, id: Long? = null) :
+    constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), isUnread: Boolean = false, id: Long = 0) :
             this(FavoriteTweet(tweet, account, isUnread, id))
 
     constructor(cursor: Cursor) : this(
@@ -24,6 +24,7 @@ data class MockFavoriteTweet(val favoriteTweet: FavoriteTweet) : MockEntity {
         return ContentValues().apply {
             putAll(tweet)
             put("account", favoriteTweet.account)
+            put("is_unread", favoriteTweet.isUnread)
         }
     }
 

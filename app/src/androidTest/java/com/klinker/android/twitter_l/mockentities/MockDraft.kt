@@ -9,7 +9,7 @@ data class MockDraft(val draft: Draft) : MockEntity {
 
     override val id get() = draft.id
 
-    constructor(account: Int, text: String = "", id: Long? = null) : this(Draft(text, account, id))
+    constructor(account: Int, text: String = "", id: Long = 0) : this(Draft(text, account, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),

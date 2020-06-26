@@ -17,7 +17,7 @@ data class MockDirectMessage(val directMessage: DirectMessage) : MockEntity {
             time: Long = 0L,
             sender: User = makeMockUser("chrislhayes", "Chris Hayes", "Sender.jpg", 23243L),
             recipient: User = makeMockUser("parkermolloy", "Parker Molloy", "Recipient.jpg", 28393L),
-            id: Long? = null
+            id: Long = 0
     ) : this(DirectMessage(twitterId, text, time, sender, recipient, account, id))
 
     constructor(cursor: Cursor) : this(

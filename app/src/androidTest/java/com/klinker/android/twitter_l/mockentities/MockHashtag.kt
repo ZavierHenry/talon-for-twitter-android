@@ -5,10 +5,10 @@ import android.database.Cursor
 import com.klinker.android.twitter_l.data.roomdb.Hashtag
 
 data class MockHashtag(val hashtag: Hashtag) : MockEntity {
-    override val id: Long?
+    override val id: Long
         get() = hashtag.id
 
-    constructor(tag: String = "#tag", id: Long? = null) : this(Hashtag(tag, id))
+    constructor(tag: String = "#tag", id: Long = 0) : this(Hashtag(tag, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getString(cursor.getColumnIndex("tag")),

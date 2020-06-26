@@ -4,6 +4,7 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.QueuedTweetDao
 import com.klinker.android.twitter_l.mockentities.MockQueuedTweet
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Before
@@ -27,9 +28,8 @@ class RoomDatabaseQueuedTweetTest {
     @Test
     @Throws(Exception::class)
     fun testInsertQueuedTweet() {
-        val queuedTweet = MockQueuedTweet(1)
-        val id = queuedTweetDao.insert(queuedTweet.queuedTweet)
-        assertThat("Did not return a valid id. Most likely a problem inserting entity into database", id, notNullValue())
+        val queuedTweet = queuedTweetDao.insert(MockQueuedTweet(1).queuedTweet)
+        assertThat("Invalid id", MockQueuedTweet(queuedTweet), hasValidId())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 

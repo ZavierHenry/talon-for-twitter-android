@@ -1,22 +1,19 @@
 package com.klinker.android.twitter_l.data.roomdb
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 
 abstract class BaseDao<T> {
 
-    @Insert
-    abstract fun insert(entity: T) : Long?
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertEntity(entity: T) : Long
 
-    @Insert
-    abstract fun insert(vararg entities: T): List<Long?>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertEntities(vararg entities: T): List<Long>
 
-    @Insert
-    abstract fun insert(entities: List<T>) : List<Long>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertEntities(entities: List<T>) : List<Long>
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     abstract fun update(entity: T)
 
     @Delete

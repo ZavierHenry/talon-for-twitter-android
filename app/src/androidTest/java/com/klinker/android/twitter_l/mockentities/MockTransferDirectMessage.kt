@@ -17,14 +17,14 @@ data class MockTransferDirectMessage(override val mockEntity: MockDirectMessage)
             time: Long = 0L,
             sender: User = makeMockUser("chrislhayes", "Chris Hayes", "Sender.jpg", 1L),
             recipient: User = makeMockUser("parkermolloy", "Parker Molloy", "Recipient.jpg", 2L),
-            id: Long? = null
+            id: Long = 0
     ) : this(MockDirectMessage(account, twitterId, text, time, sender, recipient, id))
 
-    override fun copyId(id: Long?): MockTransferEntity<MockDirectMessage> {
+    override fun copyId(id: Long): MockTransferEntity<MockDirectMessage> {
         return this.copy(mockEntity = mockEntity.copy(directMessage = directMessage.copy(id = id)))
     }
 
-    override fun toSQLiteContentValues(id: Long?): ContentValues {
+    override fun toSQLiteContentValues(id: Long): ContentValues {
         val converter = ListStringConverter()
 
         return ContentValues().apply {
@@ -42,7 +42,7 @@ data class MockTransferDirectMessage(override val mockEntity: MockDirectMessage)
             //put(DMSQLiteHelper.COLUMN_EXTRA_THREE, directMessage.gif url)
             //put in media
 
-            if (id != null) {
+            if (id != -1L) {
                 put(DMSQLiteHelper.COLUMN_ID, id)
             }
         }

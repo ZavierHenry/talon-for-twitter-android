@@ -9,7 +9,7 @@ data class MockFollower(val follower: Follower) : MockEntity {
 
     override val id get() = follower.id
 
-   constructor(account: Int, user: User = MockUtilities.makeMockUser(), id: Long? = null) :
+   constructor(account: Int, user: User = MockUtilities.makeMockUser(), id: Long = 0) :
            this(Follower(user, account, id))
 
     constructor(cursor: Cursor) : this(

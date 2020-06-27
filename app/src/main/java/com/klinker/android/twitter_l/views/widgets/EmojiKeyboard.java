@@ -41,12 +41,15 @@ import com.klinker.android.twitter_l.adapters.emoji.PeopleEmojiAdapter;
 import com.klinker.android.twitter_l.adapters.emoji.RecentEmojiAdapter;
 import com.klinker.android.twitter_l.adapters.emoji.ThingsEmojiAdapter;
 import com.klinker.android.twitter_l.adapters.emoji.TransEmojiAdapter;
+import com.klinker.android.twitter_l.data.roomdb.Emoji;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.EmojiDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.Recent;
 import com.klinker.android.twitter_l.utils.EmojiUtils;
 import com.klinker.android.twitter_l.views.widgets.text.FontPrefEditText;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EmojiKeyboard extends LinearLayout {
 
@@ -59,6 +62,8 @@ public class EmojiKeyboard extends LinearLayout {
 
     private static EmojiDataSource dataSource;
     private static ArrayList<Recent> recents;
+
+    private List<Emoji> emojis;
 
     public EmojiKeyboard(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -81,6 +86,7 @@ public class EmojiKeyboard extends LinearLayout {
             dataSource = new EmojiDataSource(getContext());
             dataSource.open();
             recents = (ArrayList<Recent>) dataSource.getAllRecents();
+            emojis = TalonDatabase.getInstance(getContext()).emojiDao().getAllEmojis();
 
             emojiPager.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, keyboardHeight));
 
@@ -170,7 +176,10 @@ public class EmojiKeyboard extends LinearLayout {
     public void removeRecent(int position) {
         try {
             dataSource.deleteRecent(recents.get(position).id);
+            //Emoji emoji = emojis.get(position);
+            //TalonDatabase.getInstance(getContext()).emojiDao().delete(emoji);
             recents.remove(position);
+            //emojis.remove(position);
             emojiPagerAdapter.notifyDataSetChanged();
         } catch (Exception e) {
 

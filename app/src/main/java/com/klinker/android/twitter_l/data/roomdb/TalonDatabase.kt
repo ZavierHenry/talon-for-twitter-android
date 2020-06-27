@@ -10,6 +10,7 @@ import androidx.room.TypeConverters
 @Database(entities = [
     DirectMessage::class,
     Draft::class,
+    Emoji::class,
     FavoriteTweet::class,
     FavoriteUser::class,
     Follower::class,
@@ -26,6 +27,7 @@ abstract class TalonDatabase : RoomDatabase() {
 
     abstract fun directMessageDao(): DirectMessageDao
     abstract fun draftDao(): DraftDao
+    abstract fun emojiDao(): EmojiDao
     abstract fun favoriteTweetDao(): FavoriteTweetDao
     abstract fun favoriteUserDao(): FavoriteUserDao
     abstract fun followerDao(): FollowerDao

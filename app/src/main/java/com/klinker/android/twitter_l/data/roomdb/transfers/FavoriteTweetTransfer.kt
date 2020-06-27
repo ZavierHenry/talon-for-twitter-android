@@ -48,8 +48,13 @@ class FavoriteTweetTransfer(context: Context) : TalonDatabaseCallback(context.ge
             put("liked", true)
             put("source", source)
             put("is_reply", conversation == 1)
-            put("gif_url", gifUrl)
-            put("media_length", mediaLength)
+
+            if (!gifUrl.isNullOrBlank()) {
+                put("gif_url", gifUrl)
+            }
+
+
+            put("media_length", if (mediaLength != -1L) mediaLength else null)
 
             if (!retweeter.isNullOrBlank()) {
                 put("retweeter_screen_name", retweeter)

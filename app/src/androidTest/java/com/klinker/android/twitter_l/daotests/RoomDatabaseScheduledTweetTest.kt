@@ -5,6 +5,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.ScheduledTweetDao
 import com.klinker.android.twitter_l.mockentities.MockSavedTweet
 import com.klinker.android.twitter_l.mockentities.MockScheduledTweet
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasInvalidId
 import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
@@ -89,6 +90,39 @@ class RoomDatabaseScheduledTweetTest {
         assertThat("Initial setup entities did not insert into database properly", database.size, equalTo(scheduledTweets.size))
         val scheduledTweet = scheduledTweetDao.getNextScheduledTweet(3000L)
         assertThat("Getting next scheduled message does not return null when it should with non-empty database", scheduledTweet, nullValue())
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testAlarmIdUniqueness() {
+        val scheduledTweet = MockScheduledTweet(1, alarmId = 2L)
+        val id = database.insertIntoDatabase(scheduledTweet)
+        assertThat("Initial insertion failed", id, not(equalTo(-1L)))
+        assertThat("Entity not in database", database.size, equalTo(1))
+
+        val duplicateAlarm = MockScheduledTweet(1, alarmId = 2L)
+        val duplicateInsertedTweet = scheduledTweetDao.insert(duplicateAlarm.scheduledTweet)
+
+        assertThat("Database did not reject entity based on duplicate alarm id", MockScheduledTweet(duplicateInsertedTweet), hasInvalidId())
+        assertThat("Incorrect number of entities in database", database.size, equalTo(1))
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testAlarmIdUniqueness_differentAccount() {
+        val scheduledTweet = MockScheduledTweet(1, alarmId = 2L)
+        val id = database.insertIntoDatabase(scheduledTweet)
+        assertThat("Initial insertion failed", id, not(equalTo(-1L)))
+        assertThat("Entity not in database", database.size, equalTo(1))
+
+        val newScheduledTweet = MockScheduledTweet(2, alarmId = 2L)
+        val newInsertedTweet = scheduledTweetDao.insert(newScheduledTweet.scheduledTweet)
+
+        assertThat("Database did not reject entity based on duplicate alarm id", MockScheduledTweet(newInsertedTweet), hasInvalidId())
+        assertThat("Incorrect number of entities in database", database.size, equalTo(1))
+
     }
 
 

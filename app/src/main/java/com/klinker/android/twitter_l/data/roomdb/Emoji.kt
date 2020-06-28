@@ -8,7 +8,7 @@ const val maxEmojis = 60
 data class Emoji @JvmOverloads constructor(
         val text: String,
         val icon: String,
-        val count: Int = 0,
+        val count: Long = 0,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
 )
 

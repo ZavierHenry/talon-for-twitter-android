@@ -27,7 +27,7 @@ class RoomDatabaseUserTweetTest {
     @Test
     @Throws(Exception::class)
     fun testInsertUserTweet() {
-        val userTweet = userTweetDao.insert(MockUserTweet(1).userTweet)
+        val userTweet = userTweetDao.insert(MockUserTweet(1L).userTweet)
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
         assertThat(userTweet.id, not(equalTo(-1L)))
         assertThat("Invalid id", MockUserTweet(userTweet), hasValidId())

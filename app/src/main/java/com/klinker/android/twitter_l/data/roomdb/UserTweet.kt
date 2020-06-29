@@ -7,10 +7,10 @@ import twitter4j.Status
 @Entity(tableName = "user_tweets", indices = [Index(value = ["tweet_id", "user_user_id"], unique = true)])
 data class UserTweet @JvmOverloads constructor(
         @Embedded val tweet: Tweet,
-        val account: Int,
+        @ColumnInfo(name = "account_user_id") val userId: Long,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
 ) {
-    constructor(status: Status, account: Int) : this(Tweet(status), account)
+    constructor(status: Status, userId: Long) : this(Tweet(status), userId)
 }
 
 @Dao
@@ -33,10 +33,10 @@ abstract class UserTweetDao : BaseDao<UserTweet>() {
         }
     }
 
-    @Query("SELECT * FROM user_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
-    abstract fun getUserTweets(account: Int, page: Int = 1, pageSize: Int = 250) : List<UserTweet>
+    @Query("SELECT * FROM user_tweets WHERE account_user_id = :userId ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
+    abstract fun getUserTweets(userId: Long, page: Int = 1, pageSize: Int = 250) : List<UserTweet>
 
-    @Query("DELETE FROM user_tweets WHERE user_user_id = :userId and id NOT IN (SELECT id FROM user_tweets WHERE user_user_id = :userId ORDER BY id DESC LIMIT :size)")
+    @Query("DELETE FROM user_tweets WHERE account_user_id = :userId and id NOT IN (SELECT id FROM user_tweets WHERE account_user_id = :userId ORDER BY id DESC LIMIT :size)")
     abstract fun trimDatabase(userId: Long, size: Int)
 
 }

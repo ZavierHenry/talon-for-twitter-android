@@ -10,11 +10,11 @@ data class MockUserTweet(val userTweet: UserTweet) : MockEntity {
     override val id: Long
         get() = userTweet.id
 
-    constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long = 0) :
-            this(UserTweet(tweet, account, id))
+    constructor(userId: Long, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long = 0) :
+            this(UserTweet(tweet, userId, id))
 
     constructor(cursor: Cursor) : this(
-            cursor.getInt(cursor.getColumnIndex("account")),
+            cursor.getLong(cursor.getColumnIndex("account_user_id")),
             MockUtilities.cursorToTweet(cursor),
             cursor.getLong(cursor.getColumnIndex("id"))
     )
@@ -23,7 +23,7 @@ data class MockUserTweet(val userTweet: UserTweet) : MockEntity {
         val tweet = MockUtilities.tweetToContentValues(userTweet.tweet)
         return ContentValues().apply {
             putAll(tweet)
-            put("account", userTweet.account)
+            put("account_user_id", userTweet.userId)
         }
     }
 }

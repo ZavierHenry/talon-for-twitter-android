@@ -41,14 +41,26 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun userTweetDao(): UserTweetDao
 
     companion object {
-        private var database: TalonDatabase? = null
+        @Volatile private var database: TalonDatabase? = null
 
         @JvmStatic
         fun getInstance(context: Context) : TalonDatabase {
-            return database ?:
-                Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database")
-                        .build()
-                        .also { database = it }
+            val databaseInstance = database
+            if (databaseInstance != null) {
+                return databaseInstance
+            }
+
+            return synchronized(this) {
+                val otherDatabaseInstance = database
+                if (otherDatabaseInstance != null) {
+                    otherDatabaseInstance
+                } else {
+                    val newDatabase = Room.databaseBuilder(context, TalonDatabase::class.java, "talon-database")
+                            .build()
+                    database = newDatabase
+                    newDatabase
+                }
+            }
         }
 
         @JvmStatic

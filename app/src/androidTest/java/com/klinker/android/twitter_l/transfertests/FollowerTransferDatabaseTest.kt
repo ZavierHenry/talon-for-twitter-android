@@ -7,7 +7,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.FollowerTransfer
 import com.klinker.android.twitter_l.data.sq_lite.FollowersSQLiteHelper
 import com.klinker.android.twitter_l.mockentities.MockFollower
-import com.klinker.android.twitter_l.mockentities.MockTransferFollower
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferFollower
 import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not

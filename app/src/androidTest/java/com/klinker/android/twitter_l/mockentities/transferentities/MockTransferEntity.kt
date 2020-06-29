@@ -1,6 +1,7 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
+import com.klinker.android.twitter_l.mockentities.MockEntity
 
 interface MockTransferEntity<out T : MockEntity> {
     val mockEntity: T

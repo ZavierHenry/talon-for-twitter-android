@@ -1,6 +1,5 @@
 package com.klinker.android.twitter_l.transfertests
 
-import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -11,7 +10,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.klinker.android.twitter_l.data.roomdb.TalonDatabase
 import com.klinker.android.twitter_l.data.roomdb.transfers.TalonDatabaseCallback
 import com.klinker.android.twitter_l.mockentities.MockEntity
-import com.klinker.android.twitter_l.mockentities.MockTransferEntity
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferEntity
 import org.junit.rules.TemporaryFolder
 import org.junit.rules.TestRule
 import org.junit.runner.Description

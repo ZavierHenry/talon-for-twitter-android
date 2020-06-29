@@ -1,6 +1,5 @@
 package com.klinker.android.twitter_l.transfertests
 
-import android.content.ContentValues
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
@@ -8,7 +7,7 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.DraftTransfer
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
 import com.klinker.android.twitter_l.mockentities.MockDraft
-import com.klinker.android.twitter_l.mockentities.MockTransferDraft
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferDraft
 import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
 import org.hamcrest.CoreMatchers.*
 import org.junit.Rule

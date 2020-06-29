@@ -1,10 +1,10 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
-import com.klinker.android.twitter_l.data.roomdb.DirectMessage
 import com.klinker.android.twitter_l.data.roomdb.ListStringConverter
 import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.data.sq_lite.DMSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockDirectMessage
 import com.klinker.android.twitter_l.mockentities.MockUtilities.Companion.makeMockUser
 
 data class MockTransferDirectMessage(override val mockEntity: MockDirectMessage) : MockTransferEntity<MockDirectMessage> {

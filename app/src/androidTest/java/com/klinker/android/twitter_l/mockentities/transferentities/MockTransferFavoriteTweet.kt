@@ -1,7 +1,8 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
 import com.klinker.android.twitter_l.data.sq_lite.FavoriteTweetsSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockFavoriteTweet
 
 data class MockTransferFavoriteTweet(override val mockEntity: MockFavoriteTweet) : MockTransferEntity<MockFavoriteTweet> {
     private val favoriteTweet = mockEntity.favoriteTweet

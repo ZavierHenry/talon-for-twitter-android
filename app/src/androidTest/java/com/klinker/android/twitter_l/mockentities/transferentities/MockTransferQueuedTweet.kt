@@ -1,7 +1,8 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockQueuedTweet
 
 data class MockTransferQueuedTweet(override val mockEntity: MockQueuedTweet) : MockTransferEntity<MockQueuedTweet> {
     private val queuedTweet = mockEntity.queuedTweet

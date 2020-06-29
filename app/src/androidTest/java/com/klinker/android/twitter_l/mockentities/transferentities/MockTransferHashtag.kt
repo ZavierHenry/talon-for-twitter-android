@@ -1,7 +1,8 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
 import com.klinker.android.twitter_l.data.sq_lite.HashtagSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockHashtag
 
 
 data class MockTransferHashtag(override val mockEntity: MockHashtag) : MockTransferEntity<MockHashtag> {

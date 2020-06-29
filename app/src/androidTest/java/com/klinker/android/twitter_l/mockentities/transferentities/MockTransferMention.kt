@@ -1,10 +1,10 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
-import com.klinker.android.twitter_l.data.roomdb.ListStringConverter
-import com.klinker.android.twitter_l.data.roomdb.Mention
 import com.klinker.android.twitter_l.data.roomdb.Tweet
 import com.klinker.android.twitter_l.data.sq_lite.MentionsSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockMention
+import com.klinker.android.twitter_l.mockentities.MockUtilities
 
 data class MockTransferMention(override val mockEntity: MockMention) : MockTransferEntity<MockMention> {
 

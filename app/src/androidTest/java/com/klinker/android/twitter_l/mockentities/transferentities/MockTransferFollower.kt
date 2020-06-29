@@ -1,8 +1,9 @@
-package com.klinker.android.twitter_l.mockentities
+package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
 import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.data.sq_lite.FollowersSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockFollower
 import com.klinker.android.twitter_l.mockentities.MockUtilities.Companion.makeMockUser
 
 data class MockTransferFollower(override val mockEntity: MockFollower) : MockTransferEntity<MockFollower> {

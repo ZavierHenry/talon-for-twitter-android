@@ -6,9 +6,8 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.QueuedTweetTransfer
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
-import com.klinker.android.twitter_l.mockentities.MockDraft
 import com.klinker.android.twitter_l.mockentities.MockQueuedTweet
-import com.klinker.android.twitter_l.mockentities.MockTransferQueuedTweet
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferQueuedTweet
 import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not

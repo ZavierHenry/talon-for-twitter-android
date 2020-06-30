@@ -6,8 +6,11 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.ScheduledTweetTransfer
 import com.klinker.android.twitter_l.data.sq_lite.QueuedSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockQueuedTweet
 import com.klinker.android.twitter_l.mockentities.MockScheduledTweet
 import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferDraft
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferQueuedTweet
 import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferScheduledTweet
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
@@ -58,6 +61,25 @@ class ScheduledTweetTransferDatabaseTest {
 
         val expected = mockScheduledTweet.copyId(scheduledTweet.id).mockEntity
         assertThat("Entities are different", expected, matchesMockEntity(scheduledTweet))
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testScheduledTweetTransfer_NoTransferOtherQueuedTweetTypes() {
+        val mockDraft = MockTransferDraft(1, "Test draft")
+        val mockQueuedTweet = MockTransferQueuedTweet(1, "Test queued tweet")
+
+        val mockDraftId = database.insertIntoSQLiteDatabase(mockDraft)
+        val mockQueuedTweetId = database.insertIntoSQLiteDatabase(mockQueuedTweet)
+
+        assertThat("Failed draft insertion into database", mockDraftId, not(equalTo(-1L)))
+        assertThat("Failed queued tweet insertion into database", mockQueuedTweetId, not(equalTo(-1L)))
+
+        database.buildDestinationDatabase()
+
+        assertThat("Entities transfered into table that shouldn't have", database.destSize, equalTo(0))
+
     }
 
 }

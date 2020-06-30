@@ -26,9 +26,7 @@ data class MockTransferSavedTweet(override val mockEntity: MockSavedTweet) : Moc
             put(SavedTweetSQLiteHelper.COLUMN_SCREEN_NAME, tweet.author.screenName)
             put(SavedTweetSQLiteHelper.COLUMN_TIME, tweet.time)
 
-            tweet.retweeter?.let {
-                put(SavedTweetSQLiteHelper.COLUMN_RETWEETER, it.screenName)
-            }
+            put(SavedTweetSQLiteHelper.COLUMN_RETWEETER, tweet.retweeter?.screenName ?: "")
 
             put(SavedTweetSQLiteHelper.COLUMN_PIC_URL, tweet.images.joinToString(" "))
             put(SavedTweetSQLiteHelper.COLUMN_URL, tweet.urls.joinToString("  "))

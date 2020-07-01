@@ -2,11 +2,16 @@ package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
 import com.klinker.android.twitter_l.data.roomdb.HomeTweet
+import com.klinker.android.twitter_l.data.roomdb.Tweet
 import com.klinker.android.twitter_l.data.sq_lite.HomeSQLiteHelper
 import com.klinker.android.twitter_l.mockentities.MockHomeTweet
+import com.klinker.android.twitter_l.mockentities.MockUtilities
 
 data class MockTransferHomeTweet(override val mockEntity: MockHomeTweet) : MockTransferEntity<MockHomeTweet> {
     private val homeTweet = mockEntity.homeTweet
+
+    constructor(account: Int, isUnread: Boolean = true, isCurrentPosition: Boolean = false, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long = 0) :
+            this(MockHomeTweet(account, isUnread, isCurrentPosition, tweet, id))
 
     override fun copyId(id: Long): MockTransferEntity<MockHomeTweet> {
         return this.copy(mockEntity = mockEntity.copy(homeTweet = homeTweet.copy(id = id)))
@@ -32,8 +37,8 @@ data class MockTransferHomeTweet(override val mockEntity: MockHomeTweet) : MockT
 
             put(HomeSQLiteHelper.COLUMN_CLIENT_SOURCE, tweet.source)
             put(HomeSQLiteHelper.COLUMN_CONVERSATION, tweet.isReply)
-            put(HomeSQLiteHelper.COLUMN_ANIMATED_GIF, tweet.gifUrl)
-            put(HomeSQLiteHelper.COLUMN_MEDIA_LENGTH, tweet.mediaLength)
+            put(HomeSQLiteHelper.COLUMN_ANIMATED_GIF, tweet.gifUrl ?: "")
+            put(HomeSQLiteHelper.COLUMN_MEDIA_LENGTH, tweet.mediaLength ?: -1)
 
             put(HomeSQLiteHelper.COLUMN_CURRENT_POS, homeTweet.isCurrentPosition)
 

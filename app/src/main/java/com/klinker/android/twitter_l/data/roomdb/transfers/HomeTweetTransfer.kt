@@ -26,7 +26,7 @@ class HomeTweetTransfer(context: Context) : TalonDatabaseCallback(context.getDat
         val hashtags = cursor.getString(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_HASHTAGS))
         val mentions = cursor.getString(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_USERS))
         val gifUrl = cursor.getString(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_ANIMATED_GIF))
-        val isCurrentPosition = cursor.getInt(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_CURRENT_POS))
+        val isCurrentPosition = cursor.getString(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_CURRENT_POS))
         val source = cursor.getString(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_CLIENT_SOURCE))
         val isReply = cursor.getInt(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_CONVERSATION))
         val mediaLength = cursor.getLong(cursor.getColumnIndex(HomeSQLiteHelper.COLUMN_MEDIA_LENGTH))
@@ -55,7 +55,7 @@ class HomeTweetTransfer(context: Context) : TalonDatabaseCallback(context.getDat
                 put("gif_url", gifUrl)
             }
 
-            put("is_current_position", isCurrentPosition == 1)
+            put("is_current_position", isCurrentPosition == "1")
             put("source", source)
             put("is_reply", isReply == 1)
             put("media_length", if (mediaLength != -1L) mediaLength else null)

@@ -29,7 +29,8 @@ class MockEntityMatcher<T>(private val expected: T) : TypeSafeDiagnosingMatcher<
     }
 
     override fun describeTo(description: Description?) {
-        description?.appendText("Both entities to have the same values")
+        description?.appendText("Both entities to have the value: ")
+        description?.appendValue(expected)
     }
 
     companion object {

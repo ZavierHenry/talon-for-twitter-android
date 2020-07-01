@@ -53,7 +53,7 @@ class MockUtilities {
         }
 
         fun cursorToUser(cursor: Cursor, prefix: String = "") : User {
-            val screenName = cursor.getString(cursor.getColumnIndex("${prefix}screen_name"))
+            val screenName = cursor.getString(cursor.getColumnIndex("${prefix}screen_name")) ?: ""
             val name = getNullableField(cursor, "${prefix}name") { cursor.getString(it) }
             val profilePic = getNullableField(cursor, "${prefix}profile_pic") { cursor.getString(it) }
             val userId = getNullableField(cursor, "${prefix}user_id") { cursor.getLong(it) }
@@ -108,7 +108,7 @@ class MockUtilities {
                 screenName: String = "chrislhayes",
                 name: String? = "Chris Hayes",
                 profilePic: String? = "Image_Avatar.jpg",
-                userId: Long = 43298L
+                userId: Long? = 43298L
         ) : User {
             return User(screenName, name, profilePic, userId)
         }

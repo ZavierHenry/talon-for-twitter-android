@@ -7,6 +7,7 @@ import com.klinker.android.twitter_l.data.roomdb.FollowerDao
 import com.klinker.android.twitter_l.data.roomdb.User
 import com.klinker.android.twitter_l.mockentities.MockFollower
 import com.klinker.android.twitter_l.mockentities.MockUtilities
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasInvalidId
 import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -69,5 +70,25 @@ class RoomDatabaseFollowerTest {
                 contains(*insertedFollowers.filter { it.account == 2}.map { it.id }.sortedBy { it }.toTypedArray())
         )
     }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun testUserIdAccount_Uniqueness() {
+        val userId = 12L
+        val follower = MockFollower(1, user = MockUtilities.makeMockUser(userId = userId))
+
+        val id = database.insertIntoDatabase(follower)
+        assertThat("Problem setting up entity in database", id, not(equalTo(-1L)))
+        assertThat("Initial entity did not save into database", database.size, equalTo(1))
+
+        val duplicateFollower = follower.copy()
+        val insertedFollower = followerDao.insert(duplicateFollower.follower)
+
+        assertThat("Uniqueness constraint not enforced", MockFollower(insertedFollower), hasInvalidId())
+    }
+
+
+
 
 }

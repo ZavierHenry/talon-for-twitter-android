@@ -4,7 +4,7 @@ import androidx.room.*
 import twitter4j.User as TwitterUser
 
 
-@Entity(tableName = "followers")
+@Entity(tableName = "followers", indices = [Index(value = ["user_id", "account"], unique = true)])
 data class Follower @JvmOverloads constructor(
         @Embedded val user: User,
         val account: Int,

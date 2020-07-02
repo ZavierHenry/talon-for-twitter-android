@@ -1,11 +1,16 @@
 package com.klinker.android.twitter_l.mockentities.transferentities
 
 import android.content.ContentValues
+import com.klinker.android.twitter_l.data.roomdb.Tweet
 import com.klinker.android.twitter_l.data.sq_lite.FavoriteTweetsSQLiteHelper
 import com.klinker.android.twitter_l.mockentities.MockFavoriteTweet
+import com.klinker.android.twitter_l.mockentities.MockUtilities
 
 data class MockTransferFavoriteTweet(override val mockEntity: MockFavoriteTweet) : MockTransferEntity<MockFavoriteTweet> {
     private val favoriteTweet = mockEntity.favoriteTweet
+
+    constructor(account: Int, tweet: Tweet = MockUtilities.makeMockTweet(), isUnread: Boolean = false, id : Long = 0) :
+            this(MockFavoriteTweet(account, tweet, isUnread, id))
 
     override fun copyId(id: Long): MockTransferEntity<MockFavoriteTweet> {
         return this.copy(mockEntity = mockEntity.copy(favoriteTweet = favoriteTweet.copy(id = id)))
@@ -31,7 +36,7 @@ data class MockTransferFavoriteTweet(override val mockEntity: MockFavoriteTweet)
             put(FavoriteTweetsSQLiteHelper.COLUMN_CLIENT_SOURCE, tweet.source)
             put(FavoriteTweetsSQLiteHelper.COLUMN_CONVERSATION, tweet.isReply)
             put(FavoriteTweetsSQLiteHelper.COLUMN_ANIMATED_GIF, tweet.gifUrl)
-            put(FavoriteTweetsSQLiteHelper.COLUMN_MEDIA_LENGTH, tweet.mediaLength)
+            put(FavoriteTweetsSQLiteHelper.COLUMN_MEDIA_LENGTH, tweet.mediaLength ?: -1)
         }
     }
 }

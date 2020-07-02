@@ -15,7 +15,7 @@ class FavoriteTweetTransfer(context: Context) : TalonDatabaseCallback(context.ge
         val text = cursor.getString(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_TEXT))
         val tweetId = cursor.getLong(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_TWEET_ID))
         val name = cursor.getString(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_NAME))
-        val profilePic = cursor.getString(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_PIC_URL))
+        val profilePic = cursor.getString(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_PRO_PIC))
         val screenName = cursor.getString(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_SCREEN_NAME))
         val time = cursor.getLong(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_TIME))
         val retweeter = cursor.getString(cursor.getColumnIndex(FavoriteTweetsSQLiteHelper.COLUMN_RETWEETER))

@@ -27,7 +27,7 @@ class ScheduledTweetTransferDatabaseTest {
             "${QueuedSQLiteHelper.COLUMN_ACCOUNT} integer",
             "${QueuedSQLiteHelper.COLUMN_TEXT} text",
             "${QueuedSQLiteHelper.COLUMN_TIME} integer",
-            "${QueuedSQLiteHelper.COLUMN_TYPE}, integer",
+            "${QueuedSQLiteHelper.COLUMN_TYPE} integer",
             "${QueuedSQLiteHelper.COLUMN_ALARM_ID} integer"
     )
 

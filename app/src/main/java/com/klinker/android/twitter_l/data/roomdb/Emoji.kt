@@ -10,28 +10,15 @@ data class Emoji @JvmOverloads constructor(
         val icon: String,
         val count: Long = 0,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
-)
+) : BaseDao.TalonEntity<Emoji> {
+
+    override fun copyWithId(id: Long): Emoji {
+        return this.copy(id = id)
+    }
+}
 
 @Dao
 abstract class EmojiDao : BaseDao<Emoji>() {
-
-    fun insert(entity: Emoji) : Emoji {
-        val id = insertEntity(entity)
-        return entity.copy(id = id)
-    }
-
-
-    fun insert(vararg entities: Emoji) : List<Emoji> {
-        return insertEntities(*entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(entities: List<Emoji>) : List<Emoji> {
-        return insertEntities(entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
 
     fun incrementEmojiCount(emoji: Emoji) : Emoji {
         val updatedEmoji = emoji.copy(count = emoji.count + 1)
@@ -46,10 +33,13 @@ abstract class EmojiDao : BaseDao<Emoji>() {
     abstract fun queryEmojis() : List<Emoji>
 
     fun getAllEmojis() : List<Emoji> {
-        val limit = 60
         val emojis = queryEmojis()
         trimEmojis()
         return emojis
+    }
+
+    fun create(text: String, icon: String) : Emoji {
+        return this.insert(Emoji(text, icon, count = 0))
     }
 
 

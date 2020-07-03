@@ -9,30 +9,23 @@ data class SavedTweet @JvmOverloads constructor(
         @Embedded val tweet: Tweet,
         val account: Int,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
-) {
+) : BaseDao.TalonEntity<SavedTweet> {
     constructor(status: Status, account: Int) : this(Tweet(status), account)
+
+    override fun copyWithId(id: Long): SavedTweet {
+        return this.copy(id = id)
+    }
 }
 
 @Dao
 abstract class SavedTweetDao : BaseDao<SavedTweet>() {
 
-    fun insert(vararg entities: SavedTweet): List<SavedTweet> {
-        return insertEntities(*entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(entities: List<SavedTweet>): List<SavedTweet> {
-        return insertEntities(entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(entity: SavedTweet): SavedTweet {
-        val id = insertEntity(entity)
-        return entity.copy(id = id)
-    }
-
     @Query("SELECT * FROM saved_tweets WHERE account = :account ORDER BY tweet_id ASC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getSavedTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<SavedTweet>
+
+    @Ignore
+    fun create(status: Status, account: Int) : SavedTweet {
+        return this.insert(SavedTweet(status, account))
+    }
+
 }

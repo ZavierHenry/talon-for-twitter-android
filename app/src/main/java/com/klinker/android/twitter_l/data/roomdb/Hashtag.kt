@@ -6,27 +6,15 @@ import androidx.room.*
 data class Hashtag @JvmOverloads constructor(
         val tag: String,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
-)
+) : BaseDao.TalonEntity<Hashtag> {
+
+    override fun copyWithId(id: Long): Hashtag {
+        return this.copy(id = id)
+    }
+}
 
 @Dao
 abstract class HashtagDao : BaseDao<Hashtag>() {
-
-    fun insert(vararg entities: Hashtag): List<Hashtag> {
-        return insertEntities(*entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(entities: List<Hashtag>): List<Hashtag> {
-        return insertEntities(entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(entity: Hashtag): Hashtag {
-        val id = insertEntity(entity)
-        return entity.copy(id = id)
-    }
 
     @Query("SELECT * FROM hashtags WHERE tag LIKE :pattern")
     protected abstract fun queryPattern(pattern: String) : List<Hashtag>

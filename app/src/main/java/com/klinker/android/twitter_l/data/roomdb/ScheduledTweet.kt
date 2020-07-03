@@ -9,27 +9,15 @@ data class ScheduledTweet(
         @ColumnInfo(name = "alarm_id") val alarmId: Long,
         val account: Int,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
-)
+) : BaseDao.TalonEntity<ScheduledTweet> {
+
+    override fun copyWithId(id: Long): ScheduledTweet {
+        return this.copy(id = id)
+    }
+}
 
 @Dao
 abstract class ScheduledTweetDao : BaseDao<ScheduledTweet>() {
-
-    fun insert(entity: ScheduledTweet): ScheduledTweet {
-        val id = insertEntity(entity)
-        return entity.copy(id = id)
-    }
-
-    fun insert(entities: List<ScheduledTweet>): List<ScheduledTweet> {
-        return insertEntities(entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(vararg entities: ScheduledTweet): List<ScheduledTweet> {
-        return insertEntities(*entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
 
     @Query("SELECT * FROM scheduled_tweets WHERE account = :account ORDER BY time DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getScheduledTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<ScheduledTweet>
@@ -39,5 +27,10 @@ abstract class ScheduledTweetDao : BaseDao<ScheduledTweet>() {
 
     @Query("SELECT * FROM scheduled_tweets WHERE time > :currentTime ORDER BY time DESC LIMIT 1")
     abstract fun getNextScheduledTweet(currentTime: Long) : ScheduledTweet?
+
+    @Ignore
+    fun create(text: String, time: Long, alarmId: Long, account: Int) : ScheduledTweet {
+        return this.insert(ScheduledTweet(text, time, alarmId, account))
+    }
 
 }

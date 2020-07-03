@@ -10,35 +10,28 @@ data class FavoriteTweet @JvmOverloads constructor(
         val account: Int,
         @ColumnInfo(name = "is_unread") val isUnread: Boolean = false,
         @PrimaryKey(autoGenerate = true) val id: Long = 0
-) {
+) : BaseDao.TalonEntity<FavoriteTweet> {
     @JvmOverloads
     constructor(status: Status, account: Int, isUnread: Boolean = false) : this(Tweet(status), account, isUnread)
+
+    override fun copyWithId(id: Long): FavoriteTweet {
+        return this.copy(id = id)
+    }
+
 }
 
 @Dao
 abstract class FavoriteTweetDao : BaseDao<FavoriteTweet>() {
-
-    fun insert(entity: FavoriteTweet): FavoriteTweet {
-        val id = insertEntity(entity)
-        return entity.copy(id = id)
-    }
-
-    fun insert(vararg entities: FavoriteTweet): List<FavoriteTweet> {
-        return insertEntities(*entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
-
-    fun insert(entities: List<FavoriteTweet>): List<FavoriteTweet> {
-        return insertEntities(entities).mapIndexed { index, id ->
-            entities[index].copy(id = id)
-        }
-    }
 
     @Query("SELECT * FROM favorite_tweets WHERE account = :account ORDER BY tweet_id DESC LIMIT :pageSize OFFSET ((:page - 1) * :pageSize)")
     abstract fun getFavoriteTweets(account: Int, page: Int = 1, pageSize: Int = 200) : List<FavoriteTweet>
 
     @Query("DELETE FROM favorite_tweets WHERE account = :account AND id NOT IN (SELECT id FROM favorite_tweets WHERE account = :account ORDER BY id DESC LIMIT :size)")
     abstract fun trimDatabase(account: Int, size: Int)
+
+    @Ignore
+    fun create(status: Status, account: Int, isUnread: Boolean = false) : FavoriteTweet {
+        return this.insert(FavoriteTweet(status, account, isUnread))
+    }
 }
 

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.klinker.android.twitter_l.R;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.FollowersDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.HomeDataSource;
 import com.klinker.android.twitter_l.data.sq_lite.MentionsDataSource;
@@ -127,6 +128,11 @@ public class DownloadFragment extends Fragment {
                         mentionsSource.createTweet(status, sharedPrefs.getInt("current_account", 1), false);
                     }
                 }
+
+//                for (twitter4j.Status status: statuses) {
+//                    int account = sharedPrefs.getInt("current_account", 1);
+//                    TalonDatabase.getInstance(activity).mentionDao().create(status, account, false);
+//                }
 
                 // syncs 100 Direct Messages
 //                DMDataSource dmSource = DMDataSource.getInstance(activity);

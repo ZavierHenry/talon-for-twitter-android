@@ -36,4 +36,5 @@ abstract class MentionDao : BaseDao<Mention>() {
         return this.insert(Mention(status, account, isUnread))
     }
 
+
 }

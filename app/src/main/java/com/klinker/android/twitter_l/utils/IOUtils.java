@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.klinker.android.twitter_l.R;
 import com.klinker.android.twitter_l.adapters.TimelinePagerAdapter;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.*;
 import com.klinker.android.twitter_l.settings.AppSettings;
 
@@ -309,6 +310,11 @@ public class IOUtils {
         // The directory is now empty so delete it
         return dir.delete();
     }
+
+//    public static boolean newTrimDatabase(Context context, int account) {
+//        TalonDatabase.getInstance(context).trimTables(context, account);
+//        return true;
+//    }
 
     public static boolean trimDatabase(Context context, int account) {
         try {

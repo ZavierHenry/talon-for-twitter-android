@@ -14,7 +14,13 @@ class EntityValidIdMatcher<T>() : TypeSafeDiagnosingMatcher<T>() where T : MockE
     }
 
     override fun matchesSafely(item: T, mismatchDescription: Description?): Boolean {
-        return item.id != 0L && item.id != -1L
+        if (item.id == 0L || item.id == -1L) {
+            mismatchDescription?.appendText("Item id is ")
+                    ?.appendValue(item.id)
+            return false
+        }
+
+        return true
     }
 
     companion object {

@@ -63,7 +63,7 @@ class FavoriteTweetTransfer(context: Context) : TalonDatabaseCallback(context.ge
             put("is_unread", isUnread == 1)
         }
 
-        newDatabase.insert("favorite_tweets", OnConflictStrategy.ABORT, contentValues)
+        newDatabase.insert("favorite_tweets", OnConflictStrategy.IGNORE, contentValues)
 
     }
 }

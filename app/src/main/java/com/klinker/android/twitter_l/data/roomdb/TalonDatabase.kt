@@ -15,6 +15,7 @@ import com.klinker.android.twitter_l.settings.AppSettings
     Emoji::class,
     FavoriteTweet::class,
     FavoriteUser::class,
+    FavoriteUserNotification::class,
     Follower::class,
     Hashtag::class,
     HomeTweet::class,
@@ -32,6 +33,7 @@ abstract class TalonDatabase : RoomDatabase() {
     abstract fun emojiDao(): EmojiDao
     abstract fun favoriteTweetDao(): FavoriteTweetDao
     abstract fun favoriteUserDao(): FavoriteUserDao
+    abstract fun favoriteUserNotificationDao(): FavoriteUserNotificationDao
     abstract fun followerDao(): FollowerDao
     abstract fun hashtagDao() : HashtagDao
     abstract fun homeTweetDao(): HomeTweetDao

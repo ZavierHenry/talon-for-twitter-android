@@ -38,6 +38,7 @@ import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.klinker.android.twitter_l.R;
+import com.klinker.android.twitter_l.data.roomdb.TalonDatabase;
 import com.klinker.android.twitter_l.data.sq_lite.*;
 import com.klinker.android.twitter_l.receivers.MarkMentionReadReceiver;
 import com.klinker.android.twitter_l.receivers.NotificationDeleteReceiverOne;
@@ -711,7 +712,9 @@ public class NotificationUtils {
             FavoriteUserNotificationDataSource dataSource = new FavoriteUserNotificationDataSource(context);
             dataSource.open();
             for (NotificationIdentifier notification : tweets) {
+                //Long tweetId = Long.parseLong(notification.tweetId);
                 try {
+                    //if (!TalonDatabase.getInstance(context).favoriteUserNotificationDao().hasShownNotification(tweetId)) {
                     if (!dataSource.hasShownNotification(Long.parseLong(notification.tweetId))) {
                         if (!Utils.isAndroidN() && notifiedCount == 0 && settings.sound) {
                             try {
@@ -723,6 +726,7 @@ public class NotificationUtils {
 
                         notificationManager.notify(notification.notificationId, notification.notification);
                         dataSource.storeShowedNotification(Long.parseLong(notification.tweetId));
+                        //TalonDatabase.getInstance(context).favoriteUserNotificationDao().create(Long.parseLong(notification.tweetId));
 
                         notifiedCount++;
                     }

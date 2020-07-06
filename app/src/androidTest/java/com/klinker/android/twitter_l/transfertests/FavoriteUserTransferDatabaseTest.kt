@@ -57,9 +57,6 @@ class FavoriteUserTransferDatabaseTest {
         val expected = mockFavoriteUser.copyId(favoriteUser.id).mockEntity
         assertThat("Entities are different", expected, matchesMockEntity(favoriteUser))
 
-
-
-
     }
 
 }

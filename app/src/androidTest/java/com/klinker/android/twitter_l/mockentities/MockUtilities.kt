@@ -108,7 +108,7 @@ class MockUtilities {
                 screenName: String = "chrislhayes",
                 name: String? = "Chris Hayes",
                 profilePic: String? = "Image_Avatar.jpg",
-                userId: Long? = 43298L
+                userId: Long? = 43L
         ) : User {
             return User(screenName, name, profilePic, userId)
         }
@@ -124,8 +124,8 @@ class MockUtilities {
                 urls: List<String> = List(0) { "" },
                 likes: Int? = null,
                 retweets: Int? = null,
-                liked: Boolean? = false,
-                retweeted: Boolean? = false,
+                liked: Boolean? = null,
+                retweeted: Boolean? = null,
                 source: String? = null,
                 retweeter: User? = null,
                 isReply: Boolean = false,

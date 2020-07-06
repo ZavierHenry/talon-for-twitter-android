@@ -39,10 +39,6 @@ data class MockTransferMention(override val mockEntity: MockMention) : MockTrans
             put(MentionsSQLiteHelper.COLUMN_CONVERSATION, tweet.isReply)
             put(MentionsSQLiteHelper.COLUMN_ANIMATED_GIF, tweet.gifUrl ?: "")
             put(MentionsSQLiteHelper.COLUMN_MEDIA_LENGTH, tweet.mediaLength ?: -1)
-
-            if (id != -1L) {
-                put(MentionsSQLiteHelper.COLUMN_ID, id)
-            }
         }
     }
 }

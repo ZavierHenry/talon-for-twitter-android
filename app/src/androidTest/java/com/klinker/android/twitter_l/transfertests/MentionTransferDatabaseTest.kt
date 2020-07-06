@@ -6,6 +6,13 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.Mention
 import com.klinker.android.twitter_l.data.roomdb.transfers.MentionTransfer
 import com.klinker.android.twitter_l.data.sq_lite.MentionsSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockMention
+import com.klinker.android.twitter_l.mockentities.MockUtilities
+import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferMention
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +39,9 @@ class MentionTransferDatabaseTest  {
             "${MentionsSQLiteHelper.COLUMN_RETWEETER} text",
             "${MentionsSQLiteHelper.COLUMN_ANIMATED_GIF} text",
             "${MentionsSQLiteHelper.COLUMN_EXTRA_TWO} text",
-            "${MentionsSQLiteHelper.COLUMN_EXTRA_THREE} text"
+            "${MentionsSQLiteHelper.COLUMN_EXTRA_THREE} text",
+            "${MentionsSQLiteHelper.COLUMN_CONVERSATION} integer default 0",
+            "${MentionsSQLiteHelper.COLUMN_MEDIA_LENGTH} integer default -1"
     )
 
     @get:Rule val database = with(ApplicationProvider.getApplicationContext<Context>()) {
@@ -48,7 +57,22 @@ class MentionTransferDatabaseTest  {
     @Test
     @Throws(Exception::class)
     fun basicMentionTransfer() {
-        TODO("Not implemented as of yet")
+        val mockMention = MockTransferMention(1, tweet = MockUtilities.makeMockTweet(author = MockUtilities.makeMockUser(userId = null)))
+
+        val oldId = database.insertIntoSQLiteDatabase(mockMention)
+        assertThat("Failed insertion into database", oldId, not(equalTo(-1L)))
+        assertThat("Failed insertion into source SQLite database", database.sourceSize, equalTo(1))
+
+        database.buildDestinationDatabase()
+
+        assertThat("Entity did not transfer into the new database", database.destSize, equalTo(1))
+        val mention = database.queryFromTalonDatabase("SELECT * FROM mentions LIMIT 1")!!.use { cursor ->
+            cursor.moveToFirst()
+            MockMention(cursor)
+        }
+
+        val expected = mockMention.copyId(mention.id).mockEntity
+        assertThat("Entities are different", mention, matchesMockEntity(expected))
     }
 
 }

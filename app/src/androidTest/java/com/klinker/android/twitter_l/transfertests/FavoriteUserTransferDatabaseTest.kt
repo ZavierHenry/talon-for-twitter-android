@@ -5,6 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.data.roomdb.transfers.FavoriteUserTransfer
 import com.klinker.android.twitter_l.data.sq_lite.FavoriteUsersSQLiteHelper
+import com.klinker.android.twitter_l.mockentities.MockFavoriteUser
+import com.klinker.android.twitter_l.mockentities.matchers.MockEntityMatcher.Companion.matchesMockEntity
+import com.klinker.android.twitter_l.mockentities.transferentities.MockTransferFavoriteUser
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +40,26 @@ class FavoriteUserTransferDatabaseTest {
     @Test
     @Throws(Exception::class)
     fun basicFavoriteUserTransfer() {
-        TODO("Not implemented as of yet")
+        val mockFavoriteUser = MockTransferFavoriteUser(1)
+
+        val oldId = database.insertIntoSQLiteDatabase(mockFavoriteUser)
+        assertThat("Failed insertion into database", oldId, not(equalTo(-1L)))
+        assertThat("Failed insertion into source SQLite database", database.sourceSize, equalTo(1))
+
+        database.buildDestinationDatabase()
+
+        assertThat("Entity did not transfer into the new database", database.destSize, equalTo(1))
+        val favoriteUser = database.queryFromTalonDatabase("SELECT * FROM favorite_users LIMIT 1")!!.use { cursor ->
+            cursor.moveToFirst()
+            MockFavoriteUser(cursor)
+        }
+
+        val expected = mockFavoriteUser.copyId(favoriteUser.id).mockEntity
+        assertThat("Entities are different", expected, matchesMockEntity(favoriteUser))
+
+
+
+
     }
 
 }

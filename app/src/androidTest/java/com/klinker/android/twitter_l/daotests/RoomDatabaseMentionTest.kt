@@ -4,6 +4,7 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.klinker.android.twitter_l.mockentities.MockMention
 import com.klinker.android.twitter_l.data.roomdb.MentionDao
+import com.klinker.android.twitter_l.mockentities.matchers.EntityValidIdMatcher.Companion.hasValidId
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Before
@@ -28,7 +29,7 @@ class RoomDatabaseMentionTest {
     @Throws(Exception::class)
     fun testInsertMention() {
         val mention = mentionDao.insert(MockMention(1).mention)
-        assertThat("Invalid id", MockMention(mention), notNullValue())
+        assertThat("Invalid id", MockMention(mention), hasValidId())
         assertThat("Incorrect number of entries in database", database.size, equalTo(1))
     }
 

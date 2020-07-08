@@ -60,7 +60,7 @@ abstract class TalonDatabase : RoomDatabase() {
             }
         }
 
-        mentionDao().trimDatabase(account, settings.mentionsSize)
+        mentionDao().trimTable(account, settings.mentionsSize)
         directMessageDao().trimDatabase(account, settings.dmSize)
         hashtagDao().trimDatabase(500)
         //trim activity table

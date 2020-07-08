@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.roomdb.ListStringConverter
 import java.io.File
+import java.util.*
 
 abstract class TalonDatabaseCallback(private val oldDatabaseFile: File, private val tableName: String, private val primaryKey: String? = null) : RoomDatabase.Callback() {
 
@@ -27,6 +28,10 @@ abstract class TalonDatabaseCallback(private val oldDatabaseFile: File, private 
 
     fun reserializeListString(list: String, oldDelimiter: String) : String {
         return list.split(oldDelimiter).let { ListStringConverter().fromListString(it) }
+    }
+
+    fun unserializeMutedList(list: String?, oldDelimiter: String) : List<String> {
+        return list?.split(oldDelimiter)?.map { it.toLowerCase(Locale.getDefault()) } ?: emptyList()
     }
 
 }

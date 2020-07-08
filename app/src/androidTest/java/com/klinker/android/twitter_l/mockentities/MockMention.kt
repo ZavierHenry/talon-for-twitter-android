@@ -11,13 +11,14 @@ data class MockMention(val mention: Mention) : MockEntity {
     override val id: Long
         get() = mention.id
 
-    constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long = 0) :
-            this(Mention(tweet, account, isUnread, id))
+    constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), isMuted: Boolean = false, id: Long = 0) :
+            this(Mention(tweet, account, isUnread, isMuted, id))
 
     constructor(cursor: Cursor) : this(
             cursor.getInt(cursor.getColumnIndex("account")),
             cursor.getInt(cursor.getColumnIndex("is_unread")) == 1,
             MockUtilities.cursorToTweet(cursor),
+            cursor.getInt(cursor.getColumnIndex("is_muted")) == 1,
             cursor.getLong(cursor.getColumnIndex("id"))
     )
 

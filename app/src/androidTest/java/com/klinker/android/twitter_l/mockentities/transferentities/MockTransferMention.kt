@@ -10,8 +10,8 @@ data class MockTransferMention(override val mockEntity: MockMention) : MockTrans
 
     private val mention = mockEntity.mention
 
-    constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), id: Long = 0) :
-            this(MockMention(account, isUnread, tweet, id))
+    constructor(account: Int, isUnread: Boolean = true, tweet: Tweet = MockUtilities.makeMockTweet(), isMuted: Boolean = false, id: Long = 0) :
+            this(MockMention(account, isUnread, tweet, isUnread, id))
 
     override fun copyId(id: Long): MockTransferEntity<MockMention> {
         return this.copy(mockEntity = mockEntity.copy(mention = mention.copy(id = id)))

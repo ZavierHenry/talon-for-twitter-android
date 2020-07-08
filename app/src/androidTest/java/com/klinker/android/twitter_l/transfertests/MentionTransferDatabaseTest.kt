@@ -3,6 +3,7 @@ package com.klinker.android.twitter_l.transfertests
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import androidx.test.platform.app.InstrumentationRegistry
 import com.klinker.android.twitter_l.data.roomdb.Mention
 import com.klinker.android.twitter_l.data.roomdb.transfers.MentionTransfer
 import com.klinker.android.twitter_l.data.sq_lite.MentionsSQLiteHelper
@@ -44,7 +45,7 @@ class MentionTransferDatabaseTest  {
             "${MentionsSQLiteHelper.COLUMN_MEDIA_LENGTH} integer default -1"
     )
 
-    @get:Rule val database = with(ApplicationProvider.getApplicationContext<Context>()) {
+    @get:Rule val database = with(InstrumentationRegistry.getInstrumentation().context) {
         TestTransferDatabase(
                 MentionsSQLiteHelper.TABLE_MENTIONS,
                 "mentions",

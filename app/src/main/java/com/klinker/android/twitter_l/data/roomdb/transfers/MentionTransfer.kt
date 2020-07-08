@@ -7,8 +7,10 @@ import androidx.room.OnConflictStrategy
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.klinker.android.twitter_l.data.roomdb.Mention
 import com.klinker.android.twitter_l.data.sq_lite.MentionsSQLiteHelper
+import com.klinker.android.twitter_l.settings.AppSettings
+import java.util.*
 
-class MentionTransfer(context: Context) : TalonDatabaseCallback(context.getDatabasePath("mentions.db"), MentionsSQLiteHelper.TABLE_MENTIONS, MentionsSQLiteHelper.COLUMN_ID) {
+class MentionTransfer(val context: Context) : TalonDatabaseCallback(context.getDatabasePath("mentions.db"), MentionsSQLiteHelper.TABLE_MENTIONS, MentionsSQLiteHelper.COLUMN_ID) {
     override fun onEachTableRow(cursor: Cursor, newDatabase: SupportSQLiteDatabase) {
         val account = cursor.getInt(cursor.getColumnIndex(MentionsSQLiteHelper.COLUMN_ACCOUNT))
         val text = cursor.getString(cursor.getColumnIndex(MentionsSQLiteHelper.COLUMN_TEXT))
@@ -27,6 +29,15 @@ class MentionTransfer(context: Context) : TalonDatabaseCallback(context.getDatab
 
         val gifUrl = cursor.getString(cursor.getColumnIndex(MentionsSQLiteHelper.COLUMN_ANIMATED_GIF))
         val mediaLength = cursor.getLong(cursor.getColumnIndex(MentionsSQLiteHelper.COLUMN_MEDIA_LENGTH))
+
+        val sharedPreferences = AppSettings.getSharedPreferences(context)
+        val mutedUsers = unserializeMutedList(sharedPreferences.getString("muted_users", ""), " ")
+        val mutedHashtags = unserializeMutedList(sharedPreferences.getString("muted_hashtags", ""), " ")
+        val mutedExpressions = unserializeMutedList(sharedPreferences.getString("muted_regex", ""), "   ")
+
+        val isMuted = mutedUsers.contains(screenName.toLowerCase(Locale.getDefault()))
+                || mutedHashtags.any { hashtags.contains(it, ignoreCase = true) }
+                || mutedExpressions.any { text.contains(it, ignoreCase = true) }
 
         val contentValues = ContentValues().apply {
             put("account", account)
@@ -57,10 +68,10 @@ class MentionTransfer(context: Context) : TalonDatabaseCallback(context.getDatab
                 put("media_length", mediaLength)
             }
 
+            put("is_muted", isMuted)
         }
 
         newDatabase.insert("mentions", OnConflictStrategy.ABORT, contentValues)
-
 
     }
 }
